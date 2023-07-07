@@ -95,20 +95,23 @@ class Tiles(pygame.sprite.Sprite):
 		self.dtheta = 0
 		self.dx = -1
 
+		self.height=0
+		self.width=0
+
 		if self.type == 1:
-			width = 50
-			height = 20
+			self.width = 50
+			self.height = 20
 		elif self.type == 2:
-			width = 20
-			height = 50
+			self.width = 20
+			self.height = 50
 		elif self.type == 3:
-			width = 50
-			height = 20
+			self.width = 50
+			self.height = 20
 			self.dtheta = 2
 
 
-		self.image = pygame.Surface((width, height), pygame.SRCALPHA)
-		pygame.draw.rect(self.image, (255, 255, 255), (0, 0, width, height), border_radius=8)
+		self.image = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
+		pygame.draw.rect(self.image, (255, 255, 255), (0, 0,self.width, self.height), border_radius=8)
 		self.rect = self.image.get_rect(center=(self.x, self.y))
 
 	def rotate(self):

@@ -33,6 +33,10 @@ class Game:
 
 	def __init__(self):
 
+
+
+
+
 		pygame.init()
 
 		self.info = pygame.display.Info()
@@ -65,7 +69,7 @@ class Game:
 		self.score = 0
 		self.highscore = 0
 		self.sound_on = True
-		self.easy_level = False
+		self.easy_level = True
 
 		self.home_page = True
 		self.game_page = False
@@ -141,99 +145,106 @@ class Game:
 		self.tile_delta = 2000
 
 
+		self.coin = Coins(0, self.win)
+		self.t = Tiles(0, 0, self.win)
 
 	def run(self):
 
 		while self.running:
+			self.update()
+			self.render()
 
-			for event in pygame.event.get():
-				if event.type == pygame.QUIT:
+
+
+	def update(self):
+
+		for event in pygame.event.get():
+			if event.type == pygame.QUIT:
+				self.running = False
+
+			if event.type == pygame.KEYDOWN:
+				if event.key == pygame.K_ESCAPE or \
+						event.key == pygame.K_q:
 					self.running = False
 
-				if event.type == pygame.KEYDOWN:
-					if event.key == pygame.K_ESCAPE or \
-						event.key == pygame.K_q:
-						self.running = False
-
-				if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE and self.game_page:
-					if not self.clicked:
-						self.clicked = True
-						for self.ball in self.ball_group:
-							self.ball.dtheta *= -1
-							self.flip_fx.play()
-
-						self.num_clicks += 1
-						if self.num_clicks % 5 == 0:
-							self.color_index += 1
-							if self.color_index > len(self.color_list) - 1:
-								self.color_index = 0
-
-							self.color = self.color_list[self.color_index]
-
-				if event.type == pygame.KEYUP and event.key == pygame.K_SPACE and self.game_page:
-					self.clicked = False
-
-			if self.game_page:
-
-				if self.player_alive:
-
+			if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE and self.game_page:
+				if not self.clicked:
+					self.clicked = True
 					for self.ball in self.ball_group:
-						if pygame.sprite.spritecollide(self.ball, self.coin_group, True):
-							self.score_fx.play()
-							self.score += 1
-							Balls.update_score(self, self.score)
-							if self.highscore <= self.score:
-									self.highscore = self.score
-									Balls.update_highscore(self, self.highscore)
+						self.ball.dtheta *= -1
+						self.flip_fx.play()
+
+					self.num_clicks += 1
+					if self.num_clicks % 5 == 0:
+						self.color_index += 1
+						if self.color_index > len(self.color_list) - 1:
+							self.color_index = 0
+
+						self.color = self.color_list[self.color_index]
+
+			if event.type == pygame.KEYUP and event.key == pygame.K_SPACE and self.game_page:
+				self.clicked = False
+
+		if self.game_page:
+
+			if self.player_alive:
+
+				for self.ball in self.ball_group:
+					if pygame.sprite.spritecollide(self.ball, self.coin_group, True):
+						self.score_fx.play()
+						self.score += 1
+						Balls.update_score(self, self.score)
+						if self.highscore <= self.score:
+							self.highscore = self.score
+							Balls.update_highscore(self, self.highscore)
+
+						x, self.y = self.ball.rect.center
+						for i in range(10):
+							particle = Particle(x, self.y, self.color, self.win)
+							self.particle_group.add(particle)
+
+					if pygame.sprite.spritecollide(self.ball, self.tile_group, True):
+						x, y = self.ball.rect.center
+						for i in range(30):
+							particle = Particle(x, y, self.color, self.win)
+							self.particle_group.add(particle)
+
+						self.player_alive = False
+						self.dead_fx.play()
+
+				self.current_time = pygame.time.get_ticks()
+				self.delta = self.current_time - self.start_time
+				if self.coin_delta < self.delta < self.coin_delta + 100 and self.new_coin:
+					self.y = random.randint(self.CENTER[1] - self.RADIUS, self.CENTER[1] + self.RADIUS)
+					self.coin = Coins(self.y, self.win)
+					self.coin_group.add(self.coin)
+					self.new_coin = False
+
+				if self.current_time - self.start_time >= self.tile_delta:
+					self.y = random.choice([self.CENTER[1] - 80, self.CENTER[1], self.CENTER[1] + 80])
+					self.type_ = random.randint(1, 3)
+					self.t = Tiles(self.y, self.type_, self.win)
+					self.tile_group.add(self.t)
+
+					self.start_time = self.current_time
+					self.new_coin = True
+
+		if not self.player_alive and len(self.particle_group) == 0:
+			# self.score_page = True
+			self.game_page = False
+			print("test")
+			#self.score_page_fx.play()
+
+			self.ball_group.empty()
+			self.tile_group.empty()
+			self.coin_group.empty()
+
+			self.end_game()
+
+		#self.check_end()
 
 
-							x, self.y = self.ball.rect.center
-							for i in range(10):
-								particle = Particle(x, self.y, self.color, self.win)
-								self.particle_group.add(particle)
 
-						if pygame.sprite.spritecollide(self.ball, self.tile_group, True):
-							x, y = self.ball.rect.center
-							for i in range(30):
-								particle = Particle(x, y, self.color, self.win)
-								self.particle_group.add(particle)
-
-							self.player_alive = False
-							self.dead_fx.play()
-
-					self.current_time = pygame.time.get_ticks()
-					self.delta = self.current_time- self.start_time
-					if  self.coin_delta < self.delta < self.coin_delta + 100 and self.new_coin:
-						self.y = random.randint(self.CENTER[1]-self.RADIUS, self.CENTER[1]+self.RADIUS)
-						self.coin = Coins(self.y, self.win)
-						self.coin_group.add(self.coin)
-						self.new_coin = False
-
-					if self.current_time- self.start_time >= self.tile_delta:
-						self.y = random.choice([self.CENTER[1]-80, self.CENTER[1], self.CENTER[1]+80])
-						self.type_ = random.randint(1,3)
-						self.t = Tiles(self.y, self.type_, self.win)
-						self.tile_group.add(self.t)
-
-						self.start_time = self.current_time
-						self.new_coin = True
-
-			if not self.player_alive and len(self.particle_group) == 0:
-				#self.score_page = True
-				self.game_page = False
-
-				self.score_page_fx.play()
-
-				self.ball_group.empty()
-				self.tile_group.empty()
-				self.coin_group.empty()
-
-				self.end_game()
-
-
-			self.check_end()
-
-			self.render()
 
 
 	def render(self):
@@ -243,17 +254,7 @@ class Game:
 		#if self.home_page:
 		#self.connected.update()
 
-
-
-
-
-
-
-
-
-
 		self.game_page = True
-
 
 		#if self.score_page:
 			#self.game_msg.update()
@@ -308,6 +309,7 @@ class Game:
 			self.reset()
 
 	def end_game(self):
+		print("true")
 		self.terminated = True
 
 	def reset(self):

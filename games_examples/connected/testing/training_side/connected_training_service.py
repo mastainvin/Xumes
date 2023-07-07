@@ -24,37 +24,46 @@ class ConnectedTrainingService(StableBaselinesTrainer):
                          total_timesteps, algorithm_type, algorithm, random_reset_rate)
 
         self.score = 0
-        self.actions = ["nothing"]
+
 
     def convert_obs(self):
+
         return {
-            'ball_pos': np.array([self.balls.pos_list]),
-            'score': np.array([self.balls.score]),
-            'highscore': np.array([self.balls.highscore]),
-            'coins_x': np.array([self.coins.x]),
-            'coins_y': np.array([self.coins.y]),
-            'tiles_x': np.array([self.tiles.x]),
-            'tiles_y': np.array([self.tiles.y]),
-            'tiles_type': np.array([self.tiles.type]),
-            'particle_x': np.array([self.particle.x]),
-            'particle_y': np.array([self.particle.y])
+            'ball_x': np.array([self.game.ball.rect.x]),
+            'ball_y': np.array([self.game.ball.rect.y]),
+            'score': np.array([self.game.ball.score]),
+            'highscore': np.array([self.game.ball.highscore]),
+            'coins_x': np.array([self.game.coin.x]),
+            'coins_y': np.array([self.game.coin.y]),
+            'tiles_x': np.array([self.game.t.x]),
+            'tiles_y': np.array([self.game.t.y]),
+            'tiles_type': np.array([self.game.t.type]),
         }
 
     def convert_reward(self) -> float:
         reward = 0
 
-        if self.balls.pos_list < self.game.HEIGHT - 20:
-            reward += 0.2
-        if self.balls.score > self.score:
-            reward += 5
-            self.score = self.balls.score
-        if self.balls.score >= self.balls.highscore:
-            reward += 10
-        if self.game.terminated:
-            reward -= 5
+        #il gagne un coin -> 1 si il perds -1 0
 
-        if self.tiles.y < self.balls.pos_list:
-            reward += 10
+        if self.game.ball.score > self.score :
+            self.score = self.game.ball.score
+            reward += 1
+
+        if self.game.terminated:
+                return -1
+        return 0
+
+
+        #if self.game.ball.rect.x < self.game.t.x:
+            #reward += 10
+        #if self.game.ball.score > self.score:
+            #reward += 5
+            #self.score = self.game.ball.score
+        #if self.game.ball.score >= self.game.ball.highscore:
+            #reward += 10
+        #if self.game.terminated:
+            #reward -= 5
+
 
         return reward
 
@@ -62,39 +71,38 @@ class ConnectedTrainingService(StableBaselinesTrainer):
         return self.game.terminated
 
     def convert_actions(self, raws_actions) -> List[str]:
-        position = ["nothing", "space"]
-        self.actions = [position[raws_actions[1]]]
-        return self.actions
+        if raws_actions == 1:
+            return ["space"]
+        return ["nothing"]
 
 if __name__ == "__main__":
 
     if len(sys.argv) > 1:
         if sys.argv[1] == "-train":
-            logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
+            logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
         elif sys.argv[1] == "-play":
             logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
 
     dct = {
-        'ball_pos': spaces.Box(-1, 1, dtype=np.float32, shape=(1,)),
+
+        'ball_x':spaces.Box(-1, 1, dtype=np.float32, shape=(1,)),
+        'ball_y': spaces.Box(-1, 1, dtype=np.float32, shape=(1,)),
         'score': spaces.Box(-1, 1, dtype=np.float32, shape=(1,)),
         'highscore': spaces.Box(-1, 1, dtype=np.float32, shape=(1,)),
         'coins_x': spaces.Box(-1, 1, dtype=np.float32, shape=(1,)),
         'coins_y': spaces.Box(-1, 1, dtype=np.float32, shape=(1,)),
         'tiles_x': spaces.Box(-1, 1, dtype=np.float32, shape=(1,)),
         'tiles_y': spaces.Box(-1, 1, dtype=np.float32, shape=(1,)),
-        'tiles_type': spaces.Box(-1, 1, dtype=np.float32, shape=(1,)),
-        'particle_x': spaces.Box(-1, 1, dtype=np.float32, shape=(1,)),
-        'particle_y': spaces.Box(-1, 1, dtype=np.float32, shape=(1,))
-
+        'tiles_type': spaces.Box(-1, 1, dtype=np.float32, shape=(1,))
     }
 
     training_service = ConnectedTrainingService(
         entity_manager=AutoEntityManager(JsonGameElementStateConverter()),
         communication_service=CommunicationServiceTrainingMq(),
         observation_space=spaces.Dict(dct),
-        action_space=spaces.MultiDiscrete([3, 3]),
+        action_space=spaces.Discrete(2),
         max_episode_length=2000,
-        total_timesteps=200000,
+        total_timesteps=100000,
         algorithm_type="MultiInputPolicy",
         algorithm=stable_baselines3.PPO,
         random_reset_rate=0.0
