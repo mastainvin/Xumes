@@ -5,6 +5,7 @@ import math
 SCREEN = WIDTH, HEIGHT = 288, 512
 CENTER = WIDTH //2, HEIGHT // 2
 
+
 pygame.font.init()
 pygame.mixer.init()
 
@@ -17,6 +18,8 @@ class Balls(pygame.sprite.Sprite):
 		self.initial_angle = angle
 		self.win = win
 		self.reset()
+		self.score = 0
+		self.highscore = 0
 
 		self.rect = pygame.draw.circle(self.win, (25, 25, 25), (self.x,self.y), 6)
 
@@ -41,6 +44,12 @@ class Balls(pygame.sprite.Sprite):
 			else:
 				radius = 2
 			pygame.draw.circle(self.win, color, pos, radius)
+
+	def update_score(self, score):
+		self.score = score
+
+	def update_highscore(self, highscore):
+		self.highscore = highscore
 
 	def reset(self):
 		self.x, self.y = self.initial_pos
