@@ -1,0 +1,35 @@
+[project]
+name="xumes"
+version="0.0.21"
+authors = [
+  { name="Vincent Mastain", email="vincentmastain@gmail.com" },
+]
+description = "A game test tool."
+readme = "README.rst"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+   "gymnasium>=0.28.1",
+    "pygame>=2.4.0",
+    "numpy>=1.23.5",
+    "pyzmq>=25.1.0",
+    "flask>=2.3.2",
+    "sb3_contrib>=2.0.0a1",
+    "stable_baselines3>=2.0.0a1",
+    "requests>=2.30.0",
+    "mkdocs>=1.4.3"
+]
+
+
+[build-system]
+requires = ["flit_core >=3.2,<4"]
+build-backend = "flit_core.buildapi"
+[tool.setuptools]
+py-modules = []
+[project.urls]
+"Homepage" = "https://github.com/mastainvin/Xumes"
+"Bug Tracker" = "https://github.com/mastainvin/Xumes/issues"

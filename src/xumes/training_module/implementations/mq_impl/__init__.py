@@ -1,0 +1,1 @@
+from xumes.training_module.implementations.mq_impl.communication_service_training_mq import CommunicationServiceTrainingMq

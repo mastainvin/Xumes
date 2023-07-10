@@ -1,0 +1,13 @@
+site_name: Xumes
+theme: readthedocs
+
+nav:
+  - Home: 'index.md'
+  - "What's Xumes?": 'description.md'
+  - Installation: 'usage.md'
+  - "Impl. default observables":
+      - "Game side": './implement_without_observables/game_side_without_observables.md'
+      - "Training side": './implement_without_observables/training_side_without_observables.md'
+  - Impl. your observables:
+      - "Game side": './implement_with_observables/game_side_with_observables.md'
+      - "Training side": './implement_with_observables/training_side_with_observables.md'
