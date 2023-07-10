@@ -31,8 +31,6 @@ class ConnectedTrainingService(StableBaselinesTrainer):
         return {
             'ball_x': np.array([self.game.ball.rect.x]),
             'ball_y': np.array([self.game.ball.rect.y]),
-            'score': np.array([self.game.ball.score]),
-            'highscore': np.array([self.game.ball.highscore]),
             'coins_x': np.array([self.game.coin.x]),
             'coins_y': np.array([self.game.coin.y]),
             'tiles_x': np.array([self.game.t.x]),
@@ -50,7 +48,7 @@ class ConnectedTrainingService(StableBaselinesTrainer):
             reward += 1
 
         if self.game.terminated:
-                return -1
+            return -1
         return 0
 
 
@@ -87,8 +85,6 @@ if __name__ == "__main__":
 
         'ball_x':spaces.Box(-1, 1, dtype=np.float32, shape=(1,)),
         'ball_y': spaces.Box(-1, 1, dtype=np.float32, shape=(1,)),
-        'score': spaces.Box(-1, 1, dtype=np.float32, shape=(1,)),
-        'highscore': spaces.Box(-1, 1, dtype=np.float32, shape=(1,)),
         'coins_x': spaces.Box(-1, 1, dtype=np.float32, shape=(1,)),
         'coins_y': spaces.Box(-1, 1, dtype=np.float32, shape=(1,)),
         'tiles_x': spaces.Box(-1, 1, dtype=np.float32, shape=(1,)),
@@ -101,8 +97,8 @@ if __name__ == "__main__":
         communication_service=CommunicationServiceTrainingMq(),
         observation_space=spaces.Dict(dct),
         action_space=spaces.Discrete(2),
-        max_episode_length=2000,
-        total_timesteps=100000,
+        max_episode_length=10000,
+        total_timesteps=300000,
         algorithm_type="MultiInputPolicy",
         algorithm=stable_baselines3.PPO,
         random_reset_rate=0.0

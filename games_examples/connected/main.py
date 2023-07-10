@@ -50,7 +50,7 @@ class Game:
 		pygame.display.set_caption('Connected')
 
 		self.clock = pygame.time.Clock()
-		self.FPS = 90
+		self.FPS = 0
 
 	# COLORS **********************************************************************
 
@@ -229,6 +229,8 @@ class Game:
 					self.start_time = self.current_time
 					self.new_coin = True
 
+
+
 		if not self.player_alive and len(self.particle_group) == 0:
 			# self.score_page = True
 			self.game_page = False
@@ -239,11 +241,19 @@ class Game:
 			self.tile_group.empty()
 			self.coin_group.empty()
 
+
+
 			self.end_game()
 
+
 		#self.check_end()
-
-
+		self.ball_group.update(self.color)
+		self.coin_group.update(self.color)
+		self.tile_group.update()
+		self.score_msg.update(self.score)
+		self.particle_group.update()
+		self.clock.tick(self.FPS)
+		pygame.display.update()
 
 
 
@@ -294,15 +304,11 @@ class Game:
 
 		if self.game_page:
 			pygame.draw.circle(self.win, self.BLACK, self.CENTER, 80, 20)
-			self.ball_group.update(self.color)
-			self.coin_group.update(self.color)
-			self.tile_group.update()
-			self.score_msg.update(self.score)
-			self.particle_group.update()
+
 
 		pygame.draw.rect(self.win, self.BLUE, (0, 0, self.WIDTH, self.HEIGHT), 5, border_radius=10)
-		self.clock.tick(self.FPS)
-		pygame.display.update()
+
+
 
 	def check_end(self):
 		if self.terminated:
@@ -313,6 +319,7 @@ class Game:
 		self.terminated = True
 
 	def reset(self):
+
 		self.ball.reset()
 		#simuler le bouton replay
 		self.game_page = True

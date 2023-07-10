@@ -31,6 +31,8 @@ class ConnectedTestRunner(TestRunner):
             self.test_client.wait()
             self.game.update()
 
+
+
     def run_test_render(self) -> None:
 
         while self.game.running:
@@ -53,9 +55,9 @@ if __name__ == "__main__":
 
     if len(sys.argv) > 1:
         if sys.argv[1] == "-test":
-            logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
+            logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
         if sys.argv[1] == "-render":
-            logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
+            logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
 
         game_service = GameService(test_runner=ConnectedTestRunner(),
                                    event_factory=PygameEventFactory(),
