@@ -39,27 +39,29 @@ class ConnectedTrainingService(StableBaselinesTrainer):
         }
 
     def convert_reward(self) -> float:
-        reward = 0
+        #reward = 0
 
-        #il gagne un coin -> 1 si il perds -1 0
+        #if self.game.ball.score > self.score :
+            #reward += 5
+            #self.score = self.game.ball.score
 
-        if self.game.ball.score > self.score :
-            reward += 5
-            self.score = self.game.ball.score
+        #if self.game.ball.score > self.game.ball.highscore:
+            #reward += 8
 
-        if self.game.ball.score > self.game.ball.highscore:
-            reward += 8
+        #if self.game.terminated:
+            #reward -= 10
+
+        #return reward
 
         if self.game.terminated:
-            reward -= 10
+            self.score = 0
+            return -1
 
-
-
-        #if self.game.ball.rect.x < self.game.t.x:
-            #reward += 5
-
-
-        return reward
+        if self.game.ball.score > self.score:
+            self.score = self.game.ball.score
+            return 1
+        else:
+            return 0.1
 
     def convert_terminated(self) -> bool:
         if self.game.terminated:
