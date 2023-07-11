@@ -44,23 +44,17 @@ class ConnectedTrainingService(StableBaselinesTrainer):
         #il gagne un coin -> 1 si il perds -1 0
 
         if self.game.ball.score > self.score :
+            reward += 5
             self.score = self.game.ball.score
-            reward += 1
+
+        if self.game.ball.score >= self.game.ball.highscore:
+            reward += 10
 
         if self.game.terminated:
-            return -1
-        return 0
-
+            reward -= 1
 
         #if self.game.ball.rect.x < self.game.t.x:
-            #reward += 10
-        #if self.game.ball.score > self.score:
             #reward += 5
-            #self.score = self.game.ball.score
-        #if self.game.ball.score >= self.game.ball.highscore:
-            #reward += 10
-        #if self.game.terminated:
-            #reward -= 5
 
 
         return reward
@@ -77,7 +71,7 @@ if __name__ == "__main__":
 
     if len(sys.argv) > 1:
         if sys.argv[1] == "-train":
-            logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
+            logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
         elif sys.argv[1] == "-play":
             logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
 
@@ -98,7 +92,7 @@ if __name__ == "__main__":
         observation_space=spaces.Dict(dct),
         action_space=spaces.Discrete(2),
         max_episode_length=10000,
-        total_timesteps=300000,
+        total_timesteps=100000,
         algorithm_type="MultiInputPolicy",
         algorithm=stable_baselines3.PPO,
         random_reset_rate=0.0
@@ -109,7 +103,7 @@ if __name__ == "__main__":
             training_service.train(save_path="./models", log_path="./logs", test_name="test")
             training_service.save("./models/model")
         elif sys.argv[1] == "-play":
-            training_service.load("./models/best_model.zip")
+            training_service.load("./models/m3_400k.zip")
             training_service.play(100000)
 
 
