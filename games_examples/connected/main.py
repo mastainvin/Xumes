@@ -78,23 +78,28 @@ class Game:
 
 	# SOUNDS **********************************************************************
 
-		self.flip_fx = pygame.mixer.Sound('C:/Users/amyli/OneDrive/Bureau/4A/Canada/Stage/Xumes/games_examples/connected/Sounds/flip.mp3')
-		self.score_fx = pygame.mixer.Sound('C:/Users/amyli/OneDrive/Bureau/4A/Canada/Stage/Xumes/games_examples/connected/Sounds/point.mp3')
-		self.dead_fx = pygame.mixer.Sound('C:/Users/amyli/OneDrive/Bureau/4A/Canada/Stage/Xumes/games_examples/connected/Sounds/dead.mp3')
-		self.score_page_fx = pygame.mixer.Sound('C:/Users/amyli/OneDrive/Bureau/4A/Canada/Stage/Xumes/games_examples/connected/Sounds/score_page.mp3')
+		import os
 
-		pygame.mixer.music.load('C:/Users/amyli/OneDrive/Bureau/4A/Canada/Stage/Xumes/games_examples/connected/Sounds/bgm.mp3')
-		pygame.mixer.music.play(loops=-1)
-		pygame.mixer.music.set_volume(0.5)
+		current_directory = os.path.dirname(__file__)
+		sounds_directory = os.path.abspath(os.path.join(current_directory, '..', 'connected/Sounds'))
+
+		self.flip_fx = pygame.mixer.Sound(os.path.join(sounds_directory, 'flip.mp3'))
+		self.score_fx = pygame.mixer.Sound(os.path.join(sounds_directory, 'point.mp3'))
+		self.dead_fx = pygame.mixer.Sound(os.path.join(sounds_directory, 'dead.mp3'))
+		self.score_page_fx = pygame.mixer.Sound(os.path.join(sounds_directory, 'score_page.mp3'))
+
 
 
 	# FONTS ***********************************************************************
 
-		self.title_font = "C:/Users/amyli/OneDrive/Bureau/4A/Canada/Stage/Xumes/games_examples/connected/Fonts/Aladin-Regular.ttf"
-		self.score_font = "C:/Users/amyli/OneDrive/Bureau/4A/Canada/Stage/Xumes/games_examples/connected/Fonts/DroneflyRegular-K78LA.ttf"
-		self.game_over_font = "C:/Users/amyli/OneDrive/Bureau/4A/Canada/Stage/Xumes/games_examples/connected/Fonts/ghostclan.ttf"
-		self.final_score_font = "C:/Users/amyli/OneDrive/Bureau/4A/Canada/Stage/Xumes/games_examples/connected/Fonts/DalelandsUncialBold-82zA.ttf"
-		self.new_high_font = "C:/Users/amyli/OneDrive/Bureau/4A/Canada/Stage/Xumes/games_examples/connected/Fonts/BubblegumSans-Regular.ttf"
+
+		fonts_directory = os.path.join(current_directory, 'Fonts')
+
+		self.title_font = os.path.join(fonts_directory, 'Aladin-Regular.ttf')
+		self.score_font = os.path.join(fonts_directory, 'DroneflyRegular-K78LA.ttf')
+		self.game_over_font = os.path.join(fonts_directory, 'ghostclan.ttf')
+		self.final_score_font = os.path.join(fonts_directory, 'DalelandsUncialBold-82zA.ttf')
+		self.new_high_font = os.path.join(fonts_directory, 'BubblegumSans-Regular.ttf')
 
 		self.connected = Message(self.WIDTH//2, 120, 55, "ConnecteD", self.title_font, self.WHITE, self.win)
 		self.score_msg = Message(self.WIDTH//2, 100, 60, "0", self.score_font, (150, 150, 150), self.win)
@@ -105,13 +110,14 @@ class Game:
 
 	# Button images
 
-		self.home_img = pygame.image.load('C:/Users/amyli/OneDrive/Bureau/4A/Canada/Stage/Xumes/games_examples/connected/Assets/homeBtn.png')
-		self.replay_img = pygame.image.load('C:/Users/amyli/OneDrive/Bureau/4A/Canada/Stage/Xumes/games_examples/connected/Assets/replay.png')
-		self.sound_off_img = pygame.image.load("C:/Users/amyli/OneDrive/Bureau/4A/Canada/Stage/Xumes/games_examples/connected/Assets/soundOffBtn.png")
-		self.sound_on_img = pygame.image.load("C:/Users/amyli/OneDrive/Bureau/4A/Canada/Stage/Xumes/games_examples/connected/Assets/soundOnBtn.png")
-		self.easy_img = pygame.image.load("C:/Users/amyli/OneDrive/Bureau/4A/Canada/Stage/Xumes/games_examples/connected/Assets/easy.jpg")
-		self.hard_img = pygame.image.load("C:/Users/amyli/OneDrive/Bureau/4A/Canada/Stage/Xumes/games_examples/connected/Assets/hard.jpg")
+		assets_directory = os.path.join(current_directory, 'Assets')
 
+		self.home_img = pygame.image.load(os.path.join(assets_directory, 'homeBtn.png'))
+		self.replay_img = pygame.image.load(os.path.join(assets_directory, 'replay.png'))
+		self.sound_off_img = pygame.image.load(os.path.join(assets_directory, 'soundOffBtn.png'))
+		self.sound_on_img = pygame.image.load(os.path.join(assets_directory, 'soundOnBtn.png'))
+		self.easy_img = pygame.image.load(os.path.join(assets_directory, 'easy.jpg'))
+		self.hard_img = pygame.image.load(os.path.join(assets_directory, 'hard.jpg'))
 	# Buttons
 
 		self.easy_btn = Button(self.easy_img, (70, 24), self.WIDTH//4-10, self.HEIGHT-100)
@@ -192,10 +198,13 @@ class Game:
 				for self.ball in self.ball_group:
 					if pygame.sprite.spritecollide(self.ball, self.coin_group, True):
 						self.score_fx.play()
+
 						self.score += 1
+						print(self.score)
 						Balls.update_score(self, self.score)
 						if self.highscore <= self.score:
 							self.highscore = self.score
+							print(self.highscore)
 							Balls.update_highscore(self, self.highscore)
 
 						x, self.y = self.ball.rect.center
@@ -258,6 +267,8 @@ class Game:
 
 
 	def render(self):
+
+		self.FPS = 60
 
 		self.win.fill(self.GRAY)
 
