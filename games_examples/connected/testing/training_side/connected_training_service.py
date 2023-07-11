@@ -28,14 +28,14 @@ class ConnectedTrainingService(StableBaselinesTrainer):
 
     def convert_obs(self):
 
+
         return {
-            'ball_x': np.array([self.game.ball.rect.x]),
-            'ball_y': np.array([self.game.ball.rect.y]),
-            'coins_x': np.array([self.game.coin.x]),
-            'coins_y': np.array([self.game.coin.y]),
-            'tiles_x': np.array([self.game.t.x]),
-            'tiles_y': np.array([self.game.t.y]),
-            'tiles_type': np.array([self.game.t.type]),
+            'dist_coin_x': np.array([self.game.ball.rect.x - self.game.coin.x ]),
+            'dist_coin_y': np.array([self.game.ball.rect.y - self.game.coin.y]),
+            'dist_tiles_x': np.array([self.game.ball.rect.x - self.game.t.x]),
+            'dist_tiles_y': np.array([self.game.ball.rect.y - self.game.t.y]),
+            'tiles_type': np.array([self.game.t.type])
+
         }
 
     def convert_reward(self) -> float:
@@ -47,11 +47,13 @@ class ConnectedTrainingService(StableBaselinesTrainer):
             reward += 5
             self.score = self.game.ball.score
 
-        if self.game.ball.score >= self.game.ball.highscore:
-            reward += 10
+        if self.game.ball.score > self.game.ball.highscore:
+            reward += 8
 
         if self.game.terminated:
-            reward -= 1
+            reward -= 10
+
+
 
         #if self.game.ball.rect.x < self.game.t.x:
             #reward += 5
@@ -60,6 +62,8 @@ class ConnectedTrainingService(StableBaselinesTrainer):
         return reward
 
     def convert_terminated(self) -> bool:
+        if self.game.terminated:
+            self.score = 0
         return self.game.terminated
 
     def convert_actions(self, raws_actions) -> List[str]:
@@ -73,17 +77,16 @@ if __name__ == "__main__":
         if sys.argv[1] == "-train":
             logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
         elif sys.argv[1] == "-play":
-            logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
+            logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
 
     dct = {
 
-        'ball_x':spaces.Box(-1, 1, dtype=np.float32, shape=(1,)),
-        'ball_y': spaces.Box(-1, 1, dtype=np.float32, shape=(1,)),
-        'coins_x': spaces.Box(-1, 1, dtype=np.float32, shape=(1,)),
-        'coins_y': spaces.Box(-1, 1, dtype=np.float32, shape=(1,)),
-        'tiles_x': spaces.Box(-1, 1, dtype=np.float32, shape=(1,)),
-        'tiles_y': spaces.Box(-1, 1, dtype=np.float32, shape=(1,)),
+        'dist_coin_x':spaces.Box(-1, 1, dtype=np.float32, shape=(1,)),
+        'dist_coin_y': spaces.Box(-1, 1, dtype=np.float32, shape=(1,)),
+        'dist_tiles_x': spaces.Box(-1, 1, dtype=np.float32, shape=(1,)),
+        'dist_tiles_y': spaces.Box(-1, 1, dtype=np.float32, shape=(1,)),
         'tiles_type': spaces.Box(-1, 1, dtype=np.float32, shape=(1,))
+
     }
 
     training_service = ConnectedTrainingService(
@@ -91,7 +94,7 @@ if __name__ == "__main__":
         communication_service=CommunicationServiceTrainingMq(),
         observation_space=spaces.Dict(dct),
         action_space=spaces.Discrete(2),
-        max_episode_length=10000,
+        max_episode_length=20000,
         total_timesteps=100000,
         algorithm_type="MultiInputPolicy",
         algorithm=stable_baselines3.PPO,
@@ -103,7 +106,7 @@ if __name__ == "__main__":
             training_service.train(save_path="./models", log_path="./logs", test_name="test")
             training_service.save("./models/model")
         elif sys.argv[1] == "-play":
-            training_service.load("./models/m3_400k.zip")
+            training_service.load("./models/best_model.zip")
             training_service.play(100000)
 
 

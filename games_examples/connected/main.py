@@ -37,6 +37,7 @@ class Game:
 
 
 
+
 		pygame.init()
 
 		self.info = pygame.display.Info()
@@ -75,6 +76,7 @@ class Game:
 		self.game_page = False
 		self.score_page = False
 		self.running = True
+		self.collided_rectangles = False
 
 	# SOUNDS **********************************************************************
 
@@ -157,12 +159,25 @@ class Game:
 	def run(self):
 
 		while self.running:
-			self.update()
+			self.update_check()
 			self.render()
 
 
 
+
 	def update(self):
+
+		self.update_main()
+
+		self.ball_group.update(self.color)
+		self.coin_group.update(self.color)
+		self.tile_group.update()
+		self.score_msg.update(self.score)
+		self.particle_group.update()
+		self.clock.tick(self.FPS)
+		pygame.display.update()
+
+	def update_main(self):
 
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
@@ -200,11 +215,11 @@ class Game:
 						self.score_fx.play()
 
 						self.score += 1
-						print(self.score)
+						#print(self.score)
 						Balls.update_score(self, self.score)
 						if self.highscore <= self.score:
 							self.highscore = self.score
-							print(self.highscore)
+							#print(self.highscore)
 							Balls.update_highscore(self, self.highscore)
 
 						x, self.y = self.ball.rect.center
@@ -212,7 +227,9 @@ class Game:
 							particle = Particle(x, self.y, self.color, self.win)
 							self.particle_group.add(particle)
 
-					if pygame.sprite.spritecollide(self.ball, self.tile_group, True):
+					self.collided_rectangles = pygame.sprite.spritecollide(self.ball, self.tile_group, True)
+					if self.collided_rectangles:
+						print("collide")
 						x, y = self.ball.rect.center
 						for i in range(30):
 							particle = Particle(x, y, self.color, self.win)
@@ -220,6 +237,8 @@ class Game:
 
 						self.player_alive = False
 						self.dead_fx.play()
+
+						self.collided_rectangles = True
 
 				self.current_time = pygame.time.get_ticks()
 				self.delta = self.current_time - self.start_time
@@ -250,19 +269,12 @@ class Game:
 			self.tile_group.empty()
 			self.coin_group.empty()
 
-
-
 			self.end_game()
 
+	def update_check(self):
 
-		#self.check_end()
-		self.ball_group.update(self.color)
-		self.coin_group.update(self.color)
-		self.tile_group.update()
-		self.score_msg.update(self.score)
-		self.particle_group.update()
-		self.clock.tick(self.FPS)
-		pygame.display.update()
+		self.update_main()
+		self.check_end()
 
 
 
@@ -315,10 +327,15 @@ class Game:
 
 		if self.game_page:
 			pygame.draw.circle(self.win, self.BLACK, self.CENTER, 80, 20)
+			self.ball_group.update(self.color)
+			self.coin_group.update(self.color)
+			self.tile_group.update()
+			self.score_msg.update(self.score)
+			self.particle_group.update()
 
-
+		self.clock.tick(self.FPS)
 		pygame.draw.rect(self.win, self.BLUE, (0, 0, self.WIDTH, self.HEIGHT), 5, border_radius=10)
-
+		pygame.display.update()
 
 
 	def check_end(self):

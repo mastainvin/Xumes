@@ -47,9 +47,11 @@ class Balls(pygame.sprite.Sprite):
 
 	def update_score(self, score):
 		self.score = score
+		print(self.score)
 
 	def update_highscore(self, highscore):
 		self.highscore = highscore
+		print(self.highscore)
 
 	def reset(self):
 		self.x, self.y = self.initial_pos
