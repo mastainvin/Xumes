@@ -215,8 +215,9 @@ class Game:
 						self.score_fx.play()
 
 						self.score += 1
-						#print(self.score)
+						# print(self.score)
 						Balls.update_score(self, self.score)
+
 						if self.highscore <= self.score:
 							self.highscore = self.score
 							#print(self.highscore)
@@ -237,7 +238,7 @@ class Game:
 
 						self.player_alive = False
 						self.dead_fx.play()
-
+						print("score",self.score)
 						self.collided_rectangles = True
 
 				self.current_time = pygame.time.get_ticks()

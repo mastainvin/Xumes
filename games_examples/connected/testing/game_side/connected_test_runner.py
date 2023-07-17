@@ -15,7 +15,7 @@ class ConnectedTestRunner(TestRunner):
         super().__init__()
         self.game = Game()
         self.game = self.bind(self.game, "game", state=[
-            State("terminated", methods_to_observe=["update", "reset"]),
+            State("terminated",[State("score"),State("highscore")], methods_to_observe=["update", "reset"]),
             State("ball",[State( "score" ), State( "highscore" ), State("rect", [State( "x" ), State( "y" )])], methods_to_observe="update"),
             State("coin", [State("x"), State("y")], methods_to_observe="update"),
             State("t", [State("x"), State("y"),  State("type") ], methods_to_observe="update")
