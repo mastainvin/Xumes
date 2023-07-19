@@ -31,10 +31,9 @@ class Pipe:
                                  HEIGHT - self.height - self.space_length)
 
         # Check if collides with player
-        self.collision()
-
-        # Check if player passed the pipe (win one point)
-        self.is_player_passed()
+        if not self.collision():
+            # Check if player passed the pipe (win one point)
+            self.is_player_passed()
 
     def collision(self):
         # if the pipe collides we stop the game
@@ -42,6 +41,8 @@ class Pipe:
                 self.position <= SIZE + LEFT_POSITION <= self.position + PIPE_WIDTH or self.position <= LEFT_POSITION <= self.position + PIPE_WIDTH) and (
                 self.player.position <= self.height or self.player.position + SIZE >= self.space_length + self.height):
             self.generator.end()
+            return True
+        return False
 
     def is_player_passed(self):
         if self.position + PIPE_WIDTH / 2 <= SIZE + LEFT_POSITION and not self.player_passed:
