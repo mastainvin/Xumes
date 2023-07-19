@@ -1,7 +1,7 @@
 import logging
 import sys
 from typing import List
-
+import random
 import numpy as np
 import stable_baselines3
 from gymnasium import spaces
@@ -26,72 +26,168 @@ class SnakeTrainingService(StableBaselinesTrainer):
                          total_timesteps, algorithm_type, algorithm, random_reset_rate)
 
         self.score = 0
+        self.distance=100
         self.actions = ["nothing", "nothing"]
 
     def convert_obs(self) :
-
-        snake_head_x = self.snake.body[0][0]
-        snake_head_y = self.snake.body[0][1]
-
-        # fruit = self.get_entity("fruit")
-        fruit_x = self.fruit.pos.x
-        fruit_y = self.fruit.pos.y
-
         return {
-            "fruit_above_snake": np.array([1 if snake_head_y > fruit_y else 0]),
-            "fruit_right_snake": np.array([1 if snake_head_x < fruit_x else 0]),
-            "fruit_below_snake": np.array([1 if snake_head_y < fruit_y else 0]),
-            "fruit_left_snake": np.array([1 if snake_head_x > fruit_x else 0]),
+            "fruit_above_snake": np.array([1 if self.snake.body[1] > self.fruit.pos[1] else 0]),
+            "fruit_right_snake": np.array([1 if self.snake.body[0] < self.fruit.pos[0] else 0]),
+            "fruit_below_snake": np.array([1 if self.snake.body[1] < self.fruit.pos[1] else 0]),
+            "fruit_left_snake": np.array([1 if self.snake.body[0] > self.fruit.pos[0] else 0]),
             "obstacle_above": np.array(
-                [1 if snake_head_y - 1 == 0 or (snake_head_x, snake_head_y - 1) in self.snake.body else 0]),
+                [1 if self.snake.body[1] - 1 == 0 or (self.snake.body[0], self.snake.body[1] - 1) in self.snake.body else 0]),
             "obstacle_right": np.array(
-                [1 if snake_head_x + 1 == cell_number or (snake_head_x + 1, snake_head_y) in self.snake.body else 0]),
+                [1 if self.snake.body[0] + 1 == cell_number or (self.snake.body[0] + 1, self.snake.body[1]) in self.snake.body else 0]),
             "obstacle_bellow": np.array(
-                [1 if snake_head_y + 1 == cell_number or (snake_head_x, snake_head_y + 1) in self.snake.body else 0]),
+                [1 if self.snake.body[1] + 1 == cell_number or (self.snake.body[0], self.snake.body[1] + 1) in self.snake.body else 0]),
             "obstacle_left": np.array(
-                [1 if snake_head_x - 1 == 0 or (snake_head_x - 1, snake_head_y) in self.snake.body else 0]),
+                [1 if self.snake.body[0] - 1 == 0 or (self.snake.body[0] - 1, self.snake.body[1]) in self.snake.body else 0]),
             "direction_up": np.array([1 if self.snake.direction == (0, -1) else 0]),
             "direction_right": np.array([1 if self.snake.direction == (1, 0) else 0]),
             "direction_down": np.array([1 if self.snake.direction == (0, 1) else 0]),
             "direction_left": np.array([1 if self.snake.direction == (-1, 0) else 0]),
         }
-
     def convert_reward(self) -> float:
-        reward = 0
+        close_reward = 0
 
-        fruit_x = self.fruit.x
-        fruit_y = self.fruit.y
+        distance = np.abs(self.fruit.pos[0] - self.snake.body[0]) + np.abs(self.fruit.pos[1] - self.snake.body[1])
+        # print(self.distance, distance,"dis")
+        # 蛇头与水果同行同列
+        if np.abs(self.fruit.pos[0] - self.snake.body[0]) * np.abs(self.fruit.pos[1] - self.snake.body[1]) ==0:
+            # 如果蛇头与水果同行或同列
+            if(np.abs(self.fruit.pos[0] - self.snake.body[0])==0) and ((self.fruit.pos[1] - self.snake.body[1])*self.snake.direction[1])>=0:
+                # 如果蛇身在蛇头和水果的同列，并且蛇的方向不是蛇头指向水果的方向的反方向
+                c1=0
+                c2=0
+                # for index, element in enumerate(self.snake.body):
+                #     if element != 0 and element % 2 == 0:
+                #         # 取得蛇身的x坐标（左右坐标）
+                #         if element - self.fruit.pos[0]==0:
+                #             # 如果这个蛇身块与水果在同一列
+                #             c1+=1
+                for index, element in enumerate(self.snake.body):
+                    if index != 0 and index % 2 == 0:
+                        # 取得蛇身的x坐标（左右坐标）
+                        if element - self.fruit.pos[0] == 0:
+                            # 如果这个蛇身块与水果在同一列
+                            c1 += 1
+                            if (self.snake.body[index+1] - self.fruit.pos[1])*(self.snake.body[index+1] - self.snake.body[1])<=0:
+                                # 如果蛇身在蛇头和水果的同列，并且蛇身在蛇头和水果中间，pass
+                                c2+=1
+                if c2==0: # 所有蛇身都不在蛇头和水果中间
+                    close_reward+=10
+                    if (self.fruit.pos[1] - self.snake.body[1])*self.snake.direction[1]>0:
+                        #如果蛇还是朝着水果前进的
+                        close_reward+=30
 
-        snake_x, snake_y = self.snake.body[0][0], self.snake.body[0][1]
-        distance = np.abs(fruit_x - snake_x) + np.abs(fruit_y - snake_y)
+            elif (np.abs(self.fruit.pos[1] - self.snake.body[1]) == 0) and  (
+                    (self.fruit.pos[0] - self.snake.body[0]) * self.snake.direction[0]) >= 0:
+                # 如果蛇身在蛇头和水果的同行，并且蛇的方向不是蛇头指向水果的方向的反方向
+                c1 = 0
+                c2 = 0
+                # for index, element in enumerate(self.snake.body):
+                #     if element != 0 and element % 2 == 0:
+                #         # 取得蛇身的x坐标（左右坐标）
+                #         if element - self.fruit.pos[0]==0:
+                #             # 如果这个蛇身块与水果在同一列
+                #             c1+=1
+                for index, element in enumerate(self.snake.body):
+                    if index != 1 and index % 2 == 1:
+                        # 取得蛇身的y坐标（上下坐标）
+                        if element - self.fruit.pos[1] == 0:
+                            # 如果这个蛇身块与水果在同一行
+                            c1 += 1
+                            if (self.snake.body[index - 1] - self.fruit.pos[0]) * (
+                                    self.snake.body[index - 1] - self.snake.body[0]) <= 0:
+                                # 如果蛇身在蛇头和水果的同行，并且蛇身在蛇头和水果中间，pass
+                                c2 += 1
+                if c2 == 0:  # 所有蛇身都不在蛇头和水果中间
+                    close_reward += 10
+                    if (self.fruit.pos[0] - self.snake.body[0]) * self.snake.direction[0] > 0:
+                        # 如果蛇还是朝着水果前进的
+                        close_reward += 30
+        # check_fail
+        # if not 0 <= self.snake.body[0]+self.snake.direction[0] < cell_number or not 0 <= self.snake.body[1]+self.snake.direction[1] < cell_number:
+        if not 0 <= self.snake.body[0]< cell_number or not 0 <= self.snake.body[1] < cell_number:
+            close_reward -= 30
+        else:
+            for indexy, elementy in enumerate(self.snake.body):
+                if indexy != 1 and indexy % 2 == 1:
+                    # 取得蛇身的y坐标（上下坐标）
+                    for indexx, elementx in enumerate(self.snake.body):
+                        if indexx != 0 and indexx % 2 == 0:
+                            if elementy == self.snake.body[1] and elementx == self.snake.body[0]:
+                                close_reward -= 30
+                                break  # 跳出内层循环
+                    break  # 跳出外层循环
+
+        # 离边界非常近，则给予-10
+        if (self.snake.body[0] < 1 and self.snake.direction[0]==-1) or \
+                (self.snake.body[1] < 1 and self.snake.direction[1]==-1) or \
+                (self.snake.body[0]>cell_number-2 and self.snake.direction[0]==1) or \
+                (self.snake.body[1] > cell_number - 2 and self.snake.direction[1] == 1):
+            close_reward -= 10
+        else:
+            for indexy, elementy in enumerate(self.snake.body):
+                if indexy != 1 and indexy % 2 == 1:
+                    # 取得蛇身的y坐标（上下坐标）
+                        for indexx, elementx in enumerate(self.snake.body):
+                            if indexx != 0 and indexx % 2 == 0:
+                                if elementy==self.snake.body[1]+self.snake.direction[1] and elementx==self.snake.body[0]+self.snake.direction[0]:
+                                    close_reward -= 10
+                                    break  # 跳出内层循环
+                        break  # 跳出外层循环
+
+
+
+        # check_ate(collision):
+        if (self.fruit.pos[0] == self.snake.body[0] and self.fruit.pos[1]==self.snake.body[1]) or \
+                self.fruit.pos[0] == self.snake.body[0] +self.snake.direction[0] \
+                and self.fruit.pos[1] == self.snake.body[1]  +self.snake.direction[1] :
+            close_reward += 80
+
 
         if distance < self.distance:
-            close_reward = 1
-        elif distance > self.distance:
-            close_reward = -1
-        else:
-            close_reward = 0
+            close_reward += 5
+            self.distance=distance
 
-        if self.game_state == "fruit_ate":
-            return 10
-        elif self.game_state == "lose":
-            return -100
+        elif distance > self.distance:
+            close_reward += -1
+            self.distance = distance
+
         else:
-            return close_reward
+            close_reward += 0
+            self.distance = distance
+
+        self.distance = distance
+        print("reward:",close_reward)
+        return close_reward
 
     def convert_terminated(self) -> bool:
         return self.game.terminated
 
     def convert_actions(self, raws_actions) -> List[str]:
-        if raws_actions == 1:
-            return ['up']
-        elif raws_actions == 2:
-            return ['down']
-        elif raws_actions == 3:
-            return ['left']
-        elif raws_actions == 4:
-            return ['right']
-        return ['nothing']
+        # n=random.randint(1,6)
+        # if n==1:
+        #     direction  = ["nothing", "up", "left"]
+        # elif n==2:
+        #     direction  = ["nothing", "down", "right"]
+        # elif n==3:
+        #     direction  = ["nothing", "up", "right"]
+        # elif n==4:
+        #     direction  = ["nothing", "up", "down"]
+        # elif n==5:
+        #     direction  = ["nothing", "down", "left"]
+        # elif n==6:
+        #     direction  = ["nothing", "left", "right"]
+        # n=random.randint(1,2)
+        if self.snake.direction[0]==0:
+            direction = ["nothing", "left", "right"]
+        elif self.snake.direction[1]==0:
+            direction= ["nothing", "up", "down"]
+        self.actions = [direction[raws_actions[0]]]
+        return self.actions
 
 
 if __name__ == "__main__":
@@ -100,7 +196,7 @@ if __name__ == "__main__":
         if sys.argv[1] == "-train":
             logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
         elif sys.argv[1] == "-play":
-            logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
+            logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
 
         dct = {
             "fruit_above_snake": spaces.Box(0, 1, shape=(1,), dtype=int),
@@ -122,7 +218,7 @@ if __name__ == "__main__":
         observation_space=spaces.Dict(dct),
         action_space=spaces.MultiDiscrete([3, 3]),
         max_episode_length=2000,
-        total_timesteps=200000,
+        total_timesteps=100000,
         algorithm_type="MultiInputPolicy",
         algorithm=stable_baselines3.PPO,
         random_reset_rate=0.0
@@ -130,8 +226,9 @@ if __name__ == "__main__":
 
     if len(sys.argv) > 1:
         if sys.argv[1] == "-train":
+            training_service.load("./models/model1")
             training_service.train(save_path="./models", log_path="./logs", test_name="test")
             training_service.save("./models/model")
         elif sys.argv[1] == "-play":
-            training_service.load("./models/best_model.zip")
+            training_service.load("./models/model.zip")
             training_service.play(100000)
