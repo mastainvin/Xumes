@@ -27,3 +27,8 @@ class Fruit(pygame.sprite.Sprite):
 
     def update(self):
         self.randomize()
+    def reset(self):
+        self.pos = None
+        self.y = None
+        self.x = None
+        self.randomize()
