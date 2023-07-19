@@ -7,9 +7,8 @@ cell_size = 30
 cell_number = 15
 
 
-class Fruit(pygame.sprite.Sprite):
+class Fruit:
     def __init__(self):
-        super().__init__()
         self.pos = None
         self.y = None
         self.x = None
@@ -25,5 +24,8 @@ class Fruit(pygame.sprite.Sprite):
         self.y = random.randint(0, cell_number - 1)
         self.pos = Vector2(self.x, self.y)
 
-    def update(self):
+    def reset(self):
+        self.pos = None
+        self.y = None
+        self.x = None
         self.randomize()

@@ -1,12 +1,13 @@
+import sys
+
 import pygame
 from pygame import Vector2
 
 cell_size = 30
 
 
-class Snake(pygame.sprite.Sprite):
+class Snake:
     def __init__(self):
-        super().__init__()
         self.body = [Vector2(5, 10), Vector2(4, 10), Vector2(3, 10)]
         self.direction = Vector2(1, 0)
         self.new_block = False
@@ -32,5 +33,29 @@ class Snake(pygame.sprite.Sprite):
     def add_block(self):
         self.new_block = True
 
-    def update(self):
-        self.move_snake()
+    def reset(self):
+        self.body = [Vector2(5, 10), Vector2(4, 10), Vector2(3, 10)]
+        self.direction = Vector2(1, 0)
+        self.new_block = False
+        print("")
+
+    def check_events(self, event):
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_UP:
+                if self.direction.y != 1:
+                    selfdirection = Vector2(0, -1)
+                    print(self.direction.y)
+            if event.key == pygame.K_DOWN:
+                if self.direction.y != -1:
+                    self.direction = Vector2(0, 1)
+                    print(self.direction.y)
+            if event.key == pygame.K_LEFT:
+                if self.direction.x != 1:
+                    self.direction = Vector2(-1, 0)
+                    print(self.direction.x)
+            if event.key == pygame.K_RIGHT:
+                if self.direction.x != -1:
+                    self.direction = Vector2(1, 0)
