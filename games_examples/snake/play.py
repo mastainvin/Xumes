@@ -10,17 +10,19 @@ cell_number = 15
 
 
 class Main:
+    terminated = False
     def __init__(self):
         pygame.init()
         self.screen = pygame.display.set_mode(
             (cell_number * cell_size, cell_number * cell_size))
         self.clock = pygame.time.Clock()
-
+        self.running = True
         self.SCREEN_UPDATE = pygame.USEREVENT
         pygame.time.set_timer(self.SCREEN_UPDATE, 150)
 
         self.snake = Snake()
         self.fruit = Fruit()
+
 
     def update(self):
         self.snake.move_snake()
@@ -41,18 +43,24 @@ class Main:
             self.fruit_ate()
 
     def game_over(self):
+
         self.snake = Snake()
         self.fruit = Fruit()
+        self.terminated = False
 
     def check_fail(self):
         if not 0 <= self.snake.body[0].x < cell_number or not 0 <= self.snake.body[0].y < cell_number:
+            self.terminated = True
             self.game_over()
+
         for block in self.snake.body[1:]:
             if block == self.snake.body[0]:
+                self.terminated = True
                 self.game_over()
 
     def check_events(self, event):
         if event.type == pygame.QUIT:
+            self.running = False
             pygame.quit()
             sys.exit()
         if event.type == pygame.KEYDOWN:
@@ -70,7 +78,7 @@ class Main:
                     self.snake.direction = Vector2(1, 0)
 
     def run(self):
-        while True:
+        while self.running:
             for event in pygame.event.get():
                 self.check_events(event)
                 if event.type == self.SCREEN_UPDATE:

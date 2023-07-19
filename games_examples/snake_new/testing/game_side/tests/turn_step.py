@@ -1,6 +1,4 @@
-import pygame
-
-from games_examples.snake_new.play import Main
+from games_examples.snake.play import Main
 from src.xumes.game_module.feature_strategy import given
 from src.xumes.game_module.state_observable import State
 

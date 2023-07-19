@@ -11,7 +11,7 @@ from src.xumes import \
     CommunicationServiceGameMq
 from src.xumes import PygameEventFactory
 from src.xumes import JsonTestRunner
-from games_examples.snake_new.play import Main
+from games_examples.snake.play import Main
 from games_examples.snake.src.fruit import cell_number
 from games_examples.snake.testing.test_game_service.snake_observables import SnakeObservable, FruitObservable
 

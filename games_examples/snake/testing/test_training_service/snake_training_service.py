@@ -13,7 +13,7 @@ from src.xumes import StableBaselinesTrainer, \
     OBST
 from src.xumes import \
     CommunicationServiceTrainingMq
-from games_examples.snake_new.play import cell_number
+from games_examples.snake.play import cell_number
 from games_examples.snake.testing.test_training_service.entities.snake_entity_manager import SnakeEntityManager
 
 
