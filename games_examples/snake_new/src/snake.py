@@ -7,10 +7,13 @@ cell_size = 30
 
 
 class Snake:
+
+
     def __init__(self):
         self.body = [Vector2(5, 10), Vector2(4, 10), Vector2(3, 10)]
         self.direction = Vector2(1, 0)
         self.new_block = False
+
 
     def draw_snake(self, screen):
         for block in self.body:
@@ -22,6 +25,7 @@ class Snake:
     def move_snake(self):
         if self.new_block:
             body_copy = self.body[:]
+            #print(body_copy)
             body_copy.insert(0, body_copy[0] + self.direction)
             self.body = body_copy[:]
             self.new_block = False
@@ -29,6 +33,7 @@ class Snake:
             body_copy = self.body[:-1]
             body_copy.insert(0, body_copy[0] + self.direction)
             self.body = body_copy[:]
+            #print(body_copy)
 
     def add_block(self):
         self.new_block = True
@@ -36,8 +41,9 @@ class Snake:
     def reset(self):
         self.body = [Vector2(5, 10), Vector2(4, 10), Vector2(3, 10)]
         self.direction = Vector2(1, 0)
+
         self.new_block = False
-        print("")
+
 
     def check_events(self, event):
         if event.type == pygame.QUIT:
@@ -46,16 +52,18 @@ class Snake:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_UP:
                 if self.direction.y != 1:
-                    selfdirection = Vector2(0, -1)
-                    print(self.direction.y)
+                    self.direction = Vector2(0, -1)
+
             if event.key == pygame.K_DOWN:
                 if self.direction.y != -1:
                     self.direction = Vector2(0, 1)
-                    print(self.direction.y)
+
             if event.key == pygame.K_LEFT:
                 if self.direction.x != 1:
                     self.direction = Vector2(-1, 0)
-                    print(self.direction.x)
+
             if event.key == pygame.K_RIGHT:
                 if self.direction.x != -1:
                     self.direction = Vector2(1, 0)
+
+            print(self.direction)
