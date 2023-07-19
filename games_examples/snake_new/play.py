@@ -20,6 +20,8 @@ class Main:
         self.SCREEN_UPDATE = pygame.USEREVENT
         pygame.time.set_timer(self.SCREEN_UPDATE, 150)
 
+        self.running = True
+
         self.snake = Snake()
         self.fruit = Fruit()
 
@@ -89,6 +91,12 @@ class Main:
             pygame.display.update()
             self.clock.tick(60)
 
+    def check_end(self):
+        if self.terminated:
+            self.reset()
+
+    def end_game(self):
+        self.terminated = True
 
 if __name__ == "__main__":
     main = Main()
