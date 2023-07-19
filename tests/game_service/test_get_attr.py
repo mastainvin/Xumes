@@ -88,14 +88,14 @@ class TestGetattr(unittest.TestCase):
         a = A(1)
         self.assertEqual({"a": 1, "__type__": "A"}, get_object_from_attributes(a, state_attribute))
 
-    def test_state_attribute_not_exist_attr(self):
+    def test_state_attr_not_exist(self):
         class A:
             def __init__(self, av):
                 self.a = av
 
         state_attribute = State("b")
         a = A(1)
-        self.assertRaises(StateConversionError, get_object_from_attributes, a, state_attribute)
+        self.assertEqual({"__type__": "A", "b": None}, get_object_from_attributes(a, state_attribute))
 
     def test_state_attribute_not_exist_in_list_attr(self):
         class A:
@@ -104,7 +104,7 @@ class TestGetattr(unittest.TestCase):
 
         state_attribute = [State("a"), State("b")]
         a = A(1)
-        self.assertRaises(StateConversionError, get_object_from_attributes, a, state_attribute)
+        self.assertEqual({"a": 1, "b": None, "__type__": "A"}, get_object_from_attributes(a, state_attribute))
 
     def test_state_attribute_attr_in_attr(self):
         class A:
@@ -228,7 +228,7 @@ class TestGetattr(unittest.TestCase):
             return s
 
         state_attribute = State(func=func_sum_raise)
-        self.assertRaises(StateConversionError, get_object_from_attributes, li, state_attribute)
+        self.assertEqual(None, get_object_from_attributes(li, state_attribute))
 
     def test_state_with_func_on_tuple1(self):
         class A:
@@ -268,7 +268,7 @@ class TestGetattr(unittest.TestCase):
 
         state_attribute = State(func=lambda x: sum(x) + x[5])
 
-        self.assertRaises(StateConversionError, get_object_from_attributes, a, state_attribute)
+        self.assertEqual(None, get_object_from_attributes(a, state_attribute))
 
     def test_state_with_func_on_dict1(self):
         class A:
@@ -307,13 +307,12 @@ class TestGetattr(unittest.TestCase):
     def test_state_with_func_on_dict3_error(self):
         a = {"a": 1, "b": 2, "c": 3}
 
-        def func_raise(x):
+        def func_error(x):
             return x["d"]
 
-        state_attribute = State(func=func_raise)
+        state_attribute = State(func=func_error)
 
-        self.assertRaises(StateConversionError, get_object_from_attributes, a, state_attribute)
-
+        self.assertEqual(None, get_object_from_attributes(a, state_attribute))
 
 if __name__ == '__main__':
     unittest.main()

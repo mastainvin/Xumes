@@ -113,7 +113,7 @@ class Game():
 
             for idx, bat in self.sorted_bats.items():
                 if bat is not None:
-                    bat.update()
+                    bat.update_state()
                     if bat.direction == -1:
                         if bat.rect.x < self.player.sp.rect.x:
                             moving_towards = True

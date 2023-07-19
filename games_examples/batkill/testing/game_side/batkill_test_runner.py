@@ -98,7 +98,7 @@ class BatKillerTestRunner(Game, JsonTestRunner):
 
             for idx, bat in self.sorted_bats.items():
                 if bat is not None:
-                    bat.update()
+                    bat.update_state()
                     if bat.collider_rect is not None:
                         bat.bool_collider_rect = True
                     if self.player.sp.attack.attack_poly is not None and not bat.dying:
@@ -150,7 +150,7 @@ class BatKillerTestRunner(Game, JsonTestRunner):
 
             for idx, bat in self.sorted_bats.items():
                 if bat is not None:
-                    bat.update()
+                    bat.update_state()
                     if bat.collider_rect is not None:
                         bat.bool_collider_rect = True
                     if self.player.sp.attack.attack_poly is not None and not bat.dying:

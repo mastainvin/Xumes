@@ -1,13 +1,18 @@
 site_name: Xumes
 theme: readthedocs
+site_description: Xumes is a game testing tool for games
+site_author: Xumes
 
 nav:
-  - Home: 'index.md'
-  - "What's Xumes?": 'description.md'
-  - Installation: 'usage.md'
-  - "Impl. default observables":
-      - "Game side": './implement_without_observables/game_side_without_observables.md'
-      - "Training side": './implement_without_observables/training_side_without_observables.md'
-  - Impl. your observables:
-      - "Game side": './implement_with_observables/game_side_with_observables.md'
-      - "Training side": './implement_with_observables/training_side_with_observables.md'
+  - User guide:
+      - "Installation": 'usage.md'
+      - "Getting started": 'description.md'
+      - "CLI": 'cli.md'
+  - Testers:
+      - "Steps files": 'steps.md'
+      - "Features files": 'features.md'
+  - Trainers:
+      - "Trainers files": 'trainers.md'
+  - Documentation:
+      - "Architecture": 'architecture.md'
+

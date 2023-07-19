@@ -1,7 +1,7 @@
 from unittest import TestCase
 
-from xumes.training_module import JsonGameElementStateConverter
 from xumes.training_module.entity_manager import AutoEntityManager, choose_delegate
+from xumes.training_module.implementations import JsonGameElementStateConverter
 
 
 class TestAutoEntityManager(TestCase):
@@ -159,39 +159,39 @@ class TestAutoEntityManager(TestCase):
 
     def test_update_delegate(self):
         s = choose_delegate(1)
-        s = s.update(2)
+        s = s.update_state(2)
         self.assertEqual(s, 2)
 
     def test_update_object(self):
         entity_manager = AutoEntityManager(JsonGameElementStateConverter())
         entity_manager.convert(("test1", {"a": 1, "b": 5, "__type__": "Test"}))
-        entity_manager.test1.update({"b": 6})
+        entity_manager.test1.update_state({"b": 6})
         self.assertEqual(entity_manager.test1.b, 6)
 
     def test_update_object2_add_element(self):
         entity_manager = AutoEntityManager(JsonGameElementStateConverter())
         entity_manager.convert(("test1", {"a": 1, "b": 5, "__type__": "Test"}))
-        entity_manager.test1.update({"c": 6})
+        entity_manager.test1.update_state({"c": 6})
         self.assertEqual(entity_manager.test1.c, 6)
 
     def test_update_object3_add_element_and_update(self):
         entity_manager = AutoEntityManager(JsonGameElementStateConverter())
         entity_manager.convert(("test1", {"a": 1, "b": 5, "__type__": "Test"}))
-        entity_manager.test1.update({"b": 6, "c": 7})
+        entity_manager.test1.update_state({"b": 6, "c": 7})
         self.assertEqual(entity_manager.test1.b, 6)
         self.assertEqual(entity_manager.test1.c, 7)
 
     def test_update_object6_dict(self):
         entity_manager = AutoEntityManager(JsonGameElementStateConverter())
         entity_manager.convert(("test1", {"a": 1, "b": {"c": 5}, "__type__": "Test"}))
-        entity_manager.test1.b.update({"c": 6})
+        entity_manager.test1.b.update_state({"c": 6})
         self.assertEqual(entity_manager.test1.b["c"], 6)
 
     def test_update_object7_object(self):
         entity_manager = AutoEntityManager(JsonGameElementStateConverter())
         entity_manager.convert(("test1", {"a": 1, "b": {"c": 5, "__type__": "Test2"}, "__type__": "Test"}))
         a = entity_manager.test1.b
-        entity_manager.test1.b.update({"c": 6, "__type__": "Test2"})
+        entity_manager.test1.b.update_state({"c": 6, "__type__": "Test2"})
         self.assertEqual(a.c, 6)
 
     def test_comm_update_object_no_loose(self):

@@ -1,0 +1,4 @@
+
+
+class RunningEndsError(Exception):
+    pass

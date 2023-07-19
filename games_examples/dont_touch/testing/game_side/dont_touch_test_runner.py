@@ -64,7 +64,7 @@ class DontTouchTestRunner(TestRunner):
                 if is_close_app_event(event):
                     self.game.running = False
                 if event.type == pygame.KEYDOWN:
-                    self.game.P1.update(event)
+                    self.game.P1.update_state(event)
 
             self.game.H1.move(self.game.scoreboard, self.game.P1.player_position)
             self.game.H2.move(self.game.scoreboard, self.game.P1.player_position)
@@ -92,7 +92,7 @@ class DontTouchTestRunner(TestRunner):
                     self.game.terminated = True
                     sys.exit()
                 if event.type == pygame.KEYDOWN:
-                    self.game.P1.update(event)
+                    self.game.P1.update_state(event)
 
             self.game.H1.move(self.game.scoreboard, self.game.P1.player_position)
             self.game.H2.move(self.game.scoreboard, self.game.P1.player_position)

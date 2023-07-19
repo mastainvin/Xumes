@@ -1,8 +1,8 @@
 import logging
-import threading
 from queue import Queue, Empty
 from threading import Thread, Condition
 
+from xumes.core.errors.running_ends_error import RunningEndsError
 from xumes.game_module.i_communication_service_game import ICommunicationServiceGame
 from xumes.game_module.i_event_factory import EventFactory
 from xumes.game_module.i_game_state_observer import IGameStateObserver
@@ -51,6 +51,8 @@ class GameService:
 
         self.communication_service = communication_service
 
+        self.is_finished = False
+
     def run_communication_service(self):
         """
         Start the communication service thread.
@@ -58,41 +60,36 @@ class GameService:
         self.comm_thread = Thread(target=self.communication_service.run, args=[self])
         self.comm_thread.start()
 
-    def run_test_runner(self, run_func):
-        """
-        Start the game loop if this is the main thread.
-        :param run_func: game_loop function to exec.
-        """
-        assert threading.current_thread() is threading.main_thread()
-        logging.info("Starting game loop...")
-        run_func()
-
     def run(self):
         """
         - The communication service thread, used to send state and get actions.\n
         - The game on the main thread, used to make run the game loop.
         """
         self.run_communication_service()
-        self.run_test_runner(self.test_runner.run_test)
         self.test_runner.delete_screen()
+        self.test_runner.run_test()
 
     def run_render(self):
         """
         Same has run but for the game thread, we run with rendering.
         """
         self.run_communication_service()
-        self.run_test_runner(self.test_runner.run_test_render)
+        self.test_runner.run_test_render()
 
     def stop(self):
         """
-        Stop both threads.
+        Stop communication thread.
         """
+        logging.info("Stopping game loop...")
         self.comm_thread.join()
+        self.communication_service.stop()
 
-    def wait(self):
+    def wait(self) -> bool:
         """
         First executed method in the game loop, used to make the game
         wait for an event send by the training service.
+
+        :return: True if the game has been reset, False otherwise. We don't compute the game loop if the game has been reset.
         """
 
         # Notify the communication service to send the state to
@@ -109,22 +106,27 @@ class GameService:
         self.inputs.clear()
 
         # Wait event
-        with self.game_update_condition:
-            self.game_update_condition.wait()
+        if not self.is_finished:
+            with self.game_update_condition:
+                self.game_update_condition.wait()
 
         # Run events from communication thread
+        reset = False
         while not self.tasks.empty():
             try:
                 task = self.tasks.get(block=False)
                 func = task[0]
                 args = task[1:]
                 func(*args)
+                if func.__name__ == "update_event" and args[0] == "reset":
+                    reset = True
             except Empty:
                 break
 
         # Run new events
         for key_input in self.inputs:
             key_input.press()
+        return reset  # If reset is true, we don't need to run the game loop because we want to notify the new state.
 
     def add_input(self, input_str):
         try:
@@ -143,3 +145,6 @@ class GameService:
             self.test_runner.reset()
         if event == "random_reset":
             self.test_runner.random_reset()
+        if event == "finished":
+            self.is_finished = True
+            raise RunningEndsError()

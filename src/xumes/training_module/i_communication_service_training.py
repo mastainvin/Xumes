@@ -32,3 +32,9 @@ class ICommunicationServiceTraining:
         Retrieve the state from the game service side.
         """
         raise NotImplementedError
+
+    def close(self) -> None:
+        """
+        Close the communication service.
+        """
+        raise NotImplementedError

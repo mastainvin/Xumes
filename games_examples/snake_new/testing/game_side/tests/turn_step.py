@@ -20,8 +20,8 @@ def test_impl(test_context):
     def get_dir(dir):
         return [dir[0], dir[1]]
 
-    test_context.game.snake = test_context.create(Snake, name="snake", state=[
-        State("body",  func=get_body, methods_to_observe=["move_snake"]),
-        State("direction", func=get_dir,methods_to_observe=["check_events"])
+    #test_context.game.snake = test_context.create(Snake, name="snake", state=[
+        #State("body",  func=get_body, methods_to_observe=["move_snake"]),
+        #State("direction", func=get_dir,methods_to_observe=["check_events"])
 
 

@@ -1,7 +1,7 @@
 from unittest import TestCase
 from unittest.mock import Mock, patch
 
-from xumes.game_module import StateObservable
+from xumes.game_module.state_observable import StateObservable, State
 
 
 class TestStateObservable(TestCase):
@@ -103,5 +103,5 @@ class TestStateObservable(TestCase):
         self.assertEqual(self.obs2.object, None)
         self.assertEqual(self.obs3.object, self.object)
 
-    def test_state(self):
-        pass
+
+

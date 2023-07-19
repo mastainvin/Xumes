@@ -1,10 +1,4 @@
-
-from xumes.training_module.i_state_entity import IStateEntity
-from xumes.training_module.entity_manager import EntityManager
-from xumes.training_module.entity_manager import AutoEntityManager
-from xumes.training_module.implementations import *
-
-
+from xumes.training_module.trainer_manager import observation, reward, action, config, terminated, StableBaselinesTrainerManager, VecStableBaselinesTrainerManager
 from gymnasium.envs.registration import register
 
 register(

@@ -1,9 +1,10 @@
 import logging
 from abc import abstractmethod, ABC
-from typing import TypeVar, final
+from typing import TypeVar, final, List
 
 from xumes.training_module.entity_manager import EntityManager
 from xumes.training_module.i_communication_service_training import ICommunicationServiceTraining
+from xumes.training_module.i_trainer import ITrainer
 
 OBST = TypeVar("OBST")
 
@@ -36,29 +37,6 @@ class TrainingService:
         self._entity_manager = entity_manager
         self._communication_service = communication_service
 
-    @abstractmethod
-    def train(self, save_path: str = None, eval_freq: int = 10000):
-        """
-        Implementation of the training algorithm.
-        """
-        raise NotImplementedError
-
-    @abstractmethod
-    def save(self, path: str):
-        raise NotImplementedError
-
-    @abstractmethod
-    def load(self, path: str):
-        raise NotImplementedError
-
-    @abstractmethod
-    def play(self, timesteps: int):
-        """
-        Use the algorithm not in training mode.
-        :param timesteps: Number maximum of step (action to perform).
-        """
-        raise NotImplementedError
-
     @final
     def random_reset(self):
         self._communication_service.push_event("random_reset")
@@ -71,6 +49,14 @@ class TrainingService:
     def push_actions(self, actions):
         logging.debug(f"Pushing actions: {actions}")
         self._communication_service.push_actions(actions)
+
+    @final
+    def finished(self):
+        return self._communication_service.push_event("finished")
+
+    @final
+    def close_communication(self):
+        self._communication_service.close()
 
     @final
     def retrieve_state(self) -> None:
@@ -97,38 +83,41 @@ class TrainingService:
     def __getattr__(self, item):
         return self.get_entity(item)
 
+    def __del__(self):
+        self.close_communication()
 
-class MarkovTrainingService(TrainingService, ABC):  # TODO Move class to implementations folder
 
-    @abstractmethod
-    def get_obs(self) -> OBST:
-        """
-        Method needed in the Markov Decision Process.
-        Convert game state to observation.
-        """
-        raise NotImplementedError
+class MarkovTrainingService(TrainingService, ITrainer, ABC):  # TODO Move class to implementations folder
 
-    @abstractmethod
-    def reward(self) -> float:
-        """
-        Method needed in the Markov Decision Process.
-        Convert game state to reward.
-        """
-        raise NotImplementedError
+    @final
+    def reward(self):
+        return self.convert_reward()
 
-    @abstractmethod
+    @final
+    def terminated(self):
+        return self.convert_terminated() or self._entity_manager.game_state == "reset" or self._entity_manager.game_state == "random_reset"
+
+    @final
     def push_raw_actions(self, actions):
-        """
-        Method needed in the Markov Decision Process.
-        Convert actions (ex: list of int), to list of str.
-        :param actions: Any type of actions.
-        """
+        self.push_actions(actions=self.convert_actions(actions))
+
+    @final
+    def get_obs(self) -> OBST:
+        self.retrieve_state()
+        return self.convert_obs()
+
+    @abstractmethod
+    def convert_obs(self) -> OBST:
         raise NotImplementedError
 
     @abstractmethod
-    def terminated(self) -> bool:
-        """
-        Method needed in the Markov Decision Process.
-        Get if the episode is terminated from the game state.
-        """
+    def convert_reward(self) -> float:
+        raise NotImplementedError
+
+    @abstractmethod
+    def convert_terminated(self) -> bool:
+        raise NotImplementedError
+
+    @abstractmethod
+    def convert_actions(self, raws_actions) -> List[str]:
         raise NotImplementedError

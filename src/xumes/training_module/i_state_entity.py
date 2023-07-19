@@ -11,7 +11,7 @@ class IStateEntity:
         update: Updates the entity's attributes from a state.
         build: Builds an `IStateEntity` object from a state.
     """
-    def update(self, state: ST):
+    def update_state(self, state: ST):
         """
         Updates his attributes from a state.
         :param state: representation of the updates.

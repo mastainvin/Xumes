@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from typing import final, List, TypeVar
 
 from xumes.game_module.implementations.rest_impl.json_game_state_observer import JsonGameStateObserver
-from xumes.game_module.state_observable import State, GameStateObservable
+from xumes.game_module.state_observable import State, ComposedGameStateObservable, InheritedGameStateObservable
 
 OBJ = TypeVar("OBJ")
 
@@ -51,14 +51,27 @@ class TestRunner(ABC):
         client.observer = self._observer
 
     @final
-    def bind(self, observable_object: OBJ, name: str, state:  List[State] | State | str | List[str] | None = None) -> GameStateObservable:
+    def bind(self, observable_object: OBJ, name: str,
+             state: List[State] | State | str | List[str] | None = None) -> ComposedGameStateObservable:
         """
         Add an observable object to the test runner.
         :param observable_object: the observable object to add.
         :param name: the name of the observable object.
         :param state: the state of the observable object.
         """
-        return GameStateObservable(observable_object, name, [self._observer], state)
+        return ComposedGameStateObservable(observable_object, name, [self._observer], state)
+
+    @final
+    def create(self, observable_class, name: str, state: List[State] | State | str | List[str] | None = None, *args,
+               **kwargs):
+        """
+        Create an observable object from a class.
+        :param observable_class: the class to create an observable object from.
+        :param name: the name of the observable object.
+        :param state: the state of the observable object.
+        """
+        observers = [self._observer]
+        return InheritedGameStateObservable.create(observable_class, name, state, observers, *args, **kwargs)
 
     @abstractmethod
     def run_test(self) -> None:

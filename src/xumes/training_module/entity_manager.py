@@ -35,7 +35,7 @@ class EntityManager(IStateEntity):
         }
         self._game_state: str = ""
 
-    def update(self, state) -> None:
+    def update_state(self, state) -> None:
         """
         Update the game state when receive it.
         :param state: game state (ex: "alive", "dead").
@@ -61,7 +61,7 @@ class EntityManager(IStateEntity):
 
     @final
     def _update(self, game_element_state: GameElementState):
-        u = self.get(game_element_state.name).update(game_element_state.state)
+        u = self.get(game_element_state.name).update_state(game_element_state.state)
         if u is not None:
             self._entities[game_element_state.name] = u
 
@@ -135,10 +135,10 @@ class EntityDictAdapter(dict, Entity):
     def build(state) -> IStateEntity:
         return EntityDictAdapter(state)
 
-    def update(self, state):
+    def update_state(self, state):
         for k in state:
             if k in self:
-                self[k] = self[k].update(state[k])
+                self[k] = self[k].update_state(state[k])
             else:
                 self[k] = choose_delegate(state[k])
         return self
@@ -163,11 +163,11 @@ class EntityObject(EntityDictAdapter):
             return self[name]
         raise AttributeError(f"'{self.__type__}' object has no attribute '{name}'")
 
-    def update(self, state):
+    def update_state(self, state):
         for k in state:
             if k != "__type__":
                 if k in self and isinstance(self[k], Entity):
-                    self[k] = self[k].update(state[k])
+                    self[k] = self[k].update_state(state[k])
                 else:
                     self[k] = choose_delegate(state[k])
         return self
@@ -182,7 +182,7 @@ class EntityBoolAdapter(int, Entity):
     def build(state) -> IStateEntity:
         return EntityBoolAdapter(state)
 
-    def update(self, state):
+    def update_state(self, state):
         return EntityBoolAdapter(state)
 
     def __hash__(self):
@@ -198,7 +198,7 @@ class EntityIntAdapter(int, Entity):
     def build(state) -> IStateEntity:
         return EntityIntAdapter(state)
 
-    def update(self, state):
+    def update_state(self, state):
         return EntityIntAdapter(state)
 
     def __hash__(self):
@@ -214,7 +214,7 @@ class EntityFloatAdapter(float, Entity):
     def build(state) -> IStateEntity:
         return EntityFloatAdapter(state)
 
-    def update(self, state):
+    def update_state(self, state):
         return EntityFloatAdapter(state)
 
     def __hash__(self):
@@ -230,7 +230,7 @@ class EntityComplexAdapter(complex, Entity):
     def build(state) -> IStateEntity:
         return EntityComplexAdapter(state)
 
-    def update(self, state):
+    def update_state(self, state):
         return EntityComplexAdapter(state)
 
     def __hash__(self):
@@ -246,7 +246,7 @@ class EntityStrAdapter(str, Entity):
     def build(state) -> IStateEntity:
         return EntityStrAdapter(state)
 
-    def update(self, state):
+    def update_state(self, state):
         return EntityStrAdapter(state)
 
     def __hash__(self):
@@ -267,10 +267,10 @@ class EntityListAdapter(list, Entity):
     def build(state) -> IStateEntity:
         return EntityListAdapter(state)
 
-    def update(self, state):
+    def update_state(self, state):
         for i in range(len(state)):
             if i < len(self) and isinstance(self[i], Entity):
-                self[i] = self[i].update(state[i])
+                self[i] = self[i].update_state(state[i])
             else:
                 self.append(choose_delegate(state[i]))
         return self
@@ -288,7 +288,7 @@ class EntityTupleAdapter(tuple, Entity):
     def build(state) -> IStateEntity:
         return EntityTupleAdapter(state)
 
-    def update(self, state):
+    def update_state(self, state):
         return EntityTupleAdapter(state)
 
     def __hash__(self):
@@ -306,7 +306,7 @@ class EntitySetAdapter(set, Entity):
     def build(state) -> IStateEntity:
         return EntitySetAdapter(state)
 
-    def update(self, state):
+    def update_state(self, state):
         for i in state:
             self.add(i if isinstance(i, Entity) else choose_delegate(i))
         return self

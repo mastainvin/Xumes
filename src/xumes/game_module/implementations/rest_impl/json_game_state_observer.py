@@ -30,8 +30,8 @@ class JsonGameStateObserver(Dict, IGameStateObserver):
         self.clear()
         return state
 
-    @classmethod
-    def get_instance(cls):
+    @staticmethod
+    def get_instance():
         if JsonGameStateObserver.instance is None:
             JsonGameStateObserver.instance = JsonGameStateObserver()
         return JsonGameStateObserver.instance

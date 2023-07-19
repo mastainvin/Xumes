@@ -16,12 +16,10 @@ class GymAdapter(gym.Env):
                  training_service: MarkovTrainingService,
                  observation_space: Space[ObsType],
                  action_space: Space[ActType],
-                 random_reset_rate: float = 1.0,
                  ):
         self._training_service = training_service
         self.observation_space = observation_space
         self.action_space = action_space
-        self.random_reset_rate = random_reset_rate
 
     def reset(
             self,
@@ -29,10 +27,7 @@ class GymAdapter(gym.Env):
             seed: int | None = None,
             options: dict[str, Any] | None = None,
     ) -> tuple[ObsType, dict[str, Any]]:
-        if (options and "not_random" in options and options["not_random"]) or random.random() < 1 - self.random_reset_rate:
-            self._training_service.reset()
-        else:
-            self._training_service.random_reset()
+        self._training_service.reset()
         return self._training_service.get_obs(), {}
 
     def step(self, action: ActType) -> Tuple[ObsType, SupportsFloat, bool, bool, Dict[str, Any]]:

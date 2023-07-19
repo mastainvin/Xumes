@@ -7,6 +7,7 @@ class ICommunicationServiceGame:
           action: Wait for the training server to send an action.
           run: Start the communication service (e.g., start the app of a REST API).
     """
+
     def observe(self, game_service) -> None:
         """
         Send the game state to the training server.
@@ -29,4 +30,8 @@ class ICommunicationServiceGame:
         """
         raise NotImplementedError
 
-
+    def stop(self) -> None:
+        """
+        Used to stop the communication service.
+        """
+        raise NotImplementedError
