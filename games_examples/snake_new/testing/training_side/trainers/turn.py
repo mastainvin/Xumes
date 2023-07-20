@@ -26,7 +26,7 @@ def train_impl(train_context):
         "direction_down": spaces.Box(0, 1, shape=(1,), dtype=int),
         "direction_left": spaces.Box(0, 1, shape=(1,), dtype=int)
         })
-    train_context.action_space = spaces.MultiDiscrete([3, 3])
+    train_context.action_space = spaces.MultiDiscrete(5)
     train_context.max_episode_length = 2000
     train_context.total_timesteps = int(2e5)
     train_context.algorithm_type = "MultiInputPolicy"

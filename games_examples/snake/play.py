@@ -46,16 +46,22 @@ class Main:
 
         self.snake = Snake()
         self.fruit = Fruit()
+        self.game.sleep(0.5)
         self.terminated = False
+        self.game.sleep(0.5)
 
     def check_fail(self):
         if not 0 <= self.snake.body[0].x < cell_number or not 0 <= self.snake.body[0].y < cell_number:
+            self.game.sleep(0.5)
             self.terminated = True
+            self.game.sleep(0.5)
             self.game_over()
 
         for block in self.snake.body[1:]:
             if block == self.snake.body[0]:
+                self.game.sleep(0.5)
                 self.terminated = True
+                self.game.sleep(0.5)
                 self.game_over()
 
     def check_events(self, event):
