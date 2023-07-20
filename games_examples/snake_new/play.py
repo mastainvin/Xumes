@@ -50,14 +50,14 @@ class Main:
         if not 0 <= self.snake.body[0].x < cell_number or not 0 <= self.snake.body[0].y < cell_number:
             self.end_game()
             print(self.terminated,"1")
-            time.sleep(0.5)
+
             print(self.terminated,"2")
             self.reset()
         for block in self.snake.body[1:]:
             if block == self.snake.body[0]:
                 self.end_game()
                 print(self.terminated,"1")
-                time.sleep(0.5)
+
                 print(self.terminated,"2")
                 self.reset()
 
@@ -71,7 +71,7 @@ class Main:
                     self.update()
 
             self.render()
-            pygame.display.update()
+            #pygame.display.update()
             self.clock.tick(60)
 
             self.check_end()
@@ -88,7 +88,7 @@ class Main:
         self.snake.reset()
         self.fruit.reset()
         self.terminated = False
-        time.sleep(0.5)
+
 
 
     def render(self):
