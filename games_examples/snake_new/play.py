@@ -42,12 +42,14 @@ class Main:
 
     def check_collision(self):
         if self.fruit.pos == self.snake.body[0]:
+            self.snake.fruit_ate=True
             self.fruit_ate()
 
 
     def check_fail(self):
         if not 0 <= self.snake.body[0].x < cell_number or not 0 <= self.snake.body[0].y < cell_number:
             self.end_game()
+            print(self.terminated)
             self.reset()
         for block in self.snake.body[1:]:
             if block == self.snake.body[0]:
@@ -64,9 +66,7 @@ class Main:
                     self.update()
 
             self.render()
-            pygame.display.update()
             self.clock.tick(60)
-
             self.check_end()
 
 
@@ -87,6 +87,7 @@ class Main:
         self.screen.fill((175, 215, 70))
         self.fruit.draw_fruit(self.screen)
         self.snake.draw_snake(self.screen)
+        pygame.display.update()
     def end_game(self):
         self.terminated = True
 

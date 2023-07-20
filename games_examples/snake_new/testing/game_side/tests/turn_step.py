@@ -1,5 +1,6 @@
 import pygame
-from xumes.game_module import loop, render
+from pygame import Vector2
+from xumes.game_module import loop, render, when
 
 from games_examples.snake.play import Main
 from games_examples.snake_new.src import snake
@@ -33,8 +34,7 @@ def test_impl(test_context):
 
     test_context.game.snake = test_context.create(Snake, name="snake", state=[
         State("body",  func=get_body, methods_to_observe=["move_snake"]),
-        State("direction", func=get_dir,methods_to_observe=["check_events"]),
-        State("new_block", func=get_new, methods_to_observe=[ "add_block", "move_snake"])
+        State("direction", func=get_dir,methods_to_observe=["check_events"])
     ])
 @given("A fruit")
 
@@ -60,4 +60,12 @@ def test_impl(test_context):
 @render
 def test_impl(test_context):
     test_context.Main.render()
+
+@when("There are no spaces between the head of the snake and the wall")
+def test_impl(test_context):
+    test_context.Main.reset()
+    test_context.Main.snake = Snake(body=[Vector2(5, 10), Vector2(4, 10), Vector2(3, 10)])
+
+
+
 
