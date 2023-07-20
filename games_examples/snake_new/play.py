@@ -63,7 +63,6 @@ class Main:
                 if event.type == self.SCREEN_UPDATE:
                     self.update()
 
-            self.screen.fill((175, 215, 70))
             self.render()
             pygame.display.update()
             self.clock.tick(60)
@@ -85,6 +84,7 @@ class Main:
 
 
     def render(self):
+        self.screen.fill((175, 215, 70))
         self.fruit.draw_fruit(self.screen)
         self.snake.draw_snake(self.screen)
     def end_game(self):

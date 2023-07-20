@@ -25,6 +25,7 @@ class Snake:
     def move_snake(self):
         if self.new_block:
             body_copy = self.body[:]
+
             #print(body_copy)
             body_copy.insert(0, body_copy[0] + self.direction)
             self.body = body_copy[:]
