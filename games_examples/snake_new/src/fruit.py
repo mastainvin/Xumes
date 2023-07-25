@@ -9,9 +9,7 @@ cell_number = 15
 
 class Fruit:
     def __init__(self):
-        self.pos = None
-        self.y = None
-        self.x = None
+
         self.randomize()
 
     def draw_fruit(self, screen):
@@ -25,13 +23,11 @@ class Fruit:
         self.pos = Vector2(self.x, self.y)
 
     def reset(self):
-        self.pos = None
-        self.y = None
-        self.x = None
+
         self.randomize()
 
-    def reset(self,x,y):
-        # you can set the coordinates of the fruit
-        self.y = y
-        self.x = x
-        self.pos = Vector2(self.x, self.y)
+    # def reset(self,x,y):
+    #     # you can set the coordinates of the fruit
+    #     self.y = y
+    #     self.x = x
+    #     self.pos = Vector2(self.x, self.y)

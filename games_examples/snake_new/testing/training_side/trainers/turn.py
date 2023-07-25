@@ -26,17 +26,18 @@ def train_impl(train_context):
         "direction_down": spaces.Box(0, 1, shape=(1,), dtype=int),
         "direction_left": spaces.Box(0, 1, shape=(1,), dtype=int)
         })
-    train_context.action_space = spaces.MultiDiscrete(5)
+    train_context.action_space = spaces.Discrete(5)
     train_context.max_episode_length = 2000
     train_context.total_timesteps = int(2e5)
     train_context.algorithm_type = "MultiInputPolicy"
     train_context.algorithm = stable_baselines3.PPO
+    train_context.distance=100
 
 
 @observation
 def train_impl(train_context):
     return {
-        "fruit_above_snake": np.array([1 if train_context.body[train_context.fruit.pos[1]] else 0]),
+        "fruit_above_snake": np.array([1 if train_context.snake.body[1] > train_context.fruit.pos[1] else 0]),
         "fruit_right_snake": np.array([1 if train_context.snake.body[0] < train_context.fruit.pos[0] else 0]),
         "fruit_below_snake": np.array([1 if train_context.snake.body[1] < train_context.fruit.pos[1] else 0]),
         "fruit_left_snake": np.array([1 if train_context.snake.body[0] > train_context.fruit.pos[0] else 0]),
@@ -176,19 +177,19 @@ def train_impl(train_context):
         close_reward += 80
 
     # if the snake is moving towards the fruit
-    if distance < distance:
+    if distance < train_context.distance:
         close_reward += 5
-        distance = distance
+        train_context.distance = distance
     #
-    elif distance > distance:
+    elif distance > train_context.distance:
         close_reward += -1
-        distance = distance
+        train_context.distance = distance
 
     else:
         close_reward += 0
-        distance = distance
+        train_context.distance = distance
 
-    distance = distance
+    train_context.distance = distance
     print("reward:", close_reward)
     return close_reward
 
@@ -200,9 +201,7 @@ def train_impl(train_context):
 
 @action
 def train_impl(train_context, raw_actions):
-    if snake.direction[0] == 0:
-        direction = ["nothing", "left", "right"]
-    elif snake.direction[1] == 0:
-        direction = ["nothing", "up", "down"]
-    actions = [direction[raw_actions[0]]]
-    return actions
+
+    direction = ["nothing", "up", "down","right","left"]
+    train_context.actions = [direction[raw_actions]]
+    return train_context.actions

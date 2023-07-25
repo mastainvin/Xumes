@@ -67,7 +67,7 @@ def test_impl(test_context):
 @loop
 def test_impl(test_context):
     for event in pygame.event.get():
-        test_context.snake.check_events(event) #########
+        test_context.game.snake.check_events(event) #########
         if event.type == test_context.game.SCREEN_UPDATE:
             test_context.game.update()
             test_context.game.clock.tick(0)  #maybe should deleete this line
@@ -100,7 +100,7 @@ def test_impl(test_context):
 @log
 def test_impl(test_context):
     return {
-        "points": test_context.game.snake.body
+        # "points": test_context.game.snake.body
     }
 
 
