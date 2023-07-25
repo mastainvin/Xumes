@@ -29,3 +29,9 @@ class Fruit:
         self.y = None
         self.x = None
         self.randomize()
+
+    def reset(self,x,y):
+        # you can set the coordinates of the fruit
+        self.y = y
+        self.x = x
+        self.pos = Vector2(self.x, self.y)

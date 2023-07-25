@@ -1,10 +1,15 @@
 import pygame
 from pygame import Vector2
-from xumes.game_module import State, given, when, loop, then, render, log
+from xumes.game_module import loop, render, when, then
+
 
 from games_examples.snake_new.play import Game
-from games_examples.snake_new.src.snake import Snake
 
+from games_examples.snake_new.src.fruit import Fruit
+from src.xumes.game_module.feature_strategy import given, log
+
+from games_examples.snake_new.src.snake import Snake
+from src.xumes.game_module.state_observable import State
 
 
 @given("A game with a snake")
@@ -30,15 +35,13 @@ def test_impl(test_context):
         State("body",  func=get_body, methods_to_observe=["move_snake"]),
         State("direction", func=get_dir, methods_to_observe=["check_events"])
     ])
-
-
 @given("A fruit")
+
 def get_fruit(fruit):
     # print([fruit[0],fruit[1]])
     return [fruit[0], fruit[1]]
-
-
 def test_impl(test_context):
+
 
     test_context.game.fruit= test_context.create(Fruit, name="fruit", state=[
         State("pos", func=get_fruit, methods_to_observe=["randomize"]),
@@ -62,6 +65,14 @@ def test_impl(test_context):
 #     test_context.game.clock.tick(0)
 
 
+@when("There are no spaces between the head of the snake and the wall")
+def test_impl(test_context):
+    test_context.game.reset()
+    # test_context.game.snake = Snake(body=[Vector2(14, 10), Vector2(13, 10), Vector2(12, 10)])
+    test_context.game.clock.tick(0)
+    # test_context.game
+
+
 @loop
 def test_impl(test_context):
     for event in pygame.event.get():
@@ -75,6 +86,11 @@ def test_impl(test_context):
 #     test_context.assert_true(test_context.game.player.points == int(nb_pipes))
 
 
+
+@then("The snake should turn to the direction that avoiding its body")
+def test_impl(test_context):
+    test_context.assert_not_equal(test_context.game.snake.direction, Vector2(1, 0))
+
 @render
 def test_impl(test_context):
 
@@ -84,15 +100,7 @@ def test_impl(test_context):
     test_context.game.dt = test_context.game.clock.tick(60) / 1000
 
 
-@when("There are no spaces between the head of the snake and the wall")
-def test_impl(test_context):
-    test_context.game.reset()
-    test_context.game.snake = Snake(body=[Vector2(5, 10), Vector2(4, 10), Vector2(3, 10)])
 
-
-@then("The snake should turn to the direction that avoiding its body")
-def test_impl(test_context):
-    test_context.assert_not_equal(test_context.game.snake.direction, Vector2(1, 0))
 
 
 @log
@@ -100,9 +108,5 @@ def test_impl(test_context):
     return {
         "points": test_context.game.snake.body
     }
-
-
-
-
 
 
