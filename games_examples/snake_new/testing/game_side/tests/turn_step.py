@@ -3,6 +3,7 @@ from pygame import Vector2
 from xumes.game_module import State, given, when, loop, then, render, log
 
 from games_examples.snake_new.play import Game
+from games_examples.snake_new.src.fruit import Fruit
 from games_examples.snake_new.src.snake import Snake
 
 
