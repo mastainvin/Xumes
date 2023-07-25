@@ -1,3 +1,4 @@
+import random
 import sys
 
 import pygame
@@ -50,6 +51,26 @@ class Snake:
         self.body = [Vector2(5, 10), Vector2(4, 10), Vector2(3, 10)]
         self.direction = Vector2(1, 0)
         self.fruit_ate=False
+
+        self.new_block = False
+
+    def reset2(self):
+        #for bumping into wall
+        self.body = [Vector2(13, 10), Vector2(12, 10), Vector2(11, 10), Vector2(11, 9), Vector2(11, 8),
+                     Vector2(11, 7), Vector2(12, 7), Vector2(13, 7), Vector2(14, 7)]
+        self.direction = Vector2(1, 0)
+        self.fruit_ate=False
+
+        self.new_block = False
+
+    def reset3(self):
+        # for bumping into itself
+
+        self.body = [Vector2(9, 10), Vector2(8, 10), Vector2(7, 10), Vector2(7, 9), Vector2(7, 8),
+                     Vector2(7, 7), Vector2(8, 7), Vector2(9, 7), Vector2(10, 7), Vector2(10, 6),
+                     Vector2(10, 5), Vector2(10, 4)]
+        self.direction = Vector2(0, -1)
+        self.fruit_ate = False
 
         self.new_block = False
 
