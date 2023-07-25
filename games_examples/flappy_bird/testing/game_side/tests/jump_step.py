@@ -99,7 +99,7 @@ def test_impl(test_context):
 def test_impl(test_context):
     x, y = test_context.game.player.center
     return {
-        "player": {
+        "snake": {
             "points": test_context.game.player.points,
             "x": x,
             "y": y,

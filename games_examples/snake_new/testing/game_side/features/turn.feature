@@ -56,3 +56,5 @@ Feature: Testing the turn
     And Should not change direction before reach the end of the wall
     And Change direction immediately for two times
     And If it is necessary, repeat last step when reaching the length of (width or height-3) or bump into itself
+
+

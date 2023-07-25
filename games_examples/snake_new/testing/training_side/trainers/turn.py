@@ -3,10 +3,10 @@ import stable_baselines3
 from gymnasium.vector.utils import spaces
 from xumes.training_module import observation, config, reward, action, terminated
 
-from games_examples.snake_new.play import Main
+
 from games_examples.snake_new.src import snake, fruit
 from games_examples.snake_new.src.fruit import cell_number
-from games_examples.snake_new.src.snake import Snake
+
 
 
 @config
@@ -195,7 +195,7 @@ def train_impl(train_context):
 
 @terminated
 def train_impl(train_context):
-    return train_context.main.terminated
+    return train_context.game.terminated
 
 
 @action

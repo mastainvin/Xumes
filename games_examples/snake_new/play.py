@@ -9,7 +9,7 @@ cell_size = 30
 cell_number = 15
 
 
-class Main:
+class Game:
     terminated = False
 
     def __init__(self):

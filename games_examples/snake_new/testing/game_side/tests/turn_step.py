@@ -1,11 +1,12 @@
 import pygame
 from pygame import Vector2
-from xumes.game_module import loop, render, when
+from xumes.game_module import loop, render, when, then
 
-from games_examples.snake.play import Main
-from games_examples.snake_new.src import snake
+
+from games_examples.snake_new.play import Game
+
 from games_examples.snake_new.src.fruit import Fruit
-from src.xumes.game_module.feature_strategy import given
+from src.xumes.game_module.feature_strategy import given, log
 
 from games_examples.snake_new.src.snake import Snake
 from src.xumes.game_module.state_observable import State
@@ -13,7 +14,7 @@ from src.xumes.game_module.state_observable import State
 
 @given("A game with a snake")
 def test_impl(test_context):
-    test_context.game = test_context.create(Main, "game",
+    test_context.game = test_context.create(Game, "game",
                                             state=State("terminated", methods_to_observe=["end_game", "reset"]))
 
     def get_body(bodies):
@@ -30,11 +31,9 @@ def test_impl(test_context):
         # print(new)
         return new
 
-
-
     test_context.game.snake = test_context.create(Snake, name="snake", state=[
         State("body",  func=get_body, methods_to_observe=["move_snake"]),
-        State("direction", func=get_dir,methods_to_observe=["check_events"])
+        State("direction", func=get_dir, methods_to_observe=["check_events"])
     ])
 @given("A fruit")
 
@@ -45,7 +44,7 @@ def test_impl(test_context):
 
 
     test_context.game.fruit= test_context.create(Fruit, name="fruit", state=[
-        State("pos", func=get_fruit, methods_to_observe=["__init__", "randomize", "draw_fruit"]),
+        State("pos", func=get_fruit, methods_to_observe=["randomize"]),
     ])
     test_context.game.dt = 0.09
 
@@ -65,13 +64,14 @@ def test_impl(test_context):
 #
 #     test_context.game.clock.tick(0)
 
+
 @loop
 def test_impl(test_context):
     for event in pygame.event.get():
         test_context.snake.check_events(event) #########
-        if event.type == test_context.Main.SCREEN_UPDATE:
-            test_context.Main.update()
-            test_context.Main.clock.tick(0)  #maybe should deleete this line
+        if event.type == test_context.game.SCREEN_UPDATE:
+            test_context.game.update()
+            test_context.game.clock.tick(0)  #maybe should deleete this line
 
 # @then("The player should have passed {nb_pipes} pipes")
 # def test_impl(test_context, nb_pipes):
@@ -82,14 +82,27 @@ def test_impl(test_context):
 def test_impl(test_context):
 
     # whether the screen have been drawn?
-    test_context.Main.render()
+    test_context.game.render()
     pygame.display.flip()
     test_context.game.dt = test_context.game.clock.tick(60) / 1000
 
 @when("There are no spaces between the head of the snake and the wall")
 def test_impl(test_context):
-    test_context.Main.reset()
-    test_context.Main.snake = Snake(body=[Vector2(5, 10), Vector2(4, 10), Vector2(3, 10)])
+    test_context.game.reset()
+    test_context.game.snake = Snake(body=[Vector2(5, 10), Vector2(4, 10), Vector2(3, 10)])
+
+
+@then("The snake should turn to the direction that avoiding its body")
+def test_impl(test_context):
+    test_context.assert_not_equal(test_context.game.snake.direction, Vector2(1, 0))
+
+@log
+def test_impl(test_context):
+    return {
+        "points": test_context.game.snake.body
+    }
+
+
 
 
 

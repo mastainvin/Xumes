@@ -32,7 +32,7 @@ class Snake:
         if self.new_block:
             body_copy = self.body[:]
             self.fruit_ate=True
-            print(self.fruit_ate)
+            #print(self.fruit_ate)
             #print(body_copy)
             body_copy.insert(0, body_copy[0] + self.direction)
             self.body = body_copy[:]
@@ -41,7 +41,7 @@ class Snake:
             body_copy = self.body[:-1]
             body_copy.insert(0, body_copy[0] + self.direction)
             self.body = body_copy[:]
-            print(body_copy)
+            #print(body_copy)
 
     def add_block(self):
         self.new_block = True
@@ -52,7 +52,6 @@ class Snake:
         self.fruit_ate=False
 
         self.new_block = False
-
 
     def check_events(self, event):
         if event.type == pygame.QUIT:
