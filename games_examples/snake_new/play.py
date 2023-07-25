@@ -2,6 +2,8 @@ import pygame
 import sys
 from pygame.math import Vector2
 import time
+
+
 from games_examples.snake.src.fruit import Fruit
 from games_examples.snake_new.src.snake import Snake
 
@@ -107,5 +109,5 @@ class Game:
 
 
 if __name__ == "__main__":
-    main = Main()
-    main.run()
+    game = Game()
+    game.run()

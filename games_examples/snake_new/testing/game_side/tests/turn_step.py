@@ -34,12 +34,13 @@ def test_impl(test_context):
 
 
 @given("A fruit")
-def get_fruit(fruit):
-    # print([fruit[0],fruit[1]])
-    return [fruit[0], fruit[1]]
+
 
 
 def test_impl(test_context):
+    def get_fruit(fruit):
+        # print([fruit[0],fruit[1]])
+        return [fruit[0], fruit[1]]
 
     test_context.game.fruit= test_context.create(Fruit, name="fruit", state=[
         State("pos", func=get_fruit, methods_to_observe=["randomize"]),
