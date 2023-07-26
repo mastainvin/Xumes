@@ -86,15 +86,15 @@ def test_impl(test_context):
     test_context.game.dt = test_context.game.clock.tick(60) / 1000
 
 
-@when("There are no spaces between the head of the snake and the wall")
+@when("There is one fruit")
 def test_impl(test_context):
     test_context.game.reset()
-    test_context.game.snake = Snake(body=[Vector2(5, 10), Vector2(4, 10), Vector2(3, 10)])
 
 
-@then("The snake should turn to the direction that avoiding its body")
+
+@then("The snake should be longer")
 def test_impl(test_context):
-    test_context.assert_not_equal(test_context.game.snake.direction, Vector2(1, 0))
+    test_context.assert_greater(test_context.game.snake.body, 3)
 
 
 @log

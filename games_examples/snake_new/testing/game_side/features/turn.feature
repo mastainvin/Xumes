@@ -4,9 +4,8 @@ Feature: Testing the turn
   Scenario: To eat a fruit
     Given A game with a snake
     And A fruit
-    When The head of the snake has passed the fruit
-#    And The fruit is placed before intersection
-    Then The snake should turn to the direction of the fruit when the head of the snake is in the same line with the fruit
+    When There is one fruit
+    Then The snake should be longer
 
   @eat_facing
   Scenario: To eat a fruit
