@@ -29,14 +29,11 @@ class Snake:
             pygame.draw.rect(screen, (183, 111, 122), block_rect)
 
     def move_snake(self):
-        print(self.fruit_ate)
-        print(len(self.body))
+
         if self.new_block:
             body_copy = self.body[:]
             self.fruit_ate=True
-            print(len(self.body))
-            #print(self.fruit_ate)
-            #print(body_copy)
+
             body_copy.insert(0, body_copy[0] + self.direction)
             self.body = body_copy[:]
             self.new_block = False
@@ -44,7 +41,7 @@ class Snake:
             body_copy = self.body[:-1]
             body_copy.insert(0, body_copy[0] + self.direction)
             self.body = body_copy[:]
-            #print(body_copy)
+
 
     def add_block(self):
         self.new_block = True
@@ -65,7 +62,7 @@ class Snake:
             current_time = pygame.time.get_ticks()
 
             # 检查时间差是否大于0.2秒
-            if current_time - self.last_keydown_time >= 151:  # 200毫秒 = 0.2秒
+            if current_time - self.last_keydown_time >= 151:
                 # 处理pygame.KEYDOWN事件
                 # 更新上一次接收pygame.KEYDOWN事件的时间戳
 
@@ -88,6 +85,3 @@ class Snake:
                     if self.direction.x == 0:
                         self.direction = Vector2(1, 0)
                         self.last_keydown_time = current_time
-            # print("Handling KEYDOWN event")
-
-            print(self.direction)

@@ -10,14 +10,17 @@ from games_examples.snake_new.src.snake import Snake
 
 @given("A game with a snake")
 def test_impl(test_context):
+    def get_end(end):
+        print(end,"end")
+        return end
     test_context.game = test_context.create(Game, "game",
-                                            state=State("terminated", methods_to_observe=["end_game", "reset"]))
-
+                                            state=State("terminated",func=get_end,      methods_to_observe = [ "reset", "end_game"]))
+    # "end_game"
     def get_body(bodies):
         result = []
         for body in bodies:
             result.extend([body[0], body[1]])
-            # print(result)
+        # print(result)
         return result
 
     def get_dir(dir):
@@ -31,7 +34,7 @@ def test_impl(test_context):
         State("body",  func=get_body, methods_to_observe=["move_snake"]),
         State("direction", func=get_dir, methods_to_observe=["check_events"])
     ])
-
+    test_context.game.dt = 0.09
 
 @given("A fruit")
 def test_impl(test_context):
@@ -59,7 +62,11 @@ def test_impl(test_context):
 #     test_context.game.pipe_generator.notify()
 #
 #     test_context.game.clock.tick(0)
-
+@when("There is one fruit")
+def test_impl(test_context):
+    # test_context.game.reset()
+    test_context.game.clock.tick(0)
+    # pass
 
 @loop
 def test_impl(test_context):
@@ -74,30 +81,28 @@ def test_impl(test_context):
 #     test_context.assert_true(test_context.game.player.points == int(nb_pipes))
 
 
+@then("The snake should be longer")
+def test_impl(test_context):
+    test_context.assert_greater(test_context.game.snake.body, 6)
+
 @render
 def test_impl(test_context):
 
     # whether the screen have been drawn?
     test_context.game.render()
     pygame.display.flip()
+    test_context.game.dt = test_context.game.clock.tick(60) / 1000
 
 
 
-@when("There is one fruit")
-def test_impl(test_context):
-    # test_context.game.reset()
-    pass
 
-
-@then("The snake should be longer")
-def test_impl(test_context):
-    test_context.assert_greater(test_context.game.snake.body, 6)
 
 
 @log
 def test_impl(test_context):
     return {
-        # "points": test_context.game.snake.body
+        "points": test_context.game.snake.body,
+        "terminated": test_context.game.terminated
     }
 
 

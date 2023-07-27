@@ -27,8 +27,8 @@ def train_impl(train_context):
         "direction_left": spaces.Box(0, 1, shape=(1,), dtype=int)
         })
     train_context.action_space = spaces.Discrete(5)
-    train_context.max_episode_length = 2000
-    train_context.total_timesteps = int(1e4)
+    train_context.max_episode_length = 10000
+    train_context.total_timesteps = int(1e5)
     train_context.algorithm_type = "MultiInputPolicy"
     train_context.algorithm = stable_baselines3.PPO
     train_context.distance=100
@@ -64,15 +64,16 @@ def train_impl(train_context):
 def train_impl(train_context):
     close_reward = 0
     if (train_context.fruit.pos[0] == train_context.snake.body[0] and train_context.fruit.pos[1] ==  train_context.snake.body[1]) :
-        print("eat")
-        close_reward += 10
-    if train_context.game.terminated:
-        close_reward -= 100
-    return close_reward
+        # print("eattttttt")
+        return 10
+    if train_context.game.terminated==True:
+        return -10
+    return 0
 
 
 @terminated
 def train_impl(train_context):
+    # print(train_context.game.terminated,"aaaaattt",train_context)
     return train_context.game.terminated
 
 
