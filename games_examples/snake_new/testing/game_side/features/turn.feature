@@ -18,8 +18,8 @@ Feature: Testing the turn
   Scenario: To turn before bump into the wall
     Given A game with a snake
     And A fruit
-    When There are no spaces between the head of the snake and the wall
-    Then The snake should turn to the direction that avoiding its body
+    When There is one fruit
+    Then The snake should be longer
 
   @itself
   Scenario: To turn before bump into itself

@@ -3,7 +3,7 @@ import sys
 
 import pygame
 from pygame import Vector2
-
+import time
 cell_size = 30
 
 
@@ -17,7 +17,7 @@ class Snake:
 
         self.new_block = False
         self.fruit_ate = False
-
+        self.last_keydown_time=0
         self.body = body
         self.direction = direction
 
@@ -62,20 +62,32 @@ class Snake:
             pygame.quit()
             sys.exit()
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_UP:
-                if self.direction.y != 1:
-                    self.direction = Vector2(0, -1)
+            current_time = pygame.time.get_ticks()
 
-            if event.key == pygame.K_DOWN:
-                if self.direction.y != -1:
-                    self.direction = Vector2(0, 1)
+            # 检查时间差是否大于0.2秒
+            if current_time - self.last_keydown_time >= 151:  # 200毫秒 = 0.2秒
+                # 处理pygame.KEYDOWN事件
+                # 更新上一次接收pygame.KEYDOWN事件的时间戳
 
-            if event.key == pygame.K_LEFT:
-                if self.direction.x != 1:
-                    self.direction = Vector2(-1, 0)
+                if event.key == pygame.K_UP:
+                    if self.direction.y == 0:
+                        self.direction = Vector2(0, -1)
+                        self.last_keydown_time = current_time
 
-            if event.key == pygame.K_RIGHT:
-                if self.direction.x != -1:
-                    self.direction = Vector2(1, 0)
+                if event.key == pygame.K_DOWN:
+                    if self.direction.y == 0:
+                        self.direction = Vector2(0, 1)
+                        self.last_keydown_time = current_time
+
+                if event.key == pygame.K_LEFT:
+                    if self.direction.x == 0:
+                        self.direction = Vector2(-1, 0)
+                        self.last_keydown_time = current_time
+
+                if event.key == pygame.K_RIGHT:
+                    if self.direction.x == 0:
+                        self.direction = Vector2(1, 0)
+                        self.last_keydown_time = current_time
+            # print("Handling KEYDOWN event")
 
             print(self.direction)
