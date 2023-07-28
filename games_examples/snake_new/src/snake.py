@@ -62,6 +62,7 @@ class Snake:
 
             # 检查时间差是否大于0.2秒
             if current_time - self.last_keydown_time >= 151:
+            # if True:
                 # 处理pygame.KEYDOWN事件
                 # 更新上一次接收pygame.KEYDOWN事件的时间戳
 

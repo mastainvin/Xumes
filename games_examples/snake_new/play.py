@@ -49,12 +49,13 @@ class Game:
 
     def check_fail(self):
         if not 0 <= self.snake.body[0].x < cell_number or not 0 <= self.snake.body[0].y < cell_number:
+            print("die1")
             self.end_game()
-            self.check_end()
+
         for block in self.snake.body[1:]:
             if block == self.snake.body[0]:
+                print("die2")
                 self.end_game()
-                self.check_end()
 
 
 
@@ -66,8 +67,12 @@ class Game:
                 if event.type == self.SCREEN_UPDATE:
                     self.update()
 
-
             self.render()
+            #pygame.display.update()
+            # self.clock.tick(60)
+
+
+
 
             # limits FPS to 60
             # dt is delta time in seconds since last frame, used for framerate-
@@ -87,19 +92,36 @@ class Game:
         self.fruit.draw_fruit(self.screen)
         self.snake.draw_snake(self.screen)
         pygame.display.update()
-        self.clock.tick(60)
     def end_game(self):
         # print("poi true")
         self.terminated = True
 
     def check_end(self):
         if self.terminated:
-            print("reset !")
             self.reset()
 
 
+class GameInherited(Game): # Inherited class
+    terminated2 = False # new attribute
 
+    def end_game(self):  # overloading end_game
+        super().end_game()
+        self.terminated2 = True
 
+    def reset(self):  # overloading reset
+        super().reset()
+        self.terminated2 = False
+
+    def check_fail(self):  # overloading check_fail
+        if not 0 <= self.snake.body[0].x < cell_number or not 0 <= self.snake.body[0].y < cell_number:
+            # print("Game Over - You hit the wall")
+            self.end_game()
+            self.check_end()
+        for block in self.snake.body[1:]:
+            if block == self.snake.body[0]:
+                # print("Game Over - You hit your own body")
+                self.end_game()
+                self.check_end()
 if __name__ == "__main__":
-    game = Game()
+    game = GameInherited()
     game.run()
