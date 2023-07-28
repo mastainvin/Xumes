@@ -116,12 +116,12 @@ class GameInherited(Game): # Inherited class
         if not 0 <= self.snake.body[0].x < cell_number or not 0 <= self.snake.body[0].y < cell_number:
             # print("Game Over - You hit the wall")
             self.end_game()
-            self.check_end()
+
         for block in self.snake.body[1:]:
             if block == self.snake.body[0]:
                 # print("Game Over - You hit your own body")
                 self.end_game()
-                self.check_end()
+
 if __name__ == "__main__":
     game = GameInherited()
     game.run()
