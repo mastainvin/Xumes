@@ -36,7 +36,6 @@ class Game:
         self.check_fail()
 
 
-
     def fruit_ate(self):
         self.fruit.randomize()
         self.snake.add_block()
@@ -51,18 +50,12 @@ class Game:
     def check_fail(self):
         if not 0 <= self.snake.body[0].x < cell_number or not 0 <= self.snake.body[0].y < cell_number:
             self.end_game()
-            print(self.terminated)
-            print("die1")
-
-            #print(self.terminated,"2")
             self.check_end()
         for block in self.snake.body[1:]:
             if block == self.snake.body[0]:
                 self.end_game()
-                print("die2")
-
-                #print(self.terminated,"2")
                 self.check_end()
+
 
 
 
@@ -75,12 +68,6 @@ class Game:
 
 
             self.render()
-            #pygame.display.update()
-
-
-            #self.check_end()
-
-
 
             # limits FPS to 60
             # dt is delta time in seconds since last frame, used for framerate-
@@ -102,6 +89,7 @@ class Game:
         pygame.display.update()
         self.clock.tick(60)
     def end_game(self):
+        # print("poi true")
         self.terminated = True
 
     def check_end(self):
