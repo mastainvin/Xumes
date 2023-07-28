@@ -50,10 +50,12 @@ class Game:
     def check_fail(self):
         if not 0 <= self.snake.body[0].x < cell_number or not 0 <= self.snake.body[0].y < cell_number:
             self.end_game()
+            #print("die1")
             self.check_end()
         for block in self.snake.body[1:]:
             if block == self.snake.body[0]:
                 self.end_game()
+                #print("die2")
                 self.check_end()
 
 
@@ -94,7 +96,7 @@ class Game:
 
     def check_end(self):
         if self.terminated:
-            print("reset !")
+            #print("reset !")
             self.reset()
 
 

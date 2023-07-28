@@ -8,7 +8,7 @@ Feature: Testing the turn
     Then The snake should be longer
 
   @eat_facing
-  Scenario: To eat a fruit
+  Scenario: To eat a fruit 2
     Given A game with a snake
     And A fruit
     When The head of the snake has not passed the fruit

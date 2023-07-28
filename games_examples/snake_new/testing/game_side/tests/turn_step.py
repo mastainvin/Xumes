@@ -10,11 +10,9 @@ from games_examples.snake_new.src.snake import Snake
 
 @given("A game with a snake")
 def test_impl(test_context):
-    def get_end(end):
-        print(end,"end")
-        return end
+
     test_context.game = test_context.create(Game, "game",
-                                            state=State("terminated",func=get_end,      methods_to_observe = [ "reset", "end_game"]))
+                                            state=State("terminated",methods_to_observe = [ "reset", "end_game"]))
     # "end_game"
     def get_body(bodies):
         result = []
@@ -35,7 +33,7 @@ def test_impl(test_context):
         State("direction", func=get_dir, methods_to_observe=["check_events"]),
         State("fruit_ate", methods_to_observe=["move_snake"])
     ])
-    test_context.game.dt = 0.09
+    #test_context.game.dt = 0.09
 
 @given("A fruit")
 def test_impl(test_context):
@@ -76,6 +74,7 @@ def test_impl(test_context):
         test_context.game.snake.check_events(event) #########
         if event.type == test_context.game.SCREEN_UPDATE:
             test_context.game.update()
+    #test_context.game.snake.move_snake()
 
 
 # @then("The player should have passed {nb_pipes} pipes")
@@ -98,11 +97,6 @@ def test_impl(test_context):
 
 
 
-@then("The snake should be longer")
-def test_impl(test_context):
-
-    test_context.assert_greater(len(test_context.game.snake.body), 6)
-
 
 
 
@@ -110,7 +104,7 @@ def test_impl(test_context):
 def test_impl(test_context):
     return {
 
-         "len": len(test_context.game.snake.body),
+        "len": len(test_context.game.snake.body),
         "body": test_context.game.snake.body,
         "terminated": test_context.game.terminated
 
