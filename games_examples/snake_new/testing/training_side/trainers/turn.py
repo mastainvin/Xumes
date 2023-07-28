@@ -12,6 +12,8 @@ from games_examples.snake_new.src.fruit import cell_number
 @config
 def train_impl(train_context):
 
+    train_context.distance = float('inf')
+
     train_context.observation_space = spaces.Dict({
         "fruit_above_snake": spaces.Box(0, 1, shape=(1,), dtype=int),
         "fruit_right_snake": spaces.Box(0, 1, shape=(1,), dtype=int),
@@ -27,8 +29,8 @@ def train_impl(train_context):
         "direction_left": spaces.Box(0, 1, shape=(1,), dtype=int)
         })
     train_context.action_space = spaces.Discrete(5)
-    train_context.max_episode_length = 2000
-    train_context.total_timesteps = int(1e4)
+    train_context.max_episode_length = 20000
+    train_context.total_timesteps = int(1e5)
     train_context.algorithm_type = "MultiInputPolicy"
     train_context.algorithm = stable_baselines3.PPO
     train_context.distance=100
@@ -62,15 +64,39 @@ def train_impl(train_context):
 
 @reward
 def train_impl(train_context):
-    close_reward = 0
-    if (train_context.fruit.pos[0] == train_context.snake.body[0] and train_context.fruit.pos[1] ==  train_context.snake.body[1]) or \
-            train_context.fruit.pos[0] == train_context.snake.body[0] + train_context.snake.direction[0] \
-            and train_context.fruit.pos[1] == train_context.snake.body[1] + train_context.snake.direction[1]:
+    #close_reward = 0
+    #if (train_context.fruit.pos[0] == train_context.snake.body[0] and train_context.fruit.pos[1] ==  train_context.snake.body[1]) or \
+            #train_context.fruit.pos[0] == train_context.snake.body[0] + train_context.snake.direction[0] \
+            #and train_context.fruit.pos[1] == train_context.snake.body[1] + train_context.snake.direction[1]:
+        #print("eat")
+        #close_reward += 10
+    #if train_context.game.terminated:
+        #close_reward -= 100
+    #return close_reward
+
+
+    #print(train_context.snake["body"])
+    head_x, head_y = train_context.snake.body[0], train_context.snake.body[1]
+    #print(head_x)
+    #print(head_y)
+
+    distance = np.abs(train_context.fruit.pos[0] - head_x) + np.abs(train_context.fruit.pos[1] - head_y)
+
+    if distance < train_context.distance:
+        close_reward = 1
+    elif distance > train_context.distance:
+        close_reward = -1
+    else:
+        close_reward = 0
+
+    if train_context.snake.fruit_ate:
         print("eat")
-        close_reward += 10
-    if train_context.game.terminated:
-        close_reward -= 100
-    return close_reward
+        return 10
+    elif train_context.game.terminated:
+        print("die")
+        return -100
+    else:
+        return close_reward
 
 
 @terminated

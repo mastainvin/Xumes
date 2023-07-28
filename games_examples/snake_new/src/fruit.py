@@ -9,8 +9,11 @@ cell_number = 15
 
 class Fruit:
     def __init__(self):
-
+        self.pos = None
+        self.y = None
+        self.x = None
         self.randomize()
+
 
     def draw_fruit(self, screen):
         fruit_rect = pygame.Rect(

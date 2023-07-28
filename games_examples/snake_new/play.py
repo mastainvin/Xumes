@@ -51,17 +51,18 @@ class Game:
     def check_fail(self):
         if not 0 <= self.snake.body[0].x < cell_number or not 0 <= self.snake.body[0].y < cell_number:
             self.end_game()
-            print(self.terminated,"1")
+            print(self.terminated)
+            print("die1")
 
-            print(self.terminated,"2")
-            self.reset()
+            #print(self.terminated,"2")
+            self.check_end()
         for block in self.snake.body[1:]:
             if block == self.snake.body[0]:
                 self.end_game()
-                print(self.terminated,"1")
+                print("die2")
 
-                print(self.terminated,"2")
-                self.reset()
+                #print(self.terminated,"2")
+                self.check_end()
 
 
 
@@ -72,11 +73,12 @@ class Game:
                 if event.type == self.SCREEN_UPDATE:
                     self.update()
 
+
             self.render()
             #pygame.display.update()
-            self.clock.tick(60)
 
-            self.check_end()
+
+            #self.check_end()
 
 
 
@@ -98,11 +100,13 @@ class Game:
         self.fruit.draw_fruit(self.screen)
         self.snake.draw_snake(self.screen)
         pygame.display.update()
+        self.clock.tick(60)
     def end_game(self):
         self.terminated = True
 
     def check_end(self):
         if self.terminated:
+            print("reset !")
             self.reset()
 
 

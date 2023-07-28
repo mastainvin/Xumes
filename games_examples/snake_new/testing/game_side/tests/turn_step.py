@@ -17,8 +17,9 @@ def test_impl(test_context):
         result = []
         for body in bodies:
             result.extend([body[0], body[1]])
-            print(result)
+            #print(result)
         return result
+        #return [{'x': body[0], 'y': body[1]} for body in bodies]
 
     def get_dir(dir):
         return [dir[0], dir[1]]
@@ -29,7 +30,8 @@ def test_impl(test_context):
 
     test_context.game.snake = test_context.create(Snake, name="snake", state=[
         State("body",  func=get_body, methods_to_observe=["move_snake"]),
-        State("direction", func=get_dir, methods_to_observe=["check_events"])
+        State("direction", func=get_dir, methods_to_observe=["check_events"]),
+        State("fruit_ate", methods_to_observe=["move_snake"])
     ])
 
 
@@ -45,7 +47,6 @@ def test_impl(test_context):
     test_context.game.fruit= test_context.create(Fruit, name="fruit", state=[
         State("pos", func=get_fruit, methods_to_observe=["randomize"]),
     ])
-    test_context.game.dt = 0.09
 
 # @when("The first pipe is at {i} % and the next pipe is at {j} %")
 # def test_impl(test_context, i, j):
@@ -66,11 +67,12 @@ def test_impl(test_context):
 
 @loop
 def test_impl(test_context):
+    #print(test_context.game.snake.body)
     for event in pygame.event.get():
         test_context.game.snake.check_events(event) #########
         if event.type == test_context.game.SCREEN_UPDATE:
             test_context.game.update()
-            test_context.game.clock.tick(0)  #maybe should deleete this line
+            #test_context.game.clock.tick(0)  #maybe should deleete this line
 
 # @then("The player should have passed {nb_pipes} pipes")
 # def test_impl(test_context, nb_pipes):
@@ -83,7 +85,6 @@ def test_impl(test_context):
     # whether the screen have been drawn?
     test_context.game.render()
     pygame.display.flip()
-    test_context.game.dt = test_context.game.clock.tick(60) / 1000
 
 
 @when("There is one fruit")
@@ -94,13 +95,15 @@ def test_impl(test_context):
 
 @then("The snake should be longer")
 def test_impl(test_context):
-    test_context.assert_greater(test_context.game.snake.body, 3)
+    print("1")
+    test_context.assert_greater(len(test_context.game.snake.body), 3)
+
 
 
 @log
 def test_impl(test_context):
     return {
-        # "points": test_context.game.snake.body
+         "len": len(test_context.game.snake.body)
     }
 
 
