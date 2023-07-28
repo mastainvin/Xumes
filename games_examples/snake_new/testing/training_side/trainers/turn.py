@@ -84,7 +84,11 @@ def train_impl(train_context):
     #else:
         #return close_reward
 
-    if train_context.game.terminated:
+    if (train_context.fruit.pos[0] == train_context.snake.body[0] and train_context.fruit.pos[1] ==
+            train_context.snake.body[1]):
+        print("eattttttt")
+        return 10
+    if train_context.game.terminated == True:
         return -10
     return 0
 
