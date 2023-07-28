@@ -30,7 +30,7 @@ def train_impl(train_context):
         })
     train_context.action_space = spaces.Discrete(5)
     train_context.max_episode_length = 10000
-    train_context.total_timesteps = int(1e5)
+    train_context.total_timesteps = int(2e4)
     train_context.algorithm_type = "MultiInputPolicy"
     train_context.algorithm = stable_baselines3.PPO
     train_context.distance=100
@@ -86,17 +86,18 @@ def train_impl(train_context):
 
     if (train_context.fruit.pos[0] == train_context.snake.body[0] and train_context.fruit.pos[1] ==
             train_context.snake.body[1]):
-        print("eattttttt")
+        # print("eattttttt")
         return 10
-    if train_context.game.terminated == True:
+    if train_context.game.terminated2 == True:
+        print("died")
         return -10
     return 0
 
 
 @terminated
 def train_impl(train_context):
-    # print(train_context.game.terminated,"aaaaattt",train_context)
-    return train_context.game.terminated
+    print("train_context.game.terminated2", train_context.game.terminated2)
+    return train_context.game.terminated2
 
 
 @action
