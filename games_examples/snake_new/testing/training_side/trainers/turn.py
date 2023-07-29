@@ -29,8 +29,8 @@ def train_impl(train_context):
         "direction_left": spaces.Box(0, 1, shape=(1,), dtype=int)
         })
     train_context.action_space = spaces.Discrete(5)
-    train_context.max_episode_length = 10000
-    train_context.total_timesteps = int(2e4)
+    train_context.max_episode_length = 2000
+    train_context.total_timesteps = int(250000)
     train_context.algorithm_type = "MultiInputPolicy"
     train_context.algorithm = stable_baselines3.PPO
     train_context.distance=100
@@ -83,7 +83,7 @@ def train_impl(train_context):
     if train_context.game.terminated2:  #Boolean
         print("died")
         close_reward -= 10
-    distance
+    train_context.distance=distance
     return close_reward
 
 
