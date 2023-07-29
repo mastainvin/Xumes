@@ -66,6 +66,7 @@ class Game:
 
 
 
+
     def run(self):
         while self.running:
             for event in pygame.event.get():

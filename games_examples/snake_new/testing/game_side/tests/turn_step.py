@@ -11,11 +11,13 @@ from games_examples.snake_new.src.snake import Snake
 
 @given("A game with a snake")
 def test_impl(test_context):
+
     def get_end(end):
         print(end,"end")
         return end
     test_context.game = test_context.create(GameInherited, "game",
                                             state=State("terminated2",func=get_end,      methods_to_observe = [ "reset", "end_game"]))
+
     # "end_game"
     def get_body(bodies):
         result = []
@@ -35,7 +37,7 @@ def test_impl(test_context):
         State("body",  func=get_body, methods_to_observe=["move_snake"]),
         State("direction", func=get_dir, methods_to_observe=["check_events"])
     ])
-    test_context.game.dt = 0.09
+    #test_context.game.dt = 0.09
 
 @given("A fruit")
 def test_impl(test_context):
@@ -75,7 +77,7 @@ def test_impl(test_context):
         test_context.game.snake.check_events(event) #########
         if event.type == test_context.game.SCREEN_UPDATE:
             test_context.game.update()
-     #maybe should deleete this line
+
 
 # @then("The player should have passed {nb_pipes} pipes")
 # def test_impl(test_context, nb_pipes):
@@ -102,8 +104,10 @@ def test_impl(test_context):
 @log
 def test_impl(test_context):
     return {
+
         "points": test_context.game.snake.body,
         "terminated": test_context.game.terminated2
+
     }
 
 
