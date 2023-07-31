@@ -70,13 +70,14 @@ def train_impl(train_context):
     distance = np.abs(train_context.fruit.pos[0] - head_x) + np.abs(train_context.fruit.pos[1] - head_y)
 
     if distance < train_context.distance:
+        print("near",distance , train_context.distance)
         close_reward += 1
     elif distance > train_context.distance:
+        print("far",distance, train_context.distance)
         close_reward -= 1
     else:
         close_reward = 0
-    if (train_context.fruit.pos[0] == train_context.snake.body[0] and train_context.fruit.pos[1] ==
-            train_context.snake.body[1]):
+    if (train_context.fruit.pos[0] == train_context.snake.body[0] and train_context.fruit.pos[1] == train_context.snake.body[1]) or train_context.snake.new_block:
         # eat
         print("eat")
         close_reward += 10
