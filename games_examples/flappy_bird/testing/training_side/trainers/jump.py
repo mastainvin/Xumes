@@ -50,7 +50,7 @@ def train_impl(train_context):
     if term:
         train_context.lidar.reset()
         train_context.points = 0
-    print(train_context.game.terminated ,"fla end")
+    # print(train_context.game.terminated ,"fla end")
     return term
 
 

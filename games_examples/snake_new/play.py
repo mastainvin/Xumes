@@ -73,6 +73,7 @@ class Game:
                 self.snake.check_events(event)
                 if event.type == self.SCREEN_UPDATE:
                     self.update()
+                    print(self.snake.body)
 
             self.render()
             #pygame.display.update()
@@ -84,7 +85,7 @@ class Game:
             # limits FPS to 60
             # dt is delta time in seconds since last frame, used for framerate-
             # independent physics.
-            self.dt = self.clock.tick(60) / 1000
+            # self.dt = self.clock.tick(60) / 1000
 
 
     def reset(self):
