@@ -5,7 +5,7 @@ Feature: Testing the turn
     Given A game with a snake
     And A fruit
     When There is one fruit
-    Then The snake should be longer
+    Then The snake should grow 1 block
 #
 #  @eat_facing
 #  Scenario: To eat a fruit

@@ -111,15 +111,15 @@ class Game:
 
 
 class GameInherited(Game): # Inherited class
-    terminated2 = False # new attribute
+    terminated = False # new attribute
 
     def end_game(self):  # overloading end_game
         super().end_game()
-        self.terminated2 = True
+        self.terminated = True
 
     def reset(self):  # overloading reset
         super().reset()
-        self.terminated2 = False
+        self.terminated = False
 
     def check_fail(self):
         if not 0 <= self.snake.body[0].x < cell_number or not 0 <= self.snake.body[0].y < cell_number:

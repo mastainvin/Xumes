@@ -16,14 +16,14 @@ def test_impl(test_context):
         return end
 
     test_context.game = test_context.create(GameInherited, "game",
-                                            state=State("terminated2",func=get_end,      methods_to_observe = [ "reset", "end_game"]))
+                                            state=State("terminated",func=get_end,      methods_to_observe = [ "reset", "end_game"]))
 
     # "end_game"
     def get_body(bodies):
         result = []
         for body in bodies:
             result.extend([body[0], body[1]])
-        # print(result,"result")
+        print(result,"result")
         return result
 
     def get_dir(dir):
@@ -35,11 +35,11 @@ def test_impl(test_context):
         return new
 
     test_context.game.snake = test_context.create(Snake, name="snake", state=[
-        State("body",  func=get_body, methods_to_observe=["move_snake","reset"]),
+        State("body",  func=get_body, methods_to_observe=["move_snake"]),
         State("direction", func=get_dir, methods_to_observe=["check_events"]),
         State("new_block",  methods_to_observe=["add_block"])
     ])
-    #test_context.game.dt = 0.09
+    test_context.game.dt = 0.09
 
 @given("A fruit")
 def test_impl(test_context):
@@ -70,7 +70,7 @@ def test_impl(test_context):
 @when("There is one fruit")
 def test_impl(test_context):
     test_context.game.reset()
-    # test_context.game.clock.tick(0)
+    test_context.game.clock.tick(0)
     # pass
 
 @loop
@@ -81,16 +81,13 @@ def test_impl(test_context):
             test_context.game.update()
             # print(test_context.game.snake.body, "test_context.game.snake.body")
 
+    test_context.game.update()
 
-# @then("The player should have passed {nb_pipes} pipes")
-# def test_impl(test_context, nb_pipes):
-#     test_context.assert_true(test_context.game.player.points == int(nb_pipes))
-
-
-@then("The snake should be longer")
-def test_impl(test_context):
-    # print(test_context.game.snake.body,"test_context.game.snake.body")
-    test_context.assert_greater(len(test_context.game.snake.body), 3)
+@then("The snake should grow {nb_blocks} block")
+def test_impl(test_context, nb_blocks):
+    print("yes3")
+    a=2+nb_blocks
+    test_context.assert_true(len(test_context.game.snake.body)> a)
 
 @render
 def test_impl(test_context):
@@ -98,7 +95,7 @@ def test_impl(test_context):
     # whether the screen have been drawn?
     test_context.game.render()
     pygame.display.flip()
-    # test_context.game.dt = test_context.game.clock.tick(60) / 1000
+    test_context.game.dt = test_context.game.clock.tick(5)/1000
 
 
 
@@ -110,7 +107,7 @@ def test_impl(test_context):
     return {
 
         "points": test_context.game.snake.body,
-        "terminated": test_context.game.terminated2
+        "terminated": test_context.game.terminated
 
     }
 

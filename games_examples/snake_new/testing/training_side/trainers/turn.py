@@ -82,7 +82,7 @@ def train_impl(train_context):
         # eat
 
         close_reward += 10
-    if train_context.game.terminated2:  #Boolean
+    if train_context.game.terminated:  #Boolean
 
         close_reward -= 10
     train_context.distance=distance
@@ -91,10 +91,14 @@ def train_impl(train_context):
 
 @terminated
 def train_impl(train_context):
-    # print(len(train_context.snake.body), "booooool")
+    print(train_context.snake.body, "booooool")
 
-    term =  train_context.game.terminated2
+    term =  train_context.game.terminated or  len(train_context.snake.body)>8
     # if term:
+    if train_context.game.terminated:
+        print("term1")
+    if len(train_context.snake.body)>8:
+        print("term3")
         # train_context.snake.body=train_context.snake.body[0:6]
         # print(len(train_context.snake.body), "booooool2")
     # if term:
