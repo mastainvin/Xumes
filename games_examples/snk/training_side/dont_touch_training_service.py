@@ -114,7 +114,7 @@ if __name__ == "__main__":
             training_service.train(save_path="./models", log_path="./logs", test_name="test")
             training_service.save("./models/model")
         elif sys.argv[1] == "-play":
-            training_service.load("./models/best_model.zip")
+            training_service.load("./models/best_model_A.zip")
             training_service.play(100000)
 
 

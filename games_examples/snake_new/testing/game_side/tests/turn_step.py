@@ -86,7 +86,8 @@ def test_impl(test_context):
 
 @then("The snake should be longer")
 def test_impl(test_context):
-    test_context.assert_greater(test_context.game.snake.body, 3)
+    print(len(test_context.game.snake.body))
+    test_context.assert_greater(len(test_context.game.snake.body), 6)
 
 @render
 def test_impl(test_context):
