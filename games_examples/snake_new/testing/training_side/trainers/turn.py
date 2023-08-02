@@ -70,27 +70,36 @@ def train_impl(train_context):
     distance = np.abs(train_context.fruit.pos[0] - head_x) + np.abs(train_context.fruit.pos[1] - head_y)
 
     if distance < train_context.distance:
+
         close_reward += 2
     elif distance > train_context.distance:
+
         close_reward -= 2
     else:
         close_reward = 0
-    if (train_context.fruit.pos[0] == train_context.snake.body[0] and train_context.fruit.pos[1] ==
-            train_context.snake.body[1]):
+    if (train_context.fruit.pos[0] == train_context.snake.body[0] and train_context.fruit.pos[1] == train_context.snake.body[1]) or train_context.snake.new_block:
         # eat
-        print("eat")
+
         close_reward += 10
     if train_context.game.terminated2:  #Boolean
-        print("died")
+
         close_reward -= 10
     train_context.distance=distance
     return close_reward
 
+
 @terminated
 def train_impl(train_context):
-    print("train_context.game.terminated2", train_context.game.terminated2)
-    print(train_context.snake.body)
-    return train_context.game.terminated2
+    # print(len(train_context.snake.body), "booooool")
+
+    term =  train_context.game.terminated2
+    # if term:
+        # train_context.snake.body=train_context.snake.body[0:6]
+        # print(len(train_context.snake.body), "booooool2")
+    # if term:
+        # train_context.snake.body=[5.0, 10.0, 4.0, 10.0, 3.0, 10.0]
+    return term
+
 
 
 @action

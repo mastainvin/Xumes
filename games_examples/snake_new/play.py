@@ -50,12 +50,20 @@ class Game:
     def check_fail(self):
         if not 0 <= self.snake.body[0].x < cell_number or not 0 <= self.snake.body[0].y < cell_number:
             print("die1")
+            #  hitting the wall
+            # valid: [0, cell_number-1]
             self.end_game()
 
-        for block in self.snake.body[4:]:
-            if block == self.snake.body[0]:
-                print("die2")
-                self.end_game()
+            # self.reset()
+        else:
+            if(self.snake.body.__len__()>=5):
+                for block in self.snake.body[4:]:  # blocks after the head
+                    if block == self.snake.body[0]:   #if a block's coords is the same as the head
+                        print("die2")
+                        # hitting itself
+                        self.end_game()
+                        # self.reset()
+
 
 
 
@@ -67,6 +75,7 @@ class Game:
                 self.snake.check_events(event)
                 if event.type == self.SCREEN_UPDATE:
                     self.update()
+                    print(self.snake.body)
 
             self.render()
             #pygame.display.update()
@@ -74,10 +83,11 @@ class Game:
             # limits FPS to 60
             # dt is delta time in seconds since last frame, used for framerate-
             # independent physics.
-            self.dt = self.clock.tick(60) / 1000
+            # self.dt = self.clock.tick(60) / 1000
 
 
     def reset(self):
+        # time.sleep(10000)
         self.snake.reset()
         self.fruit.reset()
         self.terminated = False
@@ -109,16 +119,26 @@ class GameInherited(Game): # Inherited class
         super().reset()
         self.terminated2 = False
 
-    def check_fail(self):  # overloading check_fail
+    def check_fail(self):
         if not 0 <= self.snake.body[0].x < cell_number or not 0 <= self.snake.body[0].y < cell_number:
-            print("Game Over - You hit the wall")
-            self.end_game()
 
-        for block in self.snake.body[4:]:
-            if block == self.snake.body[0]:
-                print("Game Over - You hit your own body")
-                self.end_game()
+            print("die1")
+            #  hitting the wall
+            # valid: [0, cell_number-1]
+            self.end_game()
+            # self.reset()
+        else:
+            if(self.snake.body.__len__()>=5):
+                for block in self.snake.body[4:]:  # blocks after the head
+                    if block == self.snake.body[0]:   #if a block's coords is the same as the head
+                        print("die2")
+                        # hitting itself
+                        self.end_game()
+                        # self.reset()
+#                         when training, the trainer call reset() automatically as long as we don't call
+#                              it
 
 if __name__ == "__main__":
     game = GameInherited()
+    # game = Game()
     game.run()

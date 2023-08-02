@@ -47,6 +47,7 @@ class Snake:
 
     def reset(self):
         self.body = [Vector2(5, 10), Vector2(4, 10), Vector2(3, 10)]
+        # print("bbbody", self.body)
         self.direction = Vector2(1, 0)
         self.fruit_ate=False
 
@@ -60,29 +61,27 @@ class Snake:
         if event.type == pygame.KEYDOWN:
             current_time = pygame.time.get_ticks()
 
-            # 检查时间差是否大于0.2秒
-            if current_time - self.last_keydown_time >= 151:
+            # time threshold
+            # if current_time - self.last_keydown_time >= 151:   #correction
             # if True:
-                # 处理pygame.KEYDOWN事件
-                # 更新上一次接收pygame.KEYDOWN事件的时间戳
 
-                if event.key == pygame.K_UP:
-                    if self.direction.y == 0:
-                        self.direction = Vector2(0, -1)
-                        self.last_keydown_time = current_time
 
-                if event.key == pygame.K_DOWN:
-                    if self.direction.y == 0:
-                        self.direction = Vector2(0, 1)
-                        self.last_keydown_time = current_time
+            if event.key == pygame.K_UP:
+                if self.direction.y == 0:
+                    self.direction = Vector2(0, -1)
+                    self.last_keydown_time = current_time
 
-                if event.key == pygame.K_LEFT:
-                    if self.direction.x == 0:
-                        self.direction = Vector2(-1, 0)
-                        self.last_keydown_time = current_time
+            if event.key == pygame.K_DOWN:
+                if self.direction.y == 0:
+                    self.direction = Vector2(0, 1)
+                    self.last_keydown_time = current_time
 
-                if event.key == pygame.K_RIGHT:
-                    if self.direction.x == 0:
-                        self.direction = Vector2(1, 0)
-                        self.last_keydown_time = current_time
+            if event.key == pygame.K_LEFT:
+                if self.direction.x == 0:
+                    self.direction = Vector2(-1, 0)
+                    self.last_keydown_time = current_time
 
+            if event.key == pygame.K_RIGHT:
+                if self.direction.x == 0:
+                    self.direction = Vector2(1, 0)
+                    self.last_keydown_time = current_time

@@ -13,8 +13,8 @@ from games_examples.snake_new.src.snake import Snake
 def test_impl(test_context):
 
     def get_end(end):
-        print(end,"end")
         return end
+
     test_context.game = test_context.create(GameInherited, "game",
                                             state=State("terminated2",func=get_end,      methods_to_observe = [ "reset", "end_game"]))
 
@@ -23,10 +23,11 @@ def test_impl(test_context):
         result = []
         for body in bodies:
             result.extend([body[0], body[1]])
-        # print(result)
+        # print(result,"result")
         return result
 
     def get_dir(dir):
+        # print(dir,"dir")
         return [dir[0], dir[1]]
 
     def get_new(new):
@@ -34,8 +35,9 @@ def test_impl(test_context):
         return new
 
     test_context.game.snake = test_context.create(Snake, name="snake", state=[
-        State("body",  func=get_body, methods_to_observe=["move_snake"]),
-        State("direction", func=get_dir, methods_to_observe=["check_events"])
+        State("body",  func=get_body, methods_to_observe=["move_snake","reset"]),
+        State("direction", func=get_dir, methods_to_observe=["check_events"]),
+        State("new_block",  methods_to_observe=["add_block"])
     ])
     #test_context.game.dt = 0.09
 
@@ -68,7 +70,7 @@ def test_impl(test_context):
 @when("There is one fruit")
 def test_impl(test_context):
     test_context.game.reset()
-    test_context.game.clock.tick(0)
+    # test_context.game.clock.tick(0)
     # pass
 
 @loop
@@ -77,6 +79,7 @@ def test_impl(test_context):
         test_context.game.snake.check_events(event) #########
         if event.type == test_context.game.SCREEN_UPDATE:
             test_context.game.update()
+            # print(test_context.game.snake.body, "test_context.game.snake.body")
 
 
 # @then("The player should have passed {nb_pipes} pipes")
@@ -86,8 +89,11 @@ def test_impl(test_context):
 
 @then("The snake should be longer")
 def test_impl(test_context):
+
     print(len(test_context.game.snake.body))
     test_context.assert_greater(len(test_context.game.snake.body), 6)
+
+
 
 @render
 def test_impl(test_context):
@@ -95,7 +101,7 @@ def test_impl(test_context):
     # whether the screen have been drawn?
     test_context.game.render()
     pygame.display.flip()
-    test_context.game.dt = test_context.game.clock.tick(60) / 1000
+    # test_context.game.dt = test_context.game.clock.tick(60) / 1000
 
 
 
