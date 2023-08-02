@@ -53,6 +53,7 @@ class Game:
             #  hitting the wall
             # valid: [0, cell_number-1]
             self.end_game()
+
             # self.reset()
         else:
             if(self.snake.body.__len__()>=5):
@@ -62,6 +63,7 @@ class Game:
                         # hitting itself
                         self.end_game()
                         # self.reset()
+
 
 
 
@@ -78,10 +80,6 @@ class Game:
             self.render()
             #pygame.display.update()
             # self.clock.tick(60)
-
-
-
-
             # limits FPS to 60
             # dt is delta time in seconds since last frame, used for framerate-
             # independent physics.
@@ -123,6 +121,7 @@ class GameInherited(Game): # Inherited class
 
     def check_fail(self):
         if not 0 <= self.snake.body[0].x < cell_number or not 0 <= self.snake.body[0].y < cell_number:
+
             print("die1")
             #  hitting the wall
             # valid: [0, cell_number-1]
@@ -138,6 +137,7 @@ class GameInherited(Game): # Inherited class
                         # self.reset()
 #                         when training, the trainer call reset() automatically as long as we don't call
 #                              it
+
 if __name__ == "__main__":
     game = GameInherited()
     # game = Game()

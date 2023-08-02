@@ -30,10 +30,10 @@ def train_impl(train_context):
         })
     train_context.action_space = spaces.Discrete(5)
     train_context.max_episode_length = 2000
-    train_context.total_timesteps = int(250000)
+    train_context.total_timesteps = int(2e5)
     train_context.algorithm_type = "MultiInputPolicy"
     train_context.algorithm = stable_baselines3.PPO
-    train_context.distance=100
+
 
 
 @observation
@@ -65,7 +65,6 @@ def train_impl(train_context):
 @reward
 def train_impl(train_context):
     close_reward = 0
-    # print(train_context.snake.body, train_context.snake.direction, train_context.snake.new_block, train_context.fruit.pos,"booody")
     head_x, head_y = train_context.snake.body[0], train_context.snake.body[1]
 
     distance = np.abs(train_context.fruit.pos[0] - head_x) + np.abs(train_context.fruit.pos[1] - head_y)
@@ -104,6 +103,7 @@ def train_impl(train_context):
     # if term:
         # train_context.snake.body=[5.0, 10.0, 4.0, 10.0, 3.0, 10.0]
     return term
+
 
 
 @action
