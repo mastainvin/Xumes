@@ -86,7 +86,7 @@ def test_impl(test_context):
 @then("The snake should grow {nb_blocks} block")
 def test_impl(test_context, nb_blocks):
     print("yes3")
-    a=2+nb_blocks
+    a=2+int(nb_blocks)
     test_context.assert_true(len(test_context.game.snake.body)> a)
 
 @render
