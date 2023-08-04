@@ -1,6 +1,7 @@
 Feature: Testing the jump
 
   @basic
+  @one
   Scenario: Middle and middle
     Given A game with a player
     And A pipe generator

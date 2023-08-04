@@ -23,7 +23,7 @@ def test_impl(test_context):
         result = []
         for body in bodies:
             result.extend([body[0], body[1]])
-        print(result,"result")
+        #print(result,"result")
         return result
 
     def get_dir(dir):
@@ -81,11 +81,12 @@ def test_impl(test_context):
             test_context.game.update()
             # print(test_context.game.snake.body, "test_context.game.snake.body")
 
-    test_context.game.update()
+    #test_context.game.update()
 
 @then("The snake should grow {nb_blocks} block")
 def test_impl(test_context, nb_blocks):
-    print("yes3")
+    print("then")
+    print(len(test_context.game.snake.body))
     a=2+int(nb_blocks)
     test_context.assert_true(len(test_context.game.snake.body)> a)
 

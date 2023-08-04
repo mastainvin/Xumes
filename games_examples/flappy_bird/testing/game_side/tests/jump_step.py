@@ -11,12 +11,8 @@ from xumes.game_module import State, given, when, loop, then, render, log
 
 @given("A game with a player")
 def test_impl(test_context):
-
-    def get_end(end):
-        print(end,"end")
-        return end
     test_context.game = test_context.create(Game, "game",
-                                            state=State("terminated", func=get_end,  methods_to_observe=["end_game", "reset"]))
+                                            state=State("terminated", methods_to_observe=["end_game", "reset"]))
 
     test_context.game.player = test_context.create(Player, name="player", state=[
         State("center", methods_to_observe=["move", "reset"]),
@@ -87,6 +83,7 @@ def test_impl(test_context, nb_pipes):
 
 @then("The player should have passed at least {nb_pipes} pipes")
 def test_impl(test_context, nb_pipes):
+    print("then")
     test_context.assert_greater_equal(test_context.game.player.points, int(nb_pipes))
 
 
@@ -103,7 +100,7 @@ def test_impl(test_context):
 def test_impl(test_context):
     x, y = test_context.game.player.center
     return {
-        "snake": {
+        "player": {
             "points": test_context.game.player.points,
             "x": x,
             "y": y,

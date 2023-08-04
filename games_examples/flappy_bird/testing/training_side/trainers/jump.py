@@ -1,11 +1,11 @@
 import numpy as np
 import stable_baselines3
 from gymnasium.vector.utils import spaces
-
-
-from xumes.training_module import observation, reward, terminated, action, config
 from games_examples.flappy_bird.testing.training_side.helpers.lidar import Lidar
 from games_examples.flappy_bird.params import LIDAR_MAX_DIST
+
+from xumes.training_module import observation, reward, terminated, action, config
+
 
 @config
 def train_impl(train_context):
@@ -18,7 +18,7 @@ def train_impl(train_context):
     })
     train_context.action_space = spaces.Discrete(2)
     train_context.max_episode_length = 2000
-    train_context.total_timesteps = int(5e3)
+    train_context.total_timesteps = int(5e5)
     train_context.algorithm_type = "MultiInputPolicy"
     train_context.algorithm = stable_baselines3.PPO
 
@@ -50,7 +50,6 @@ def train_impl(train_context):
     if term:
         train_context.lidar.reset()
         train_context.points = 0
-    # print(train_context.game.terminated ,"fla end")
     return term
 
 
