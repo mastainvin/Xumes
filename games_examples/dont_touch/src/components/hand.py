@@ -18,8 +18,9 @@ class Hand(pygame.sprite.Sprite):
         self.offset_x = 0
         self.new_x = sine(100.0, 1280, 20.0, self.offset_x)
         self.side = hand_side
-        self.can_score = True
-
+        self.can_score = True #When a hand is above the player, the player can score
+        self.move_counter = 0
+        self.SPEED_HANDS = 0.016
         self._load_hand()
 
     def reset(self):
@@ -57,38 +58,42 @@ class Hand(pygame.sprite.Sprite):
         self.offset_x = random.randint(260, 380)
         self.new_y = -40
 
-    def move(self, scoreboard: Scoreboard, player_position):
-        self.new_x = sine(100.0, 620, 20.0, self.offset_x)
-        self.new_y += self.new_spd
-        self.rect.center = (self.new_x, self.new_y)
+    def move(self, scoreboard: Scoreboard, player_position, dt):
+        self.move_counter += dt
+        if self.move_counter > 0.016:
+            self.new_x = sine(100.0, 620, 20.0, self.offset_x)
+            self.new_y += self.new_spd
+            self.rect.center = (self.new_x, self.new_y)
 
-        if self.rect.top > player_position.y - 35 and self.can_score:
-            scoreboard.increase_current_score()
-            self.can_score = False
+            if self.rect.top > player_position.y - 35 and self.can_score:
+                # On marque un point quand le bas de la main player à passer le haut de la main obstacle
+                scoreboard.increase_current_score()
+                self.can_score = False
 
-            MusicService.play_score_sound()
+                MusicService.play_score_sound()
 
-            if scoreboard.get_current_score() % 5 == 0:
-                MusicService.play_cheer_sound()
+                if scoreboard.get_current_score() % 5 == 0:
+                    MusicService.play_cheer_sound()
 
-        if self.rect.top > Config.HEIGHT:
-            self.rect.bottom = 0
-            # Play Kung Fu Sound
-            self.new_spd = random.uniform(0.5, 8)
+            if self.rect.top > Config.HEIGHT:
+                self.rect.bottom = 0
+                # Play Kung Fu Sound
+                self.new_spd = random.uniform(0.5, 8)
 
-            if self.side == HandSide.RIGHT:
-                self.offset_x = random.randint(260, 380)
-                self.new_y = -40
+                if self.side == HandSide.RIGHT:
+                    self.offset_x = random.randint(260, 380)
+                    self.new_y = -40
 
-            if self.side == HandSide.LEFT:
-                self.offset_x = random.randint(-50, 120)
-                self.new_y = -320
+                if self.side == HandSide.LEFT:
+                    self.offset_x = random.randint(-50, 120)
+                    self.new_y = -320
 
-            if self.new_spd >= 6:
-                self.new_spd = 8
-                MusicService.play_chop_sound()
+                if self.new_spd >= 6:
+                    self.new_spd = 8
+                    MusicService.play_chop_sound()
 
-            self.can_score = True
+                self.can_score = True
+            self.move_counter = 0
 
     def draw(self, screen):
         dotted_line = VisualizationService.get_dotted_line()

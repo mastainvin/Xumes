@@ -47,6 +47,8 @@ class Game:
         self.all_sprites.add(self.H1)
         self.all_sprites.add(self.H2)
 
+        self.dt = 0
+
         GlobalState.SCROLL = update_background_using_scroll(GlobalState.SCROLL)
         VisualizationService.draw_background_with_scroll(GlobalState.SCREEN, GlobalState.SCROLL)
         GlobalState.PRESS_Y = update_press_key(GlobalState.PRESS_Y)
@@ -63,10 +65,10 @@ class Game:
                     self.running = False
 
                 if event.type == pygame.KEYDOWN:
-                    self.P1.update(event)
+                    self.P1.update(event, self.dt)
 
-            self.H1.move(self.scoreboard, self.P1.player_position)
-            self.H2.move(self.scoreboard, self.P1.player_position)
+            self.H1.move(self.scoreboard, self.P1.player_position, self.dt)
+            self.H2.move(self.scoreboard, self.P1.player_position, self.dt)
 
             if pygame.sprite.spritecollide(self.P1, self.hands, False, pygame.sprite.collide_mask):
                 self.scoreboard.update_max_score()
@@ -76,7 +78,11 @@ class Game:
 
             self.check_end()
 
+            self.dt = self.FramePerSec.tick(Config.FPS) / 1000
+
             self.render()
+
+
 
 
     def render(self):
@@ -89,8 +95,8 @@ class Game:
         self.H2.draw(GlobalState.SCREEN)
         self.scoreboard.draw(GlobalState.SCREEN)
 
+        self.dt = self.FramePerSec.tick(Config.FPS) / 1000
         pygame.display.update()
-        self.FramePerSec.tick(Config.FPS)
 
     def check_end(self):
         if self.terminated:
@@ -104,6 +110,7 @@ class Game:
         self.H1.reset()
         self.H2.reset()
         self.scoreboard.reset_current_score()
+        self.FramePerSec = pygame.time.Clock()
         self.terminated = False
         time.sleep(0.5)
 

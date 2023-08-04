@@ -1,5 +1,5 @@
 class Config:
-    FPS = 60
+    FPS = 120
 
     # Screen Information
     WIDTH = 360
