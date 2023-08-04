@@ -107,7 +107,7 @@ def test_impl(test_context):
 def test_impl(test_context):
     return {
 
-        "points": test_context.game.snake.body,
+        "points": [{"x": b[0], "y": b[1]} for b in test_context.game.snake.body],
         "terminated": test_context.game.terminated
 
     }
