@@ -35,17 +35,24 @@ class Game:
 
         # Sprite Setup
         self.P1 = Player()
-        self.H1 = Hand(HandSide.RIGHT)
-        self.H2 = Hand(HandSide.LEFT)
+        self.H1 = Hand(HandSide.LEFT, offset_x=0, speed=3, random_hand=None)
+        self.H1.offset_x = -50
+        #self.H1 = None
+        #self.H2 = Hand(HandSide.RIGHT, offset_x=280, speed=3, random_hand=None)
+        self.H2 = None
 
         # Sprite Groups
         self.hands = pygame.sprite.Group()
-        self.hands.add(self.H1)
-        self.hands.add(self.H2)
+        if self.H1 is not None:
+            self.hands.add(self.H1)
+        if self.H2 is not None:
+            self.hands.add(self.H2)
         self.all_sprites = pygame.sprite.Group()
         self.all_sprites.add(self.P1)
-        self.all_sprites.add(self.H1)
-        self.all_sprites.add(self.H2)
+        if self.H1 is not None:
+            self.all_sprites.add(self.H1)
+        if self.H2 is not None:
+            self.all_sprites.add(self.H2)
 
         self.dt = 0
 
@@ -66,9 +73,10 @@ class Game:
 
                 if event.type == pygame.KEYDOWN:
                     self.P1.update(event, self.dt)
-
-            self.H1.move(self.scoreboard, self.P1.player_position, self.dt)
-            self.H2.move(self.scoreboard, self.P1.player_position, self.dt)
+            if self.H1 is not None:
+                self.H1.move(self.scoreboard, self.P1.player_position, self.dt)
+            if self.H2 is not None:
+                self.H2.move(self.scoreboard, self.P1.player_position, self.dt)
 
             if pygame.sprite.spritecollide(self.P1, self.hands, False, pygame.sprite.collide_mask):
                 self.scoreboard.update_max_score()
@@ -91,8 +99,10 @@ class Game:
         VisualizationService.draw_background_with_scroll(GlobalState.SCREEN, GlobalState.SCROLL)
 
         self.P1.draw(GlobalState.SCREEN)
-        self.H1.draw(GlobalState.SCREEN)
-        self.H2.draw(GlobalState.SCREEN)
+        if self.H1 is not None:
+            self.H1.draw(GlobalState.SCREEN)
+        if self.H2 is not None:
+            self.H2.draw(GlobalState.SCREEN)
         self.scoreboard.draw(GlobalState.SCREEN)
 
         self.dt = self.FramePerSec.tick(Config.FPS) / 1000
@@ -107,8 +117,10 @@ class Game:
 
     def reset(self):
         self.P1.reset()
-        self.H1.reset()
-        self.H2.reset()
+        if self.H1 is not None:
+            self.H1.reset()
+        if self.H2 is not None:
+            self.H2.reset()
         self.scoreboard.reset_current_score()
         self.FramePerSec = pygame.time.Clock()
         self.terminated = False

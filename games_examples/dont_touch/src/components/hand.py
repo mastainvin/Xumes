@@ -11,11 +11,15 @@ from games_examples.dont_touch.src.utils.tools import sine
 
 
 class Hand(pygame.sprite.Sprite):
-    def __init__(self, hand_side: HandSide):
+    def __init__(self, hand_side: HandSide, offset_x: int, speed: float, random_hand: bool):
         super().__init__()
-        self.new_spd = random.uniform(2.5, 3)
+        if random_hand is True:
+            self.new_spd = random.uniform(2.5, 3)
+            self.offset_x = 0
+        self.new_spd = speed
         self.new_y = 0
-        self.offset_x = 0
+        self.offset_x = offset_x #0
+        self.random_hand = random_hand
         self.new_x = sine(100.0, 1280, 20.0, self.offset_x)
         self.side = hand_side
         self.can_score = True #When a hand is above the player, the player can score
@@ -24,16 +28,19 @@ class Hand(pygame.sprite.Sprite):
         self._load_hand()
 
     def reset(self):
-        self.new_spd = random.uniform(2.5, 3)
+        if self.random_hand is True:
+            self.new_spd = random.uniform(2.5, 3)
         self.can_score = True
 
         if self.side == HandSide.RIGHT:
-            self.offset_x = random.randint(260, 380)
+            if self.random_hand is True:
+                self.offset_x = random.randint(260, 380)
             self.new_y = -40
             self.new_x = 0
 
         if self.side == HandSide.LEFT:
-            self.offset_x = random.randint(-50, 120)
+            if self.random_hand is True:
+                self.offset_x = random.randint(-50, 120)
             self.new_y = -320
             self.new_x = 0
 
@@ -48,14 +55,16 @@ class Hand(pygame.sprite.Sprite):
         self.image = VisualizationService.get_left_hand_image()
         self.rect = self.image.get_rect()
         self.mask = pygame.mask.from_surface(self.image)
-        self.offset_x = random.randint(-50, 120)
+        if self.random_hand is True:
+            self.offset_x = random.randint(-50, 120)
         self.new_y = -320
 
     def _load_right_hand(self):
         self.image = VisualizationService.get_right_hand_image()
         self.rect = self.image.get_rect()
         self.mask = pygame.mask.from_surface(self.image)
-        self.offset_x = random.randint(260, 380)
+        if self.random_hand is True:
+            self.offset_x = random.randint(260, 380)
         self.new_y = -40
 
     def move(self, scoreboard: Scoreboard, player_position, dt):
@@ -78,14 +87,17 @@ class Hand(pygame.sprite.Sprite):
             if self.rect.top > Config.HEIGHT:
                 self.rect.bottom = 0
                 # Play Kung Fu Sound
-                self.new_spd = random.uniform(0.5, 8)
+                if self.random_hand is True:
+                    self.new_spd = random.uniform(0.5, 8)
 
                 if self.side == HandSide.RIGHT:
-                    self.offset_x = random.randint(260, 380)
+                    if self.random_hand is True:
+                        self.offset_x = random.randint(260, 380)
                     self.new_y = -40
 
                 if self.side == HandSide.LEFT:
-                    self.offset_x = random.randint(-50, 120)
+                    if self.random_hand is True:
+                        self.offset_x = random.randint(-50, 120)
                     self.new_y = -320
 
                 if self.new_spd >= 6:

@@ -1,4 +1,0 @@
-
-
-class StateConversionError(Exception):
-    pass
