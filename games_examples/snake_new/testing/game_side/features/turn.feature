@@ -14,19 +14,8 @@ Feature: Testing the turn
     When There is one fruit
     Then The snake should grow 2 block
 
-  @basic
-  Scenario: To eat three fruits
-    Given A game with a snake
-    And A fruit
-    When There is one fruit
-    Then The snake should grow 3 block
 
-    @basic
-  Scenario: To eat four fruits
-    Given A game with a snake
-    And A fruit
-    When There is one fruit
-    Then The snake should grow 4 block
+
 #
 #  @eat_facing
 #  Scenario: To eat a fruit

@@ -87,7 +87,8 @@ def test_impl(test_context):
 def test_impl(test_context, nb_blocks):
     print("then")
     print(len(test_context.game.snake.body))
-    test_context.assert_true(len(test_context.game.snake.body)> int(nb_blocks))
+    a=2+int(nb_blocks)
+    test_context.assert_true(len(test_context.game.snake.body)> a)
 
 @render
 def test_impl(test_context):
