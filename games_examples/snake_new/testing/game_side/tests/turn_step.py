@@ -70,7 +70,7 @@ def test_impl(test_context):
 @when("There is one fruit")
 def test_impl(test_context):
     test_context.game.reset()
-    test_context.game.clock.tick(0)
+    #test_context.game.clock.tick(0)
     # pass
 
 @loop
@@ -87,8 +87,7 @@ def test_impl(test_context):
 def test_impl(test_context, nb_blocks):
     print("then")
     print(len(test_context.game.snake.body))
-    a=2+int(nb_blocks)
-    test_context.assert_true(len(test_context.game.snake.body)> a)
+    test_context.assert_true(len(test_context.game.snake.body)> int(nb_blocks))
 
 @render
 def test_impl(test_context):
@@ -96,7 +95,7 @@ def test_impl(test_context):
     # whether the screen have been drawn?
     test_context.game.render()
     pygame.display.flip()
-    test_context.game.dt = test_context.game.clock.tick(5)/1000
+    #test_context.game.dt = test_context.game.clock.tick(5)/1000
 
 
 

@@ -74,7 +74,7 @@ def test_impl(test_context):
     # Make all game state modification
     test_context.game.player.move(test_context.game.dt)
     test_context.game.pipe_generator.move(test_context.game.dt)
-
+print("loopf")
 
 @then("The player should have passed {nb_pipes} pipes")
 def test_impl(test_context, nb_pipes):
