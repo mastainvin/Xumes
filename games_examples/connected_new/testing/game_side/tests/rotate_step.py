@@ -3,7 +3,7 @@ from xumes.game_module import given
 from games_examples.connected_new.main import Game
 from xumes.game_module import State, given, when, loop, then, render, log
 
-from games_examples.connected_new.objects import Balls, Coins
+from games_examples.connected_new.objects import Balls, Coins, Tiles
 
 
 @given("A game with a ball")
@@ -32,7 +32,7 @@ def test_impl(test_context):
 
 @given("A tile")
 def test_impl(test_context):
-    test_context.game.tile = test_context.create(Coins, name="coin", state=[
+    test_context.game.tile = test_context.create(Tiles, name="coin", state=[
         State("rect", [State("x"), State("y")], methods_to_observe=["update"]),
         State("type", methods_to_observe=["update"]),
     ])

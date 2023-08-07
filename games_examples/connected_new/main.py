@@ -6,7 +6,8 @@
 import random
 import pygame
 
-from games_examples.connected.objects import Balls, Coins, Tiles, Particle, Message, Button
+from games_examples.connected_new.objects import Balls, Coins, Tiles, Particle, Message, Button
+
 
 
 
@@ -238,7 +239,7 @@ class Game:
 
 						self.player_alive = False
 						self.dead_fx.play()
-						print("score",self.score)
+						#print("score",self.score)
 						self.collided_rectangles = True
 
 				self.current_time = pygame.time.get_ticks()

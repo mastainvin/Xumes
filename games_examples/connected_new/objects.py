@@ -12,7 +12,7 @@ pygame.mixer.init()
 class Balls(pygame.sprite.Sprite):
 	def __init__(self, pos, radius, angle, win):
 		super(Balls, self).__init__()
-		
+
 		self.initial_pos = pos
 		self.radius = radius
 		self.initial_angle = angle
@@ -22,6 +22,7 @@ class Balls(pygame.sprite.Sprite):
 		self.highscore = 0
 
 		self.rect = pygame.draw.circle(self.win, (25, 25, 25), (self.x,self.y), 6)
+
 
 	def update(self, color):
 		x = round(CENTER[0] + self.radius * math.cos(self.angle * math.pi / 180))
@@ -35,6 +36,7 @@ class Balls(pygame.sprite.Sprite):
 		if len(self.pos_list) > 5:
 			self.pos_list.pop(0)
 
+
 		pygame.draw.circle(self.win, (255, 255, 255), (x,y), 7)
 		self.rect = pygame.draw.circle(self.win, color, (x,y), 6)
 
@@ -44,6 +46,9 @@ class Balls(pygame.sprite.Sprite):
 			else:
 				radius = 2
 			pygame.draw.circle(self.win, color, pos, radius)
+
+		#print("x ", self.rect.x, "Y ", self.rect.y)
+
 
 	def update_score(self, score):
 		self.score = score
@@ -75,6 +80,9 @@ class Coins(pygame.sprite.Sprite):
 
 		self.rect = pygame.draw.rect(self.win, (255, 255, 255), (self.x, self.y, self.size, self.size))
 
+
+
+
 	def update(self, color):
 		self.x += self.dx
 		if self.x < -20:
@@ -83,6 +91,8 @@ class Coins(pygame.sprite.Sprite):
 		pygame.draw.rect(self.win, (200, 200, 200), (self.x+self.s, self.y+self.s, self.size, self.size))
 		self.rect = pygame.draw.rect(self.win, color, (self.x, self.y, self.size, self.size))
 		pygame.draw.circle(self.win, (255,255,255), self.rect.center, 2)
+
+		#print("x ", self.rect.x, "Y ", self.rect.y)
 
 class Tiles(pygame.sprite.Sprite):
 	def __init__(self, y, type_, win):
@@ -131,6 +141,8 @@ class Tiles(pygame.sprite.Sprite):
 		image, self.rect = self.rotate()
 
 		self.win.blit(image, self.rect)
+		#print("x ", self.rect.x, "Y ", self.rect.y)
+		#print(self.type)
 
 
 class Particle(pygame.sprite.Sprite):
