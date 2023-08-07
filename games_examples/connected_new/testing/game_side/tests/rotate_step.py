@@ -43,7 +43,7 @@ def test_impl(test_context):
 def test_impl(test_context):
     test_context.game.reset()
 
-@then("The ball should have {nb_points] point")
+@then("The ball should have {nb_points} point")
 def test_impl(test_context, nb_points):
     print("then")
     test_context.assert_true(test_context.game.ball.score == int(nb_points))
