@@ -1,3 +1,4 @@
+
 import pygame
 
 from games_examples.flappy_bird.params import HEIGHT, LEFT_POSITION, SPACE_BETWEEN_PIPES, PIPE_SPACE, PIPE_WIDTH, SIZE
@@ -7,6 +8,7 @@ from games_examples.flappy_bird.src.pipe_generator import PipeGenerator
 from games_examples.flappy_bird.src.player import Player
 
 from xumes.game_module import State, given, when, loop, then, render, log
+
 
 
 @given("A game with a player")
