@@ -16,9 +16,9 @@ def test_impl(test_context):
                                             state=State("terminated", func=get_end,  methods_to_observe=["end_game", "reset"]))
 
     test_context.game.ball = test_context.create(Balls, name="ball", state=[
-        State("rect", [State( "x" ), State( "y" )], methods_to_observe="update_main"),
-        State("score" , methods_to_observe="update_main"),
-        State("highscore", methods_to_observe="update_main")
+        State("rect", [State( "x" ), State( "y" )], methods_to_observe="update"),
+        State("score" , methods_to_observe="update"),
+        State("highscore", methods_to_observe="update")
 
     ],
                                                  # add initializing params
@@ -31,7 +31,7 @@ def test_impl(test_context):
 def test_impl(test_context):
 
     test_context.game.coin = test_context.create(Coins, name="coin", state=[
-        State("rect", [State( "x" ), State( "y" )], methods_to_observe=["update_main"])
+        State("rect", [State( "x" ), State( "y" )], methods_to_observe=["update"])
     ],
                                                  y=random.randint(test_context.game.CENTER[1] - test_context.game.RADIUS,
                                                                 test_context.game.CENTER[1] + test_context.game.RADIUS),
@@ -42,7 +42,7 @@ def test_impl(test_context):
 def test_impl(test_context):
     # change game.tile into game.t, because the game developer does so in the class Game
     test_context.game.t = test_context.create(Tiles, name="tile", state=[
-        State("rect", [State("x"), State("y")], methods_to_observe=["update_main"]),
+        State("rect", [State("x"), State("y")], methods_to_observe=["update"]),
         State("type", methods_to_observe=["update"]),
     ],
         y=random.choice([test_context.game.CENTER[1] - 80,
@@ -66,15 +66,12 @@ def test_impl(test_context, nb_points):
 
 @loop
 def test_impl(test_context):
-
-    while test_context.game.running:
-        test_context.test_client.wait()
-        test_context.game.update()
+    test_context.game.update()
 
 @render
 def test_impl(test_context):
     while test_context.game.running:
-        test_context.test_client.wait()
+        # test_context.test_client.wait()
         test_context.game.update()
 
         test_context.game.render()

@@ -41,16 +41,20 @@ def train_impl(train_context):
 
 @observation
 def train_impl(train_context):
-    return{
-    'ball_x': np.array(train_context.ball.rect.x),
-    'ball_y': np.array(train_context.ball.rect.y),
-    'coins_x': np.array(train_context.coin.rect.x),
-    'coins_y': np.array(train_context.coin.rect.y),
-    'tiles_x': np.array(train_context.tile.rect.x),
-    'tiles_y': np.array(train_context.tile.rect.y),
-    'tiles_type': np.array(train_context.tile.type)
-    #     here use tile instead of t
+
+    train_context.states = {
+        'ball_x': np.array(train_context.ball.rect.x),
+        'ball_y': np.array(train_context.ball.rect.y),
+        'coins_x': np.array(train_context.coin.rect.x),
+        'coins_y': np.array(train_context.coin.rect.y),
+        'tiles_x': np.array(train_context.tile.rect.x),
+        'tiles_y': np.array(train_context.tile.rect.y),
+        'tiles_type': np.array(train_context.tile.type)
     }
+    print("Received states:", train_context.states)
+    return train_context.states
+    #     here use tile instead of t
+
 
 @reward
 def train_impl(train_context):
