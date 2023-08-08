@@ -31,8 +31,8 @@ def train_impl(train_context):
         'tiles_type': spaces.Box(-1, 1, dtype=np.float32, shape=(1,))
     })
     train_context.action_space = spaces.Discrete(2)
-    train_context.max_episode_length = 10000
-    train_context.total_timesteps = int(1e5)
+    train_context.max_episode_length = 2000
+    train_context.total_timesteps = int(10000)
     train_context.algorithm_type = "MultiInputPolicy"
     train_context.algorithm = stable_baselines3.PPO
 
@@ -49,6 +49,7 @@ def train_impl(train_context):
     'tiles_x': np.array(train_context.tile.rect.x),
     'tiles_y': np.array(train_context.tile.rect.y),
     'tiles_type': np.array(train_context.tile.type)
+    #     here use tile instead of t
     }
 
 @reward
