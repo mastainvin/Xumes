@@ -179,7 +179,7 @@ class Game:
 		pygame.display.update()
 
 	def update_main(self):
-
+		print(self.ball.rect,self.coin.rect,self.t.rect,"yesok")
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
 				self.running = False

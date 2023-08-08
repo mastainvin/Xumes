@@ -57,15 +57,15 @@ def train_impl(train_context):
 
     if train_context.game.terminated:
         train_context.score = 0
-        return -1
+        reward += -1
 
     # if self.game.ball.score > self.score:
     #     self.score = self.game.ball.score
     #     return 1
     else:
-        return 0.3
+        reward += 0.3
     # il gagne un coin -> 1 si il perds -1 0
-
+    #
     # if self.game.ball.score > self.score :
     #     self.score = self.game.ball.score
     #     reward += 1
@@ -94,6 +94,7 @@ def train_impl(train_context):
 
 @action
 def train_impl(train_context, raw_actions):
-    if raw_actions == 1:
-        return ["space"]
-    return ["nothing"]
+
+    direction = ["nothing", "space"]
+    train_context.actions = [direction[raw_actions]]
+    return train_context.actions
