@@ -1,0 +1,22 @@
+
+# SCREEN
+HEIGHT = 720
+WIDTH = 1280
+
+# Player
+JUMP_SPEEDUP = 325  # easy 325 hard 450
+FALL_SPEEDUP = 1000  # easy 1000 hard 1250
+SIZE = 40
+LEFT_POSITION = 100
+
+# Pipe
+PIPE_SPEED = 300
+PIPE_WIDTH = 80
+PIPE_SPACE = 200
+
+# Pipe generator
+SPACE_BETWEEN_PIPES = 400  # easy 400 hard 350
+
+# Lidar
+LIDAR_MAX_DIST = 2000
+
