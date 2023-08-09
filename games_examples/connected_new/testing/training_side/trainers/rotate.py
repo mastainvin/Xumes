@@ -65,11 +65,12 @@ def train_impl(train_context):
         train_context.score = 0
         reward += -1
 
-    # if self.game.ball.score > self.score:
-    #     self.score = self.game.ball.score
-    #     return 1
+    if train_context.ball.score > train_context.score:
+        train_context.score = train_context.ball.score
+        return 1
+    
     else:
-        reward += 0.3
+        reward += 0.1
     # il gagne un coin -> 1 si il perds -1 0
     #
     # if self.game.ball.score > self.score :
