@@ -6,7 +6,7 @@ from abc import abstractmethod
 from typing import List, Dict
 
 from xumes.core.colors import bcolors
-from xumes.core.modes import TEST_MODE, TRAIN_MODE
+from xumes.core.modes import TEST_MODE, TRAIN_MODE, RENDER_MODE
 from xumes.game_module.game_service import GameService
 from xumes.game_module.assertion_bucket import AssertionReport
 from xumes.game_module.feature_strategy import FeatureStrategy, Scenario, given_registry, when_registry, then_registry, \
@@ -148,7 +148,7 @@ class TestManager:
             self._delete_game_services()
             self._communication_service.reset(self)
 
-        if self._mode == TEST_MODE:
+        if self._mode == TEST_MODE or self._mode == RENDER_MODE:
             self._assert()
 
         self._communication_service.stop()

@@ -224,7 +224,7 @@ class FeatureStrategy(ABC):
                 self.reset()
 
             def reset(self) -> None:
-                if self._mode == TEST_MODE:
+                if self._mode == TEST_MODE or self._mode == RENDER_MODE:
                     exec_registry_function(registry=then_r[steps], game_context=self, scenario_name=scenario_name)
                     self._assertion_bucket.reset_iterator()
                 exec_registry_function(registry=when_r[steps], game_context=self, scenario_name=scenario_name)
