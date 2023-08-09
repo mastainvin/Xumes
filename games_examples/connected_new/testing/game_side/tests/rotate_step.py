@@ -40,27 +40,27 @@ def test_impl(test_context):
 
 @given("A coin")
 def test_impl(test_context):
-    pass
-    # test_context.game.coin = test_context.create(Coins, name="coin", state=[
-    #     State("rect", [State( "x" ), State( "y" )], methods_to_observe=["update"])
-    # ],
-    #                                              y=random.randint(test_context.game.CENTER[1] - test_context.game.RADIUS,
-    #                                                             test_context.game.CENTER[1] + test_context.game.RADIUS),
-    #                                              win=test_context.game.win)
+    # pass
+    test_context.game.coin = test_context.create(Coins, name="coin", state=[
+        State("rect", [State( "x" ), State( "y" )], methods_to_observe=["update"])
+    ],
+                                                 y=random.randint(test_context.game.CENTER[1] - test_context.game.RADIUS,
+                                                                test_context.game.CENTER[1] + test_context.game.RADIUS),
+                                                 win=test_context.game.win)
 
 
 @given("A tile")
 def test_impl(test_context):
-    pass
+    # pass
     # change game.tile into game.t, because the game developer does so in the class Game
-    # test_context.game.t = test_context.create(Tiles, name="tile", state=[
-    #     State("rect", [State("x"), State("y")], methods_to_observe=["update"]),
-    #     State("type", methods_to_observe=["update"]),
-    # ],
-    #     y=random.choice([test_context.game.CENTER[1] - 80,
-    #                      test_context.game.CENTER[1], test_context.game.CENTER[1] + 80]),
-    #                                              type_=random.randint(1, 3),
-    #                                              win=test_context.game.win)
+    test_context.game.t = test_context.create(Tiles, name="tile", state=[
+        State("rect", [State("x"), State("y")], methods_to_observe=["update"]),
+        State("type", methods_to_observe=["update"]),
+    ],
+        y=random.choice([test_context.game.CENTER[1] - 80,
+                         test_context.game.CENTER[1], test_context.game.CENTER[1] + 80]),
+                                                 type_=random.randint(1, 3),
+                                                 win=test_context.game.win)
 
 
 

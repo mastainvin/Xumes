@@ -24,11 +24,11 @@ def train_impl(train_context):
 
         'ball_x': spaces.Box(0, WIDTH, shape=(1,), dtype=np.int32),
         'ball_y': spaces.Box(-1, 1, shape=(1,), dtype=np.int32),
-        # 'coins_x': spaces.Box(-1, 1, dtype=np.int32, shape=(1,)),
-        # 'coins_y': spaces.Box(-1, 1, dtype=np.int32, shape=(1,)),
-        # 't_x': spaces.Box(-1, 1, dtype=np.int32, shape=(1,)),
-        # 't_y': spaces.Box(-1, 1, dtype=np.int32, shape=(1,)),
-        # 't_type': spaces.Box(-1, 1, dtype=np.int32, shape=(1,))
+        'coins_x': spaces.Box(-1, 1, dtype=np.int32, shape=(1,)),
+        'coins_y': spaces.Box(-1, 1, dtype=np.int32, shape=(1,)),
+        't_x': spaces.Box(-1, 1, dtype=np.int32, shape=(1,)),
+        't_y': spaces.Box(-1, 1, dtype=np.int32, shape=(1,)),
+        't_type': spaces.Box(-1, 1, dtype=np.int32, shape=(1,))
     })
     print(train_context.observation_space.shape,"shape")
     train_context.action_space = spaces.Discrete(2)
@@ -46,11 +46,11 @@ def train_impl(train_context):
     train_context.states = {
         'ball_x': np.array(train_context.ball.rect.x),
         'ball_y': np.array(train_context.ball.rect.y),
-        # 'coins_x': np.array(train_context.coin.rect.x),
-        # 'coins_y': np.array(train_context.coin.rect.y),
-        # 't_x': np.array(train_context.tile.rect.x),
-        # 't_y': np.array(train_context.tile.rect.y),
-        # 't_type': np.array(train_context.tile.type)
+        'coins_x': np.array(train_context.coin.rect.x),
+        'coins_y': np.array(train_context.coin.rect.y),
+        't_x': np.array(train_context.tile.rect.x),
+        't_y': np.array(train_context.tile.rect.y),
+        't_type': np.array(train_context.tile.type)
     }
     print("Received states:", train_context.states,train_context.ball, train_context.coin,train_context.tile)
     return train_context.states
