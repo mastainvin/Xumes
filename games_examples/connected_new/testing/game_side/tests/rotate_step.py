@@ -25,17 +25,17 @@ def test_impl(test_context):
     )
     # test_context.game = test_context.create(Game, "game",
     #                                         state=State("terminated", func=get_end,  methods_to_observe=["end_game", "reset"]))
-    # test_context.game.ball = test_context.create(Balls, name="ball", state=[
-    #     State("rect", [State( "x" ), State( "y" )], methods_to_observe="update"),
-    #     State("score" , methods_to_observe="update"),
-    #     State("highscore", methods_to_observe="update")
-    #
-    # ],
-    #                                              # add initializing params
-    #                                              pos=(test_context.game.CENTER[0],
-    #                                                   test_context.game.CENTER[1] + test_context.game.RADIUS),
-    #                                              radius=test_context.game.RADIUS, angle=90, win=test_context.game.win
-    #                                              )
+    test_context.game.ball = test_context.create(Balls, name="ball", state=[
+        State("rect", [State( "x" ), State( "y" )], methods_to_observe="update"),
+        State("score" , methods_to_observe="update"),
+        State("highscore", methods_to_observe="update")
+
+    ],
+                                                 # add initializing params
+                                                 pos=(test_context.game.CENTER[0],
+                                                      test_context.game.CENTER[1] + test_context.game.RADIUS),
+                                                 radius=test_context.game.RADIUS, angle=90, win=test_context.game.win
+                                                 )
 
 
 @given("A coin")
