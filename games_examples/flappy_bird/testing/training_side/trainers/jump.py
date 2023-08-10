@@ -16,6 +16,7 @@ def train_impl(train_context):
         "speedup": spaces.Box(-float('inf'), 300, shape=(1,), dtype=float),
         "lidar": spaces.Box(0, LIDAR_MAX_DIST, shape=(7,), dtype=int),
     })
+    print(train_context.observation_space.shape,"shape")
     train_context.action_space = spaces.Discrete(2)
     train_context.max_episode_length = 2000
     train_context.total_timesteps = int(5e3)

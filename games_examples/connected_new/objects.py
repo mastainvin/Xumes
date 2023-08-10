@@ -75,7 +75,7 @@ class Coins(pygame.sprite.Sprite):
 		self.size = 15
 
 		self.x = WIDTH + 20
-		self.dx = -1
+		self.dx = -2
 		self.s = 1
 
 		self.rect = pygame.draw.rect(self.win, (255, 255, 255), (self.x, self.y, self.size, self.size))
@@ -105,7 +105,7 @@ class Tiles(pygame.sprite.Sprite):
 
 		self.angle = 0
 		self.dtheta = 0
-		self.dx = -1
+		self.dx = -2
 
 		self.height=0
 		self.width=0
