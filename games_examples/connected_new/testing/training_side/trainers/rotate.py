@@ -32,8 +32,8 @@ def train_impl(train_context):
     })
     print(train_context.observation_space.shape,"shape")
     train_context.action_space = spaces.Discrete(2)
-    train_context.max_episode_length = 100
-    train_context.total_timesteps = int(100)
+    train_context.max_episode_length = 1000
+    train_context.total_timesteps = int(2000)
     train_context.algorithm_type = "MultiInputPolicy"
     train_context.algorithm = stable_baselines3.PPO
 
@@ -67,8 +67,8 @@ def train_impl(train_context):
 
     if train_context.ball.score > train_context.score:
         train_context.score = train_context.ball.score
-        return 1
-    
+        reward += 1
+
     else:
         reward += 0.1
     # il gagne un coin -> 1 si il perds -1 0

@@ -151,7 +151,7 @@ class Game:
 		self.start_time = pygame.time.get_ticks()
 		self.current_time = 0
 		self.coin_delta = 850
-		self.tile_delta = 2000
+		self.tile_delta = 2300
 
 
 		self.coin = Coins(0, self.win)
@@ -256,8 +256,18 @@ class Game:
 					self.t = Tiles(self.y, self.type_, self.win)
 					self.tile_group.add(self.t)
 
+
 					self.start_time = self.current_time
 					self.new_coin = True
+
+
+				tiles_to_remove = [tile for tile in self.tile_group if tile.rect.x < 32]
+				for tile in tiles_to_remove:
+					self.tile_group.remove(tile)
+
+				coins_to_remove = [coin for coin in self.coin_group if coin.x < 60]
+				for coin in coins_to_remove:
+					self.coin_group.remove(coin)
 
 
 
