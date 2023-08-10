@@ -18,11 +18,10 @@ class Player(pygame.sprite.Sprite):
         self.acc = vec(0, 0)
         self.player_position = vec(0, 0)
         self.move_counter = 0
-        self.SPEED_PLAYER = 0.016
 
     def update(self, event, dt):
         self.move_counter += dt
-        if self.move_counter > self.SPEED_PLAYER:
+        if self.move_counter > Config.SPEED:
             self.acc = vec(0, 0)
 
             if event.key == pygame.K_LEFT or event.key == pygame.K_a:
@@ -51,6 +50,8 @@ class Player(pygame.sprite.Sprite):
                 self.pos.y = 200
 
             self.rect.center = self.pos
+
+            self.move_counter = 0
 
     def draw(self, screen):
         screen.blit(VisualizationService.get_santa_hand(), (self.rect.x - 25, self.rect.y - 25))

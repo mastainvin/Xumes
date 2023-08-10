@@ -8,3 +8,5 @@ class Config:
     # Movement
     ACC = 1.2
     FRIC = -0.10
+
+    SPEED = 0.009

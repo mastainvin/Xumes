@@ -1,6 +1,6 @@
 import sys
 import time
-
+import numpy as np
 import pygame
 
 from games_examples.dont_touch.src.components.hand import Hand
@@ -77,9 +77,9 @@ class Game:
             if self.H2 is not None:
                 self.H2.move(self.scoreboard, self.P1.player_position, self.dt)
 
-            print("----------------- RIGHT HAND X -----------------\n", self.H2.new_x)
-            print("----------------- PLAYER HAND X -----------------\n", self.P1.pos[0])
-            print("----------------- PLAYER - HAND -----------------\n", self.P1.pos[0] - self.H2.new_x)
+            print("----------------- DISTANCE TO RIGHT HAND -----------------\n", np.abs(self.P1.player_position[1] - self.H2.new_y))
+            print("----------------- DISTANCE TO LEFT HAND -----------------\n", np.abs(self.P1.player_position[1] - self.H1.new_y))
+            #print("----------------- PLAYER - HAND -----------------\n", self.P1.pos[0] - self.H2.new_x)
 
             if pygame.sprite.spritecollide(self.P1, self.hands, False, pygame.sprite.collide_mask):
                 self.scoreboard.update_max_score()

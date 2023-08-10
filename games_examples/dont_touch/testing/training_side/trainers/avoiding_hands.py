@@ -4,6 +4,8 @@ from gymnasium.vector.utils import spaces
 
 from xumes.training_module import observation, reward, terminated, action, config
 
+from games_examples.dont_touch.src.config import Config
+
 
 @config
 def train_impl(train_context):
@@ -46,17 +48,17 @@ def train_impl(train_context):
         dct["left_hand_x"] = np.array([train_context.left_hand.new_x])
         dct["left_hand_y"] = np.array([train_context.left_hand.new_y])
         dct["left_hand_speed"] = np.array([train_context.left_hand.new_spd])
-    else :
-        dct["left_hand_x"] = np.array([float(-100)])
-        dct["left_hand_y"] = np.array([float(-320)])
+    else:
+        dct["left_hand_x"] = np.array([float(500)])
+        dct["left_hand_y"] = np.array([float(Config.HEIGHT + 1)])
         dct["left_hand_speed"] = np.array([float(0)])
     if train_context.right_hand is not None:
         dct["right_hand_x"] = np.array([train_context.right_hand.new_x])
         dct["right_hand_y"] = np.array([train_context.right_hand.new_y])
         dct["right_hand_speed"] = np.array([train_context.right_hand.new_spd])
     else:
-        dct["right_hand_x"] = np.array([float(400)])
-        dct["right_hand_y"] = np.array([float(-40)])
+        dct["right_hand_x"] = np.array([float(-200)])
+        dct["right_hand_y"] = np.array([float(Config.HEIGHT + 1)])
         dct["right_hand_speed"] = np.array([float(0)])
 
     return dct
@@ -70,13 +72,13 @@ def train_impl(train_context):
         if xDiff < train_context.xDiff:
             return 0.1
         else:
-            return -0.1
+            return -0.3
 
     def reward_left(xDiff):
         if xDiff > train_context.xDiff:
             return 0.1
         else:
-            return -0.1
+            return -0.3
 
     if train_context.right_hand is not None:
         xRight, yRight = train_context.right_hand.new_x, train_context.right_hand.new_y

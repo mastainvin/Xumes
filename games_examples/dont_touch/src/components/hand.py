@@ -24,7 +24,6 @@ class Hand(pygame.sprite.Sprite):
         self.side = hand_side
         self.can_score = True #When a hand is above the player, the player can score
         self.move_counter = 0
-        self.SPEED_HANDS = 0.016
         self._load_hand()
 
     def reset(self):
@@ -72,7 +71,7 @@ class Hand(pygame.sprite.Sprite):
 
     def move(self, scoreboard: Scoreboard, player_position, dt):
         self.move_counter += dt
-        if self.move_counter > 0.016:
+        if self.move_counter > Config.SPEED:
             self.new_x = sine(100.0, 620, 20.0, self.offset_x)
             self.new_y += self.new_spd
             self.rect.center = (self.new_x, self.new_y)
@@ -100,7 +99,6 @@ class Hand(pygame.sprite.Sprite):
 
                 if self.new_spd >= 6:
                     self.new_spd = 8
-                    MusicService.play_chop_sound()
 
                 self.can_score = True
             self.move_counter = 0
