@@ -352,7 +352,8 @@ class Game:
 
 	def check_end(self):
 		if self.terminated:
-			self.reset()
+			# self.reset()
+			pass
 
 	def end_game(self):
 		print("true")

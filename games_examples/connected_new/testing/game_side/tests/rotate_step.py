@@ -69,46 +69,46 @@ def test_impl(test_context):
 def test_impl(test_context):
     # recreate for the new ball; remove the old ball in the group; and notify
     test_context.game.reset()
-    test_context.game.ball_group.remove(test_context.game.ball)
-    test_context.game.ball = test_context.create(Balls, name="ball", state=[
-        State("rect", [State("x"), State("y")], methods_to_observe="update"),
-        State("score", methods_to_observe="update"),
-        State("highscore", methods_to_observe="update")
-
-    ],
-                                                 # add initializing params
-                                                 pos=(test_context.game.CENTER[0],
-                                                      test_context.game.CENTER[1] + test_context.game.RADIUS),
-                                                 radius=test_context.game.RADIUS, angle=90, win=test_context.game.win
-                                                 )
-    test_context.game.ball_group.add(test_context.game.ball)
-    test_context.game.ball.notify()
-
-#     coin
-    test_context.game.coin_group.remove(test_context.game.coin)
-    test_context.game.coin = test_context.create(Coins, name="coin", state=[
-        State("rect", [State("x"), State("y")], methods_to_observe=["update"])
-    ],
-                                                 y=random.randint(
-                                                     test_context.game.CENTER[1] - test_context.game.RADIUS,
-                                                     test_context.game.CENTER[1] + test_context.game.RADIUS),
-                                                 win=test_context.game.win)
-    test_context.game.coin_group.add(test_context.game.coin)
-    test_context.game.coin.notify()
-
-#     tile
-    test_context.game.tile_group.remove(test_context.game.t)
-    test_context.game.t = test_context.create(Tiles, name="tile", state=[
-        State("rect", [State("x"), State("y")], methods_to_observe=["update"]),
-        State("type", methods_to_observe=["update"]),
-    ],
-                                              y=random.choice([test_context.game.CENTER[1] - 80,
-                                                               test_context.game.CENTER[1],
-                                                               test_context.game.CENTER[1] + 80]),
-                                              type_=random.randint(1, 3),
-                                              win=test_context.game.win)
-    test_context.game.tile_group.add(test_context.game.t)
-    test_context.game.t.notify()
+#     test_context.game.ball_group.remove(test_context.game.ball)
+#     test_context.game.ball = test_context.create(Balls, name="ball", state=[
+#         State("rect", [State("x"), State("y")], methods_to_observe="update"),
+#         State("score", methods_to_observe="update"),
+#         State("highscore", methods_to_observe="update")
+#
+#     ],
+#                                                  # add initializing params
+#                                                  pos=(test_context.game.CENTER[0],
+#                                                       test_context.game.CENTER[1] + test_context.game.RADIUS),
+#                                                  radius=test_context.game.RADIUS, angle=90, win=test_context.game.win
+#                                                  )
+#     test_context.game.ball_group.add(test_context.game.ball)
+#     test_context.game.ball.notify()
+#
+# #     coin
+#     test_context.game.coin_group.remove(test_context.game.coin)
+#     test_context.game.coin = test_context.create(Coins, name="coin", state=[
+#         State("rect", [State("x"), State("y")], methods_to_observe=["update"])
+#     ],
+#                                                  y=random.randint(
+#                                                      test_context.game.CENTER[1] - test_context.game.RADIUS,
+#                                                      test_context.game.CENTER[1] + test_context.game.RADIUS),
+#                                                  win=test_context.game.win)
+#     test_context.game.coin_group.add(test_context.game.coin)
+#     test_context.game.coin.notify()
+#
+# #     tile
+#     test_context.game.tile_group.remove(test_context.game.t)
+#     test_context.game.t = test_context.create(Tiles, name="tile", state=[
+#         State("rect", [State("x"), State("y")], methods_to_observe=["update"]),
+#         State("type", methods_to_observe=["update"]),
+#     ],
+#                                               y=random.choice([test_context.game.CENTER[1] - 80,
+#                                                                test_context.game.CENTER[1],
+#                                                                test_context.game.CENTER[1] + 80]),
+#                                               type_=random.randint(1, 3),
+#                                               win=test_context.game.win)
+#     test_context.game.tile_group.add(test_context.game.t)
+#     test_context.game.t.notify()
 
 
 
