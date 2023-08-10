@@ -35,10 +35,10 @@ class Game:
         # Sprite Setup
         self.P1 = Player()
         self.H1 = Hand(HandSide.LEFT, offset_x=0, speed=3, random_hand=False)
-        #self.H1.offset_x = -50
+        self.H1.offset_x = 119
         #self.H1 = None
-        self.H2 = Hand(HandSide.RIGHT, offset_x=280, speed=3, random_hand=False)
-        #self.H2 = None
+        #self.H2 = Hand(HandSide.RIGHT, offset_x=280, speed=3, random_hand=False)
+        self.H2 = None
 
         # Sprite Groups
         self.hands = pygame.sprite.Group()
@@ -77,8 +77,8 @@ class Game:
             if self.H2 is not None:
                 self.H2.move(self.scoreboard, self.P1.player_position, self.dt)
 
-            print("----------------- DISTANCE TO RIGHT HAND -----------------\n", np.abs(self.P1.player_position[1] - self.H2.new_y))
-            print("----------------- DISTANCE TO LEFT HAND -----------------\n", np.abs(self.P1.player_position[1] - self.H1.new_y))
+            #print("----------------- DISTANCE TO RIGHT HAND -----------------\n", np.abs(self.P1.player_position[1] - self.H2.new_y))
+            #print("----------------- DISTANCE TO LEFT HAND -----------------\n", np.abs(self.P1.player_position[1] - self.H1.new_y))
             #print("----------------- PLAYER - HAND -----------------\n", self.P1.pos[0] - self.H2.new_x)
 
             if pygame.sprite.spritecollide(self.P1, self.hands, False, pygame.sprite.collide_mask):
