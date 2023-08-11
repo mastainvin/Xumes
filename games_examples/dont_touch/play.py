@@ -26,10 +26,9 @@ class Game:
         self.FramePerSec = pygame.time.Clock()
 
         GlobalState.load_main_screen()
-        VisualizationService.load_main_game_displays()
+        #VisualizationService.load_main_game_displays()
 
         self.running = True
-
         self.scoreboard = Scoreboard()
 
         # Sprite Setup
@@ -41,13 +40,13 @@ class Game:
         self.H2 = None
 
         # Sprite Groups
+        self.all_sprites = pygame.sprite.Group()
+        self.all_sprites.add(self.P1)
         self.hands = pygame.sprite.Group()
         if self.H1 is not None:
             self.hands.add(self.H1)
         if self.H2 is not None:
             self.hands.add(self.H2)
-        self.all_sprites = pygame.sprite.Group()
-        self.all_sprites.add(self.P1)
         if self.H1 is not None:
             self.all_sprites.add(self.H1)
         if self.H2 is not None:
@@ -57,13 +56,16 @@ class Game:
 
         GlobalState.SCROLL = update_background_using_scroll(GlobalState.SCROLL)
         VisualizationService.draw_background_with_scroll(GlobalState.SCREEN, GlobalState.SCROLL)
-        GlobalState.PRESS_Y = update_press_key(GlobalState.PRESS_Y)
-        VisualizationService.draw_main_menu(GlobalState.SCREEN, self.scoreboard.get_max_score(), GlobalState.PRESS_Y)
+        #GlobalState.PRESS_Y = update_press_key(GlobalState.PRESS_Y)
+        #VisualizationService.draw_main_menu(GlobalState.SCREEN, self.scoreboard.get_max_score(), GlobalState.PRESS_Y)
+
+        #pygame.display.update()
 
     def run(self):
 
         while self.running:
 
+            #self.render()
             events = pygame.event.get()
 
             for event in events:
@@ -76,6 +78,8 @@ class Game:
                 self.H1.move(self.scoreboard, self.P1.player_position, self.dt)
             if self.H2 is not None:
                 self.H2.move(self.scoreboard, self.P1.player_position, self.dt)
+
+            self.render()
 
             #print("----------------- DISTANCE TO RIGHT HAND -----------------\n", np.abs(self.P1.player_position[1] - self.H2.new_y))
             #print("----------------- DISTANCE TO LEFT HAND -----------------\n", np.abs(self.P1.player_position[1] - self.H1.new_y))
@@ -90,23 +94,23 @@ class Game:
 
             self.dt = self.FramePerSec.tick(Config.FPS) / 1000
 
-            self.render()
-
 
     def render(self):
 
         GlobalState.SCROLL = update_background_using_scroll(GlobalState.SCROLL)
         VisualizationService.draw_background_with_scroll(GlobalState.SCREEN, GlobalState.SCROLL)
 
-        self.P1.draw(GlobalState.SCREEN)
+        if self.P1 is not None:
+            self.P1.draw(GlobalState.SCREEN)
         if self.H1 is not None:
             self.H1.draw(GlobalState.SCREEN)
         if self.H2 is not None:
             self.H2.draw(GlobalState.SCREEN)
         self.scoreboard.draw(GlobalState.SCREEN)
 
-        self.dt = self.FramePerSec.tick(Config.FPS) / 1000
         pygame.display.update()
+
+        #self.dt = self.FramePerSec.tick(Config.FPS) / 1000
 
     def check_end(self):
         if self.terminated:
@@ -116,12 +120,12 @@ class Game:
         self.terminated = True
 
     def reset(self):
+        self.scoreboard.reset_current_score()
         self.P1.reset()
         if self.H1 is not None:
             self.H1.reset()
         if self.H2 is not None:
             self.H2.reset()
-        self.scoreboard.reset_current_score()
         self.FramePerSec = pygame.time.Clock()
         self.terminated = False
         time.sleep(0.5)
