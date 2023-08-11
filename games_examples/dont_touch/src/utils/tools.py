@@ -21,7 +21,7 @@ def update_background_using_scroll(scroll):
 
 def update_press_key(press_y):
     if press_y > 460:
-        return press_y * 0.99
+        return press_y * 0.2
 
     return press_y
 

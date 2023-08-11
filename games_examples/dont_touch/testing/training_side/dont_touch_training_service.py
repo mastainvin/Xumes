@@ -40,8 +40,8 @@ class DontTouchTrainingService(StableBaselinesTrainer):
             'right_hand_x': np.array([self.right_hand.new_x]),
             'right_hand_y': np.array([self.right_hand.new_y]),
             'right_hand_speed': np.array([self.right_hand.new_spd]),
-            'scoreboard_current_score': np.array([self.scoreboard._current_score]),
-            'scoreboard_max_score': np.array([self.scoreboard._max_score])
+            'scoreboard_current_score': np.array([self.scoreboard.current_score]),
+            'scoreboard_max_score': np.array([self.scoreboard.max_score])
         }
 
     def convert_reward(self) -> float:
@@ -49,10 +49,10 @@ class DontTouchTrainingService(StableBaselinesTrainer):
 
         if self.player.player_position[1] < Config.HEIGHT - 20:
             reward += 0.2
-        if self.scoreboard._current_score > self.score:
+        if self.scoreboard.current_score > self.score:
             reward += 5
-            self.score = self.scoreboard._current_score
-        if self.scoreboard._current_score >= self.scoreboard._max_score:
+            self.score = self.scoreboard.current_score
+        if self.scoreboard.current_score >= self.scoreboard.max_score:
             reward += 10
         if self.game.terminated:
             reward -= 5

@@ -17,36 +17,41 @@ class Player(pygame.sprite.Sprite):
         self.vel = vec(0, 0)
         self.acc = vec(0, 0)
         self.player_position = vec(0, 0)
+        self.move_counter = 0
 
-    def update(self, event):
-        self.acc = vec(0, 0)
+    def update(self, event, dt):
+        self.move_counter += dt
+        if self.move_counter > Config.SPEED:
+            self.acc = vec(0, 0)
 
-        if event.key == pygame.K_LEFT or event.key == pygame.K_a:
-            self.acc.x = -Config.ACC
-        if event.key == pygame.K_RIGHT or event.key == pygame.K_d:
-            self.acc.x = +Config.ACC
-        if event.key == pygame.K_UP or event.key == pygame.K_w:
-            self.acc.y = -Config.ACC
-        if event.key == pygame.K_DOWN or event.key == pygame.K_s:
-            self.acc.y = +Config.ACC
+            if event.key == pygame.K_LEFT or event.key == pygame.K_a:
+                self.acc.x = -Config.ACC
+            if event.key == pygame.K_RIGHT or event.key == pygame.K_d:
+                self.acc.x = +Config.ACC
+            if event.key == pygame.K_UP or event.key == pygame.K_w:
+                self.acc.y = -Config.ACC
+            if event.key == pygame.K_DOWN or event.key == pygame.K_s:
+                self.acc.y = +Config.ACC
 
-        self.acc.x += self.vel.x * Config.FRIC
-        self.acc.y += self.vel.y * Config.FRIC
-        self.vel += self.acc
-        self.pos += self.vel + 0.5 * self.acc
+            self.acc.x += self.vel.x * Config.FRIC
+            self.acc.y += self.vel.y * Config.FRIC
+            self.vel += self.acc
+            self.pos += self.vel + 0.5 * self.acc
 
-        self.player_position = self.pos.copy()
+            self.player_position = self.pos.copy()
 
-        if self.pos.x > Config.WIDTH:
-            self.pos.x = Config.WIDTH
-        if self.pos.x < 0:
-            self.pos.x = 0
-        if self.pos.y > Config.HEIGHT:
-            self.pos.y = Config.HEIGHT
-        if self.pos.y < 200:
-            self.pos.y = 200
+            if self.pos.x > Config.WIDTH:
+                self.pos.x = Config.WIDTH
+            if self.pos.x < 0:
+                self.pos.x = 0
+            if self.pos.y > Config.HEIGHT:
+                self.pos.y = Config.HEIGHT
+            if self.pos.y < 200:
+                self.pos.y = 200
 
-        self.rect.center = self.pos
+            self.rect.center = self.pos
+
+            self.move_counter = 0
 
     def draw(self, screen):
         screen.blit(VisualizationService.get_santa_hand(), (self.rect.x - 25, self.rect.y - 25))
