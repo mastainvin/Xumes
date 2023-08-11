@@ -8,6 +8,7 @@ from gymnasium.vector.utils import spaces
 from xumes.training_module import observation, reward, terminated, action, config
 from games_examples.connected_new.objects import Balls, Coins, Tiles, WIDTH, HEIGHT, CENTER
 
+
 @config
 def train_impl(train_context):
 
@@ -63,12 +64,11 @@ def train_impl(train_context):
 
     if train_context.game.terminated:
         train_context.score = 0
-        reward += -1
+        reward -= 1
 
-    if train_context.ball.score > train_context.score:
-        train_context.score = train_context.ball.score
+    if train_context.game.score > train_context.score:
+        train_context.score = train_context.game.score
         reward += 1
-
     else:
         reward += 0.1
     # il gagne un coin -> 1 si il perds -1 0

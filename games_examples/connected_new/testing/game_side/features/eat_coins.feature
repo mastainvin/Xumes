@@ -1,4 +1,4 @@
-Feature: Testing the rotation
+Feature: Testing eating a coin
 
   @basic
   Scenario: To eat a coin

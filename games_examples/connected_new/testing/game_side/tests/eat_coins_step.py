@@ -21,14 +21,17 @@ def test_impl(test_context):
           methods_to_observe="update"),
     State("coin", [State("x"), State("y")], methods_to_observe="update"),
     State("t", [State("x"), State("y"), State("type")], methods_to_observe="update"),
+    State("score", methods_to_observe=["update_score"]),
+    State("highscore", methods_to_observe=["update_highscore"])
+
                                                    ]
     )
     # test_context.game = test_context.create(Game, "game",
     #                                         state=State("terminated", func=get_end,  methods_to_observe=["end_game", "reset"]))
     test_context.game.ball = test_context.create(Balls, name="ball", state=[
         State("rect", [State( "x" ), State( "y" )], methods_to_observe="update"),
-        State("score" , methods_to_observe="update"),
-        State("highscore", methods_to_observe="update")
+        State("score" , methods_to_observe="update_score"),
+        State("highscore", methods_to_observe="update_score")
 
     ],
                                                  # add initializing params
