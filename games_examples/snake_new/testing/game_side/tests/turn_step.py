@@ -57,11 +57,11 @@ def test_impl(test_context):
 #     i, j = int(i), int(j)
 #     test_context.game.reset()
 #     test_context.game.pipe_generator.pipes = [Pipe(player=test_context.game.player,
-#                                                    generator=test_context.game.pipe_generator,
+#                                                    generator.py=test_context.game.pipe_generator,
 #                                                    height=get_height(i),
 #                                                    position=LEFT_POSITION + SIZE / 2 + SPACE_BETWEEN_PIPES - PIPE_WIDTH / 2),
 #                                               Pipe(player=test_context.game.player,
-#                                                    generator=test_context.game.pipe_generator,
+#                                                    generator.py=test_context.game.pipe_generator,
 #                                                    height=get_height(j),
 #                                                    position=LEFT_POSITION + SIZE / 2 + 2 * SPACE_BETWEEN_PIPES - PIPE_WIDTH / 2)]
 #     test_context.game.pipe_generator.notify()

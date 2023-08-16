@@ -30,10 +30,10 @@ def train_impl(train_context):
         't_y': spaces.Box(0, HEIGHT, dtype=np.int32, shape=(1,)),
         't_type': spaces.Box(1, 3, dtype=np.int32, shape=(1,))
     })
-    print(train_context.observation_space.shape,"shape")
+    # print(train_context.observation_space.shape,"shape")
     train_context.action_space = spaces.Discrete(2)
     train_context.max_episode_length = 1000
-    train_context.total_timesteps = int(5000)
+    train_context.total_timesteps = int(200000)
     train_context.algorithm_type = "MultiInputPolicy"
     train_context.algorithm = stable_baselines3.PPO
 
@@ -46,13 +46,13 @@ def train_impl(train_context):
     train_context.states = {
         'ball_x': np.array([train_context.ball.rect.x]),
         'ball_y': np.array([train_context.ball.rect.y]),
-        'coins_x': np.array([train_context.coin.rect.x]),
-        'coins_y': np.array([train_context.coin.rect.y]),
-        't_x': np.array([train_context.tile.rect.x]),
-        't_y': np.array([train_context.tile.rect.y]),
+        'coins_x': np.array([train_context.coin.x]),
+        'coins_y': np.array([train_context.coin.y]),
+        't_x': np.array([train_context.tile.x]),
+        't_y': np.array([train_context.tile.y]),
         't_type': np.array([train_context.tile.type])
     }
-    print("Received states:", train_context.states,train_context.ball, train_context.coin,train_context.tile)
+    # print("Received states:", train_context.states,train_context.observation_space, train_context.coin,train_context.tile)
     return train_context.states
     #     here use tile instead of t
 
@@ -61,41 +61,31 @@ def train_impl(train_context):
 def train_impl(train_context):
     reward = 0
 
+    if train_context.game.score > train_context.score:
+        train_context.score = train_context.game.score
+        print("+++++++++++")
+        reward += 10
+        # return reward
+
     if train_context.game.terminated:
         train_context.score = 0
-        reward += -1
+        print("tttttttttttt")
+        reward -= 10
+        # return reward
 
-    if train_context.ball.score > train_context.score:
-        train_context.score = train_context.ball.score
-        reward += 1
 
-    else:
-        reward += 0.1
-    # il gagne un coin -> 1 si il perds -1 0
-    #
-    # if self.game.ball.score > self.score :
-    #     self.score = self.game.ball.score
+
+    # if not train_context.game.terminated and train_context.game.score <= train_context.score:
+    #     # print("0.1")
     #     reward += 1
-    #
-    # if self.game.terminated:
-    #     return -1
-    # return 0
 
-    # if self.game.ball.rect.x < self.game.t.x:
-    # reward += 10
-    # if self.game.ball.score > self.score:
-    # reward += 5
-    # self.score = self.game.ball.score
-    # if self.game.ball.score >= self.game.ball.highscore:
-    # reward += 10
-    # if self.game.terminated:
-    # reward -= 5
 
     return reward
 
 
 @terminated
 def train_impl(train_context):
+    term = train_context.game.terminated
     return train_context.game.terminated
 
 

@@ -25,6 +25,7 @@ class Balls(pygame.sprite.Sprite):
 
 
 	def update(self, color):
+		# print("called update--ball")
 		x = round(CENTER[0] + self.radius * math.cos(self.angle * math.pi / 180))
 		y = round(CENTER[1] + self.radius * math.sin(self.angle * math.pi / 180))
 
@@ -73,15 +74,11 @@ class Coins(pygame.sprite.Sprite):
 		self.y = y
 		self.win = win
 		self.size = 15
-
 		self.x = WIDTH + 20
 		self.dx = -2
 		self.s = 1
 
 		self.rect = pygame.draw.rect(self.win, (255, 255, 255), (self.x, self.y, self.size, self.size))
-
-
-
 
 	def update(self, color):
 		self.x += self.dx
@@ -134,6 +131,7 @@ class Tiles(pygame.sprite.Sprite):
 
 	def update(self):
 		self.rect.x += self.dx
+		self.x += self.dx
 		if self.rect.right < 0:
 			self.kill()
 		

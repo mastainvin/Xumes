@@ -26,7 +26,7 @@ def test_impl(test_context):
         State("points", methods_to_observe=["gain_point", "reset"])], position=HEIGHT // 2, game=test_context.game)
 
 
-@given("A pipe generator")
+@given("A pipe generator.py")
 def test_impl(test_context):
     def get_rect(x):
         return [x.left, x.top, x.right, x.bottom]

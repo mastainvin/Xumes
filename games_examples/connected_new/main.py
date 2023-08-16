@@ -5,9 +5,9 @@
 
 import random
 import pygame
-
+import time
 from games_examples.connected_new.objects import Balls, Coins, Tiles, Particle, Message, Button
-
+from games_examples.connected_new.generator import PipeGenerator
 
 
 
@@ -44,13 +44,13 @@ class Game:
 		self.info = pygame.display.Info()
 		self.width = self.info.current_w
 		self.height = self.info.current_h
-
+		self.dt=0
 		if self.width >= self.height:
 			self.win = pygame.display.set_mode(self.SCREEN, pygame.NOFRAME)
 		else:
 			self.win = pygame.display.set_mode(self.SCREEN, pygame.NOFRAME | pygame.SCALED | pygame.FULLSCREEN)
 		pygame.display.set_caption('Connected')
-
+		self.generator = PipeGenerator(game=self,win = self.win)
 		self.clock = pygame.time.Clock()
 		self.FPS = 0
 
@@ -65,7 +65,7 @@ class Game:
 		self.clicked = False
 		self.new_coin = True
 		self.num_clicks = 0
-		self.score = 0
+		# self.score = 0
 
 		self.player_alive = True
 		self.score = 0
@@ -150,24 +150,22 @@ class Game:
 
 		self.start_time = pygame.time.get_ticks()
 		self.current_time = 0
-		self.coin_delta = 850
-		self.tile_delta = 2500
+		self.coin_delta = 1500
+		self.tile_delta = 4000
 
 
 		self.coin = Coins(0, self.win)
-		self.t = Tiles(0, 0, self.win)
+		self.tile = Tiles(0, 0, self.win)
 
 	def run(self):
 
 		while self.running:
 			self.update_check()
 			self.render()
-
-
-
+		self.dt = self.clock.tick(60) / 1000
 
 	def update(self):
-
+		# print("update called")
 		self.update_main()
 
 		self.ball_group.update(self.color)
@@ -179,7 +177,7 @@ class Game:
 		pygame.display.update()
 
 	def update_main(self):
-		print(self.ball.rect,self.coin.rect,self.t.rect,"yesok")
+		# print(self.ball.rect,self.coin.x,self.tile.x,"yesok")
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
 				self.running = False
@@ -231,43 +229,54 @@ class Game:
 
 					self.collided_rectangles = pygame.sprite.spritecollide(self.ball, self.tile_group, True)
 					if self.collided_rectangles:
-						print("collide")
+						# print("collide")
 						x, y = self.ball.rect.center
 						for i in range(30):
 							particle = Particle(x, y, self.color, self.win)
 							self.particle_group.add(particle)
 
 						self.player_alive = False
+						print("false")
 						self.dead_fx.play()
 						#print("score",self.score)
 						self.collided_rectangles = True
 
 				self.current_time = pygame.time.get_ticks()
 				self.delta = self.current_time - self.start_time
-				if self.coin_delta < self.delta < self.coin_delta + 100 and self.new_coin:
+
+				# self.generator.generator(self.dt)
+				# self.generator.move(self.color)
+				if self.coin_delta < self.delta < self.coin_delta + 100 and self.new_coin and len(self.coin_group)==0:
 					self.y = random.randint(self.CENTER[1] - self.RADIUS, self.CENTER[1] + self.RADIUS)
 					self.coin = Coins(self.y, self.win)
 					self.coin_group.add(self.coin)
 					self.new_coin = False
+					# self.end_game()
 
-				if self.current_time - self.start_time >= self.tile_delta:
+				if self.current_time - self.start_time >= self.tile_delta and len(self.tile_group)==0:
 					self.y = random.choice([self.CENTER[1] - 80, self.CENTER[1], self.CENTER[1] + 80])
 					self.type_ = random.randint(1, 3)
-					self.t = Tiles(self.y, self.type_, self.win)
-					self.tile_group.add(self.t)
+					self.tile = Tiles(self.y, self.type_, self.win)
+					self.tile_group.add(self.tile)
 
 
 					self.start_time = self.current_time
 					self.new_coin = True
 
 
-				tiles_to_remove = [tile for tile in self.tile_group if tile.rect.x < 32]
+
+				# if any(tile.x < 32 for tile in self.tile_group):
+					# self.end_game()
+
+
+				tiles_to_remove = [tile for tile in self.tile_group if tile.x < 31]
 				for tile in tiles_to_remove:
 					self.tile_group.remove(tile)
 
 				coins_to_remove = [coin for coin in self.coin_group if coin.x < 60]
 				for coin in coins_to_remove:
 					self.coin_group.remove(coin)
+
 
 
 
@@ -287,8 +296,6 @@ class Game:
 
 		self.update_main()
 		self.check_end()
-
-
 
 	def render(self):
 
@@ -349,26 +356,48 @@ class Game:
 		pygame.draw.rect(self.win, self.BLUE, (0, 0, self.WIDTH, self.HEIGHT), 5, border_radius=10)
 		pygame.display.update()
 
-
 	def check_end(self):
 		if self.terminated:
 			# self.reset()
 			pass
 
 	def end_game(self):
-		print("true")
+		# print("true")
 		self.terminated = True
+		time.sleep(2)
 
 	def reset(self):
+		if self.terminated:
+			print("reset called")
+			self.ball.reset()
+			#simuler le bouton replay
+			self.game_page = True
+			self.score = 0
+			self.score_msg = Message(self.WIDTH//2, 100, 60,       "0"  , self.score_font, (150, 150, 150), self.win)
 
+			if self.easy_level:
+
+				self.ball = Balls((self.CENTER[0], self.CENTER[1] + self.RADIUS), self.RADIUS, 90, self.win)
+				self.ball_group.add(self.ball)
+			else:
+				self.ball = Balls((self.CENTER[0], self.CENTER[1] + self.RADIUS), self.RADIUS, 90, self.win)
+				self.ball_group.add(self.ball)
+				self.ball = Balls((self.CENTER[0], self.CENTER[1] - self.RADIUS), self.RADIUS, 270, self.win)
+				self.ball_group.add(self.ball)
+
+			self.player_alive = True
+			self.terminated = False
+
+	def reset2(self):
+		# if self.terminated:
+		print("reset2 called")
 		self.ball.reset()
-		#simuler le bouton replay
+			#simuler le bouton replay
 		self.game_page = True
 		self.score = 0
-		self.score_msg = Message(self.WIDTH//2, 100, 60, "0", self.score_font, (150, 150, 150), self.win)
+		self.score_msg = Message(self.WIDTH//2, 100, 60,       "0"  , self.score_font, (150, 150, 150), self.win)
 
 		if self.easy_level:
-
 			self.ball = Balls((self.CENTER[0], self.CENTER[1] + self.RADIUS), self.RADIUS, 90, self.win)
 			self.ball_group.add(self.ball)
 		else:
@@ -379,7 +408,6 @@ class Game:
 
 		self.player_alive = True
 		self.terminated = False
-
 
 if __name__ == "__main__":
 	game = Game()
