@@ -33,12 +33,6 @@ class Game:
 
 
 	def __init__(self):
-
-
-
-
-
-
 		pygame.init()
 
 		self.info = pygame.display.Info()
@@ -299,50 +293,13 @@ class Game:
 
 	def render(self):
 
-		self.FPS = 60
+		self.FPS = 240
 
 		self.win.fill(self.GRAY)
 
-		#if self.home_page:
-		#self.connected.update()
 
 		self.game_page = True
 
-		#if self.score_page:
-			#self.game_msg.update()
-			#self.over_msg.update()
-
-			#if self.score:
-				#self.final_score.update(self.score, self.color)
-			#else:
-				#self.final_score.update("0", self.color)
-			#if self.score and (self.score >= self.highscore):
-				#self.new_high_msg.update(shadow=False)
-
-			#if self.home_btn.draw(self.win):
-				#self.home_page = True
-				#self.score_page = False
-				#self.game_page = False
-				#self.player_alive = True
-				#self.score = 0
-				#self.score_msg = Message(self.WIDTH//2, 100, 60, "0", self.score_font, (150, 150, 150), self.win)
-
-			#if self.replay_btn.draw(self.win):
-				#self.home_page = False
-				#self.score_page = False
-				#self.game_page = True
-				#self.score = 0
-				#self.score_msg = Message(self.WIDTH//2, 100, 60, "0", self.score_font, (150, 150, 150), self.win)
-
-			#if self.sound_btn.draw(self.win):
-				#self.sound_on = not self.sound_on
-
-				#if self.sound_on:
-					#self.sound_btn.update_image(self.sound_on_img)
-					#pygame.mixer.music.play(loops=-1)
-				#else:
-					#self.sound_btn.update_image(self.sound_off_img)
-					#pygame.mixer.music.stop()
 
 		if self.game_page:
 			pygame.draw.circle(self.win, self.BLACK, self.CENTER, 80, 20)
@@ -364,7 +321,7 @@ class Game:
 	def end_game(self):
 		# print("true")
 		self.terminated = True
-		time.sleep(2)
+		# time.sleep(2)
 
 	def reset(self):
 		if self.terminated:

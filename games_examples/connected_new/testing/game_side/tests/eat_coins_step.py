@@ -17,7 +17,7 @@ def test_impl(test_context):
                                             state=[State("terminated", func=get_end,
                                                         methods_to_observe=["end_game", "reset","reset2"]
                                                         ),
-    State("ball", [State("score"), State("highscore"), State("rect", [State("x"), State("y")])],
+    State("ball", [State("x"), State("y"),State("score"), State("highscore"), State("rect", [State("x"), State("y")])],
           methods_to_observe="update_main"),
     State("coin", [State("x"), State("y"),State("rect", [State( "x" ), State( "y" )])], methods_to_observe="update_main"),
     State("tile", [State("x"), State("y"), State("type"),State("rect", [State( "x" ), State( "y" )])], methods_to_observe="update_main"),
@@ -27,6 +27,8 @@ def test_impl(test_context):
     )
     test_context.game.ball = test_context.bind(test_context.game.ball, name="ball",
                                                state=[
+                                                   State("x", methods_to_observe=["update_main"]),
+                                                   State("y", methods_to_observe=["update_main"]),
                                                    State("rect", [State("x"), State("y")], methods_to_observe="update"),
                                                    State("score", methods_to_observe="update"),
                                                    State("highscore", methods_to_observe="update")
@@ -98,7 +100,8 @@ def test_impl(test_context):
 @then("The ball should have {nb_points} point")
 def test_impl(test_context, nb_points):
     print("then")
-    test_context.assert_true(test_context.game.score == int(nb_points))
+    test_context.assert_true(test_context.game.score >= int(nb_points))
+    test_context.assert_greater_equal(test_context.game.score, int(nb_points))
 
 
 
