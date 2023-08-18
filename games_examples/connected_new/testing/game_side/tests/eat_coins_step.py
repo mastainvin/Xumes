@@ -17,7 +17,7 @@ def test_impl(test_context):
                                             state=[State("terminated", func=get_end,
                                                         methods_to_observe=["end_game", "reset","reset2"]
                                                         ),
-    State("ball", [State("x"), State("y"),State("score"), State("highscore"), State("rect", [State("x"), State("y")])],
+    State("ball", [State("x"), State("y"),State("dtheta"),State("score"), State("highscore"), State("rect", [State("x"), State("y")])],
           methods_to_observe="update_main"),
     State("coin", [State("x"), State("y"),State("rect", [State( "x" ), State( "y" )])], methods_to_observe="update_main"),
     State("tile", [State("x"), State("y"), State("type"),State("rect", [State( "x" ), State( "y" )])], methods_to_observe="update_main"),
@@ -29,6 +29,7 @@ def test_impl(test_context):
                                                state=[
                                                    State("x", methods_to_observe=["update_main"]),
                                                    State("y", methods_to_observe=["update_main"]),
+                                                   State("dtheta", methods_to_observe=["update_main"]),
                                                    State("rect", [State("x"), State("y")], methods_to_observe="update"),
                                                    State("score", methods_to_observe="update"),
                                                    State("highscore", methods_to_observe="update")
@@ -50,7 +51,7 @@ def test_impl(test_context):
 @given("A coin")
 def test_impl(test_context):
     # pass
-    # test_context.game.coin_group.remove(test_context.game.coin)
+    test_context.game.coin_group.remove(test_context.game.coin)
     test_context.game.coin = test_context.create(Coins, name="coin", state=[
         State("x", methods_to_observe=["update_main"]),
         State("y", methods_to_observe=["update_main"]),
@@ -107,6 +108,7 @@ def test_impl(test_context, nb_points):
 
 @loop
 def test_impl(test_context):
+    print(test_context.game.ball.dtheta,"dtheta")
     test_context.game.update_check()
 
 @render

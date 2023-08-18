@@ -9,8 +9,7 @@ import time
 from games_examples.connected_new.objects import Balls, Coins, Tiles, Particle, Message, Button
 from games_examples.connected_new.generator import PipeGenerator
 
-
-
+# RADIUS = 70
 
 class Game:
 	terminated = False
@@ -181,6 +180,7 @@ class Game:
 						event.key == pygame.K_q:
 					self.running = False
 
+
 			if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE and self.game_page:
 				if not self.clicked:
 					self.clicked = True
@@ -198,6 +198,43 @@ class Game:
 
 			if event.type == pygame.KEYUP and event.key == pygame.K_SPACE and self.game_page:
 				self.clicked = False
+
+			# if event.type == pygame.KEYDOWN and event.key == pygame.K_UP and self.game_page:
+			# 	if (not self.clicked)  and  self.ball.dtheta<0:
+			# 		self.clicked = True
+			# 		for self.ball in self.ball_group:
+			# 			self.ball.dtheta *= -1
+			# 			self.flip_fx.play()
+			#
+			# 		self.num_clicks += 1
+			# 		if self.num_clicks % 5 == 0:
+			# 			self.color_index += 1
+			# 			if self.color_index > len(self.color_list) - 1:
+			# 				self.color_index = 0
+			#
+			# 			self.color = self.color_list[self.color_index]
+			#
+			# if event.type == pygame.KEYUP and event.key == pygame.K_UP and self.game_page:
+			# 	self.clicked = False
+			#
+			#
+			# elif event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN and self.game_page:
+			# 	if (not self.clicked)  and  self.ball.dtheta>0:
+			# 		self.clicked = True
+			# 		for self.ball in self.ball_group:
+			# 			self.ball.dtheta *= -1
+			# 			self.flip_fx.play()
+			#
+			# 		self.num_clicks += 1
+			# 		if self.num_clicks % 5 == 0:
+			# 			self.color_index += 1
+			# 			if self.color_index > len(self.color_list) - 1:
+			# 				self.color_index = 0
+			#
+			# 			self.color = self.color_list[self.color_index]
+			#
+			# if event.type == pygame.KEYUP and event.key == pygame.K_DOWN and self.game_page:
+			# 	self.clicked = False
 
 		if self.game_page:
 

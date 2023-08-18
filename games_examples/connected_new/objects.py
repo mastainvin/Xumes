@@ -5,7 +5,7 @@ import math
 SCREEN = WIDTH, HEIGHT = 288, 512
 CENTER = WIDTH //2, HEIGHT // 2
 
-
+RADIUS = 70
 pygame.font.init()
 pygame.mixer.init()
 
@@ -73,7 +73,7 @@ class Coins(pygame.sprite.Sprite):
 
 		self.y = y
 		self.win = win
-		self.size = 15
+		self.size = 16
 		self.x = WIDTH + 20
 		self.dx = -2
 		self.s = 1
