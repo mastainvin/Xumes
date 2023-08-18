@@ -143,8 +143,8 @@ class Game:
 
 		self.start_time = pygame.time.get_ticks()
 		self.current_time = 0
-		self.coin_delta = 1500
-		self.tile_delta = 4000
+		self.coin_delta = 500
+		self.tile_delta = 1200
 
 
 		self.coin = Coins(0, self.win)

@@ -108,7 +108,7 @@ def test_impl(test_context, nb_points):
 
 @loop
 def test_impl(test_context):
-    print(test_context.game.ball.dtheta,"dtheta")
+    print(test_context.game.tile.x,test_context.game.tile.y,test_context.game.ball.rect.x+6,test_context.game.ball.rect.y+6,"x and y")
     test_context.game.update_check()
 
 @render

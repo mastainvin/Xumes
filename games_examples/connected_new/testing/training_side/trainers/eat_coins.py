@@ -75,7 +75,11 @@ def train_impl(train_context):
     # train_context.ball_y.append(train_context.game.ball.rect.y + 6)
     # train_context.dis_coin.append(abs(train_context.game.ball.rect.y + 6 - train_context.game.coin.y - 8))
     # train_context.dis_tile.append(abs(train_context.game.ball.rect.y + 6 - train_context.game.tile.y))
+    if train_context.last_tilex == train_context.game.tile.x:
+        train_context.ball_dtheta.clear()
+        train_context.is_going_to_collide_tile.clear()
     train_context.ball_dtheta.append(train_context.game.ball.dtheta)
+
 
 
     #
@@ -85,21 +89,24 @@ def train_impl(train_context):
     if train_context.game.score > train_context.score:
         train_context.score = train_context.game.score
         # print("+++++++++++10")
-        reward += 10
+        reward += 5
         # return reward
 
     if train_context.game.terminated:
         train_context.score = 0
         # train_context.ball_y.clear()
         # print("tttttttttttterminated")
-        reward -= 8
+        reward -= 3
         # return reward
     # 0.
 
     # if train_context.game.ball.rect.x + 6<= CENTER[0]:
     #     reward+=10
 
-
+    danger1=train_context.game.ball.rect.y<train_context.game.tile.y+10 and \
+                    train_context.game.ball.rect.y+12>train_context.game.tile.y-10
+    danger23=train_context.game.ball.rect.y < train_context.game.tile.y + 25 and \
+                    train_context.game.ball.rect.y + 12 > train_context.game.tile.y - 25
     is_going_to_collide_tile1 = train_context.game.ball.rect.y<train_context.game.tile.y+10 and \
                     train_context.game.ball.rect.y+12>train_context.game.tile.y-10
     is_going_to_collide_tile23 = train_context.game.ball.rect.y < train_context.game.tile.y + 25 and \
@@ -123,6 +130,10 @@ def train_impl(train_context):
     # 1.2则ball.y，则ball.y必须向着coin.y改变
     # 2.若无tile，则ball.y必须向着coin.y改变
 
+    if train_context.game.ball.rect.x + 6 - CENTER[0]>0:
+        reward-=3
+    else:
+        reward+=3
 
     # # 1.若有tile
     if 32<train_context.game.tile.x<298 and not train_context.last_tilex == train_context.game.tile.x:
@@ -130,146 +141,169 @@ def train_impl(train_context):
         if tile13_on_the_right and train_context.game.tile.type==1 and is_going_to_collide_tile1:
             train_context.is_going_to_collide_tile.append(True)
             if train_context.game.tile.y-10<=CENTER[1]-70+6:#需要下移
-                if train_context.game.ball.dtheta*(train_context.game.ball.rect.x + 6 - CENTER[0])>=0:
-                    reward+=2
+                if train_context.game.ball.dtheta*(train_context.game.ball.rect.x + 6 - CENTER[0])>0:
+                    reward+=3
                     correct_direction =True
                     # print("avoid1")
+                elif train_context.game.ball.rect.x + 6 - CENTER[0]==0 and train_context.game.ball.dtheta<0:
+                    reward += 3
+                    correct_direction = True
                 else:
-                    reward -= 2
+                    reward -= 3
 
             elif train_context.game.tile.y+10<=CENTER[1]+70-6:#需要上移
                 if train_context.game.ball.dtheta*(train_context.game.ball.rect.x + 6 - CENTER[0])<0 :
-                    reward+=2
+                    reward+=3
                     correct_direction = True
                     # print("avoid1")
+                elif train_context.game.ball.rect.x + 6 - CENTER[0]==0 and train_context.game.ball.dtheta>0:
+                    reward += 3
+                    correct_direction = True
                 else:
-                    reward -= 2
+                    reward -= 3
 
             else:#必须y向着远离tile改变
                 if is_above_tile_center:
                     if train_context.game.ball.dtheta*(train_context.game.ball.rect.x + 6 - CENTER[0])<0:
-                        reward+=2
+                        reward+=3
                         correct_direction = True
                         # print("avoid1")
                     else:
-                        reward -= 2
+                        reward -= 3
                 elif is_under_tile_center:
-                    if train_context.game.ball.dtheta*(train_context.game.ball.rect.x + 6 - CENTER[0])>=0:
-                        reward+=2
+                    if train_context.game.ball.dtheta*(train_context.game.ball.rect.x + 6 - CENTER[0])>0:
+                        reward+=3
                         correct_direction = True
                         # print("avoid1")
                     else:
-                        reward -= 2
+                        reward -= 3
         elif tile2_on_the_right and train_context.game.tile.type==2 and is_going_to_collide_tile23:
             train_context.is_going_to_collide_tile.append(True)
             if train_context.game.tile.y-25<=CENTER[1]-70+6:#需要下移
-                if  train_context.game.ball.dtheta*(train_context.game.ball.rect.x + 6 - CENTER[0])>=0:
-                    reward+=2
+                if  train_context.game.ball.dtheta*(train_context.game.ball.rect.x + 6 - CENTER[0])>0:
+                    reward+=3
                     correct_direction = True
                     # print("avoid2")
+                elif train_context.game.ball.rect.x + 6 - CENTER[0]==0 and train_context.game.ball.dtheta<0:
+                    reward += 3
+                    correct_direction = True
                 else:
-                    reward -= 2
+                    reward -= 3
             elif train_context.game.tile.y+25<=CENTER[1]+70-6:#需要上移
                 if  train_context.game.ball.dtheta*(train_context.game.ball.rect.x + 6 - CENTER[0])<0:
-                    reward+=2
+                    reward+=3
                     correct_direction = True
                     # print("avoid2")
+                elif train_context.game.ball.rect.x + 6 - CENTER[0]==0 and train_context.game.ball.dtheta>0:
+                    reward += 3
+                    correct_direction = True
                 else:
-                    reward -= 2
+                    reward -= 3
             else:#必须y向着远离tile改变
                 if is_above_tile_center:
                     if train_context.game.ball.dtheta*(train_context.game.ball.rect.x + 6 - CENTER[0])<0:
-                        reward+=2
+                        reward+=3
                         correct_direction = True
                         # print("avoid2")
                     else:
-                        reward -= 2
+                        reward -= 3
                 elif is_under_tile_center :
-                    if train_context.game.ball.dtheta*(train_context.game.ball.rect.x + 6 - CENTER[0])>=0:
+                    if train_context.game.ball.dtheta*(train_context.game.ball.rect.x + 6 - CENTER[0])>0:
                         # print("avoid2")
-                        reward+=2
+                        reward+=3
                         correct_direction = True
                     else:
-                        reward -= 2
+                        reward -= 3
         elif tile13_on_the_right and train_context.game.tile.type==3 and is_going_to_collide_tile23:
             train_context.is_going_to_collide_tile.append(True)
             if train_context.game.tile.y-25<=CENTER[1]-70+6:#需要下移
-                if train_context.game.ball.dtheta*(train_context.game.ball.rect.x + 6 - CENTER[0])>=0:
+                if train_context.game.ball.dtheta*(train_context.game.ball.rect.x + 6 - CENTER[0])>0:
                     # print("avoid3")
-                    reward+=2
+                    reward+=3
+                    correct_direction = True
+                elif train_context.game.ball.rect.x + 6 - CENTER[0]==0 and train_context.game.ball.dtheta<0:
+                    reward += 3
                     correct_direction = True
                 else:
-                    reward -= 2
+                    reward -= 3
             elif train_context.game.tile.y+25<=CENTER[1]+70-6:#需要上移
                 if train_context.game.ball.dtheta*(train_context.game.ball.rect.x + 6 - CENTER[0])<0:
                     # print("avoid3")
-                    reward+=2
+                    reward+=3
+                    correct_direction = True
+                elif train_context.game.ball.rect.x + 6 - CENTER[0]==0 and train_context.game.ball.dtheta>0:
+                    reward += 3
                     correct_direction = True
                 else:
-                    reward -= 2
+                    reward -= 3
             else:#必须y向着远离tile改变
                 if is_above_tile_center :
                     if train_context.game.ball.dtheta*(train_context.game.ball.rect.x + 6 - CENTER[0])<0:
                         # print("avoid3")
-                        reward+=2
+                        reward+=3
                         correct_direction = True
                     else:
-                        reward -= 2
+                        reward -= 3
                 elif is_under_tile_center :
-                    if train_context.game.ball.dtheta*(train_context.game.ball.rect.x + 6 - CENTER[0])>=0:
+                    if train_context.game.ball.dtheta*(train_context.game.ball.rect.x + 6 - CENTER[0])>0:
                         # print("avoid3")
-                        reward+=2
+                        reward+=3
                         correct_direction = True
                     else:
-                        reward -= 2
-        # 1.2若无重叠并且cointile不重叠并且顺序是ball.y coin.y tile.y
-        else:
-            train_context.is_going_to_collide_tile.append(False)
-            if coin_on_the_right and 58<train_context.game.coin.x<298 and not train_context.last_coinx == train_context.game.coin.x:
-                if (train_context.game.tile.type==1 and coin_tile1_not_overlapped) or \
-                        ((train_context.game.tile.type==2 or train_context.game.tile.type==3) and coin_tile23_not_overlapped):
-                    if (train_context.game.tile.y-train_context.game.coin.y-8)*(train_context.game.coin.y+8-train_context.game.ball.rect.y-6)>0:
-                        if is_above_tile_center:#需要下移
-                            if train_context.game.ball.dtheta*(train_context.game.ball.rect.x + 6 - CENTER[0])>=0:
-                                reward += 2
-                                correct_direction = True
-                                # print("to coin")
-                            else:
-                                reward -= 2
-                        elif is_under_tile_center:#需要上移
-                            if train_context.game.ball.dtheta*(train_context.game.ball.rect.x + 6 - CENTER[0])<0:
-                                reward += 2
-                                correct_direction = True
-                                # print("to coin")
-                            else:
-                                reward -= 2
-    else:#若无tile
-        train_context.is_going_to_collide_tile.append(False)
-        if coin_on_the_right and 58 < train_context.game.coin.x < 298 and not train_context.last_coinx == train_context.game.coin.x:
-            if  (train_context.game.coin.y+8-train_context.game.ball.rect.y-6)>0:#coin.y>ball.y,then should move down
-                if train_context.game.ball.dtheta * (train_context.game.ball.rect.x + 6 - CENTER[0]) >= 0:
-                    reward += 2
-                    correct_direction = True
-                    # print("to coin no tile")
-                else:
-                    reward -= 2
-            elif  (train_context.game.coin.y+8-train_context.game.ball.rect.y-6)<0:
-                if train_context.game.ball.dtheta * (train_context.game.ball.rect.x + 6 - CENTER[0]) < 0:
-                    reward += 2
-                    correct_direction = True
-                    # print("to coin no tile")
-                else:
-                    reward -= 2
-    if len(train_context.is_going_to_collide_tile)>=2 and len(train_context.ball_dtheta)>=2:
-        last_collide = train_context.is_going_to_collide_tile[-1]
-        second_last_collide = train_context.is_going_to_collide_tile[-2]
-        last_dtheta = train_context.ball_dtheta[-1]
-        second_last_dtheta = train_context.ball_dtheta[-2]
-        if last_collide and second_last_collide:
-            if last_dtheta * second_last_dtheta >0 and correct_direction:
-                reward+=2
-            else:#has a wrong direction or changed to a wrong direction
-                reward-=2
+                        reward -= 3
+            if len(train_context.is_going_to_collide_tile) >= 2 and len(train_context.ball_dtheta) >= 2:
+                last_collide = train_context.is_going_to_collide_tile[-1]
+                second_last_collide = train_context.is_going_to_collide_tile[-2]
+                last_dtheta = train_context.ball_dtheta[-1]
+                second_last_dtheta = train_context.ball_dtheta[-2]
+                if last_collide and second_last_collide:
+                    if last_dtheta * second_last_dtheta > 0 and correct_direction:
+                        reward += 3
+                    else:  # has a wrong direction or changed to a wrong direction
+                        reward -= 3
+    #     # 1.2若无重叠并且cointile不重叠并且顺序是ball.y coin.y tile.y  并且在左半
+    #     else:
+    #         train_context.is_going_to_collide_tile.append(False)
+    #         if coin_on_the_right and 58<train_context.game.coin.x<298 and not train_context.last_coinx == train_context.game.coin.x:
+    #             if (train_context.game.tile.type==1 and coin_tile1_not_overlapped) or \
+    #                     ((train_context.game.tile.type==2 or train_context.game.tile.type==3) and coin_tile23_not_overlapped):
+    #                 if (train_context.game.tile.y-train_context.game.coin.y-8)*(train_context.game.coin.y+8-train_context.game.ball.rect.y-6)>0:
+    #                     if is_above_tile_center:#需要下移
+    #                         if train_context.game.ball.dtheta*(train_context.game.ball.rect.x + 6 - CENTER[0])>0:
+    #                             if train_context.game.ball.rect.x + 6 - CENTER[0]<=0:
+    #                                 reward += 2
+    #                                 # correct_direction = True
+    #                                 # print("to coin")
+    #                             else:
+    #                                 reward -= 2
+    #                     elif is_under_tile_center:#需要上移
+    #                         if train_context.game.ball.dtheta*(train_context.game.ball.rect.x + 6 - CENTER[0])<0:
+    #                             if train_context.game.ball.rect.x + 6 - CENTER[0]<=0:
+    #                                 reward += 2
+    #                                 # correct_direction = True
+    #                                 # print("to coin")
+    #                             else:
+    #                                 reward -= 2
+    # else:#若无tile
+    #     train_context.is_going_to_collide_tile.append(False)
+    #     if coin_on_the_right and 58 < train_context.game.coin.x < 298 and not train_context.last_coinx == train_context.game.coin.x:
+    #         if  (train_context.game.coin.y+8-train_context.game.ball.rect.y-6)>0:#coin.y>ball.y,then should move down
+    #             if train_context.game.ball.dtheta * (train_context.game.ball.rect.x + 6 - CENTER[0]) > 0:
+    #                 if train_context.game.ball.rect.x + 6 - CENTER[0] <= 0:
+    #                     reward += 2
+    #                     correct_direction = True
+    #                     # print("to coin no tile")
+    #                 else:
+    #                     reward -= 2
+    #         elif  (train_context.game.coin.y+8-train_context.game.ball.rect.y-6)<0:
+    #             if train_context.game.ball.dtheta * (train_context.game.ball.rect.x + 6 - CENTER[0]) < 0:
+    #                 if train_context.game.ball.rect.x + 6 - CENTER[0] <= 0:
+    #                     reward += 2
+    #                     correct_direction = True
+    #                     # print("to coin no tile")
+    #                 else:
+    #                     reward -= 2
+
 
     #
     #
