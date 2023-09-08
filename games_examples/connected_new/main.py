@@ -261,16 +261,18 @@ class Game:
 					self.collided_rectangles = pygame.sprite.spritecollide(self.ball, self.tile_group, True)
 					if self.collided_rectangles:
 						# print("collide")
+						self.ball_group.remove(self.ball)
 						x, y = self.ball.rect.center
 						for i in range(30):
 							particle = Particle(x, y, self.color, self.win)
 							self.particle_group.add(particle)
 
 						self.player_alive = False
+						self.end_game()
 						print("false")
 						self.dead_fx.play()
 						#print("score",self.score)
-						self.collided_rectangles = True
+						self.collided_rectangles = False
 
 				self.current_time = pygame.time.get_ticks()
 				self.delta = self.current_time - self.start_time
@@ -361,8 +363,11 @@ class Game:
 		# time.sleep(2)
 
 	def reset(self):
-		if self.terminated:
+		if self.terminated or self.score>=1:
 			print("reset called")
+			balls_to_remove = [ball for ball in self.ball_group]
+			for ball in balls_to_remove:
+				self.ball_group.remove(ball)
 			self.ball.reset()
 			#simuler le bouton replay
 			self.game_page = True
@@ -385,6 +390,9 @@ class Game:
 	def reset2(self):
 		# if self.terminated:
 		print("reset2 called")
+		balls_to_remove = [ball for ball in self.ball_group]
+		for ball in balls_to_remove:
+			self.ball_group.remove(ball)
 		self.ball.reset()
 			#simuler le bouton replay
 		self.game_page = True
@@ -403,6 +411,13 @@ class Game:
 		self.player_alive = True
 		self.terminated = False
 
+		tiles_to_remove = [tile for tile in self.tile_group]
+		for tile in tiles_to_remove:
+			self.tile_group.remove(tile)
+
+		coins_to_remove = [coin for coin in self.coin_group]
+		for coin in coins_to_remove:
+			self.coin_group.remove(coin)
 if __name__ == "__main__":
 	game = Game()
 	game.run()

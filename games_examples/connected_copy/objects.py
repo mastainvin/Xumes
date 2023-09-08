@@ -5,31 +5,37 @@ import math
 SCREEN = WIDTH, HEIGHT = 288, 512
 CENTER = WIDTH //2, HEIGHT // 2
 
-
+RADIUS = 70
 pygame.font.init()
 pygame.mixer.init()
 
 class Balls(pygame.sprite.Sprite):
-	def __init__(self, pos, radius, angle, win):
+	def __init__(self, pos, radius, accumulation, win):
 		super(Balls, self).__init__()
 
-		self.initial_pos = pos
+		self.initial_pos = (CENTER[0]-50, CENTER[1])
 		self.radius = radius
-		self.initial_angle = angle
+		self.accumulation = accumulation #accumulation  used to be  angle
 		self.win = win
 		self.reset()
 		self.score = 0
 		self.highscore = 0
-
-		self.rect = pygame.draw.circle(self.win, (25, 25, 25), (self.x,self.y), 6)
+		self.dtheta = 0
+		self.rect = pygame.draw.rect(self.win, (25, 25, 25), (self.x-6,self.y-6,12,12))
 
 
 	def update(self, color):
 		# print("called update--ball")
-		x = round(CENTER[0] + self.radius * math.cos(self.angle * math.pi / 180))
-		y = round(CENTER[1] + self.radius * math.sin(self.angle * math.pi / 180))
-
-		self.angle += self.dtheta
+		# x = round(CENTER[0] + self.radius * math.cos(self.angle * math.pi / 180))
+		x = CENTER[0]-50
+		y = CENTER[1]+self.accumulation
+		# y = round(CENTER[1] + self.radius * math.sin(self.angle * math.pi / 180))
+		# if CENTER[1]-70<(self.accumulation + self.dtheta)<CENTER[1]+70:
+		if self.rect.y+6>=CENTER[1]+66 and self.dtheta>0:
+			self.dtheta=0
+		elif self.rect.y+6<=CENTER[1]-66 and self.dtheta<0:
+			self.dtheta=0
+		self.accumulation += self.dtheta
 
 		self.step += 1
 		if self.step % 5 == 0:
@@ -37,8 +43,11 @@ class Balls(pygame.sprite.Sprite):
 		if len(self.pos_list) > 5:
 			self.pos_list.pop(0)
 
+		# pygame.draw.rect(self.win, (25, 25, 25), (x-6, y-6,12, 12), border_radius=0)
+		# self.rect = self.image.get_rect(center=(self.x, self.y))
+		# pygame.draw.rect(self.win,  color, (self.x - 7, self.y - 7, 14, 14))
+		# self.rect = pygame.draw.rect(self.win,  color, (self.x - 6, self.y - 6, 12, 12))
 
-		pygame.draw.circle(self.win, (255, 255, 255), (x,y), 7)
 		self.rect = pygame.draw.circle(self.win, color, (x,y), 6)
 
 		for index, pos in enumerate(self.pos_list):
@@ -60,9 +69,9 @@ class Balls(pygame.sprite.Sprite):
 		print(self.highscore)
 
 	def reset(self):
-		self.x, self.y = self.initial_pos
-		self.angle = self.initial_angle
-		self.dtheta = -2
+		self.x, self.y = (CENTER[0]-50, CENTER[1])
+		self.accumulation = 0
+		self.dtheta = 0
 
 		self.pos_list = []
 		self.step = 0
@@ -73,7 +82,7 @@ class Coins(pygame.sprite.Sprite):
 
 		self.y = y
 		self.win = win
-		self.size = 15
+		self.size = 16
 		self.x = WIDTH + 20
 		self.dx = -2
 		self.s = 1
@@ -115,12 +124,12 @@ class Tiles(pygame.sprite.Sprite):
 			self.height = 50
 		elif self.type == 3:
 			self.width = 50
-			self.height = 20
-			self.dtheta = 2
+			self.height = 50
+			# self.dtheta = 2
 
 
 		self.image = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
-		pygame.draw.rect(self.image, (255, 255, 255), (0, 0,self.width, self.height), border_radius=8)
+		pygame.draw.rect(self.image, (255, 255, 255), (0, 0,self.width, self.height), border_radius=0)
 		self.rect = self.image.get_rect(center=(self.x, self.y))
 
 	def rotate(self):

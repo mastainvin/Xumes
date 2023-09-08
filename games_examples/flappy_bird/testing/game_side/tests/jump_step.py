@@ -26,7 +26,7 @@ def test_impl(test_context):
         State("points", methods_to_observe=["gain_point", "reset"])], position=HEIGHT // 2, game=test_context.game)
 
 
-@given("A pipe generator.py")
+@given("A pipe generator")
 def test_impl(test_context):
     def get_rect(x):
         return [x.left, x.top, x.right, x.bottom]
@@ -98,7 +98,7 @@ def test_impl(test_context):
     test_context.game.render()
     pygame.display.flip()
 
-    test_context.game.dt = test_context.game.clock.tick(60) / 1000
+    test_context.game.dt = test_context.game.clock.tick(144) / 1000
 
 
 @log
