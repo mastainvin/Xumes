@@ -15,7 +15,7 @@ class PipeGenerator:
         self.game = game
         self.time_between = (CENTER[0]) / SPEED
         self.time_spent = 0
-        self.next = 0 #0->the next is coin, 1-> the next is tile
+        self.next = 0 #0->the next is coin.py, 1-> the next is tile
         self.win = win
     def reset(self):
         self.pipes = []

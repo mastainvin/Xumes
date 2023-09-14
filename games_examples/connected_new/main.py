@@ -170,7 +170,7 @@ class Game:
 		pygame.display.update()
 
 	def update_main(self):
-		# print(self.ball.rect,self.coin.x,self.tile.x,"yesok")
+		# print(self.ball.rect,self.coin.py.x,self.tile.x,"yesok")
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
 				self.running = False

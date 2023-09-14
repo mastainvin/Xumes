@@ -11,14 +11,14 @@ def test_impl(test_context):
     def get_end(end):
         # print(end,"end")
         return end
-    # modification:move the creation of ball, coin and tile into the creation of game
+    # modification:move the creation of ball, coin.py and tile into the creation of game
     test_context.game = test_context.create(Game, "game",
                                             state=[State("terminated", func=get_end,
                                                         methods_to_observe=["end_game", "reset","reset2"]
                                                         ),
     State("ball", [State("x"), State("y"),State("dtheta"),State("score"), State("highscore"), State("rect", [State("x"), State("y")])],
           methods_to_observe="update_main"),
-    State("coin", [State("x"), State("y"),State("rect", [State( "x" ), State( "y" )])], methods_to_observe="update_main"),
+    State("coin.py", [State("x"), State("y"),State("rect", [State( "x" ), State( "y" )])], methods_to_observe="update_main"),
     State("tile", [State("x"), State("y"), State("type"),State("rect", [State( "x" ), State( "y" )])], methods_to_observe="update_main"),
     State("highscore", methods_to_observe="update_main")                  ,
     State("score", methods_to_observe="update_main")
@@ -39,16 +39,16 @@ def test_impl(test_context):
 
 
 
-@given("A coin")
+@given("A coin.py")
 def test_impl(test_context):
-    test_context.game.coin = test_context.bind(test_context.game.coin, name="coin", state=[
+    test_context.game.coin = test_context.bind(test_context.game.coin, name="coin.py", state=[
         State("x", methods_to_observe=["update_main"]),
         State("y", methods_to_observe=["update_main"]),
         State("rect", [State("x"), State("y")], methods_to_observe=["update_main"])
     ])
     # pass
-    # test_context.game.coin_group.remove(test_context.game.coin)
-    # test_context.game.coin = test_context.create(Coins, name="coin", state=[
+    # test_context.game.coin_group.remove(test_context.game.coin.py)
+    # test_context.game.coin.py = test_context.create(Coins, name="coin.py", state=[
     #     State("x", methods_to_observe=["update_main"]),
     #     State("y", methods_to_observe=["update_main"]),
     #     State("rect", [State("x"), State("y")], methods_to_observe=["update_main"])
@@ -75,7 +75,7 @@ def test_impl(test_context):
     # test_context.game.tile_group = pygame.sprite.Group()
     # test_context.game.all_sprites = pygame.sprite.Group()
     # test_context.game.all_sprites.add(test_context.game.ball)
-    # test_context.game.all_sprites.add(test_context.game.coin)
+    # test_context.game.all_sprites.add(test_context.game.coin.py)
     # test_context.game.all_sprites.add(test_context.game.tile)
 
 

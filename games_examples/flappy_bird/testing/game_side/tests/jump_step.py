@@ -18,7 +18,7 @@ def test_impl(test_context):
         print(end,"end")
         return end
     test_context.game = test_context.create(Game, "game",
-                                            state=State("terminated", func=get_end,  methods_to_observe=["end_game", "reset"]))
+                                            state=State("terminated",  methods_to_observe=["end_game", "reset"]))
 
     test_context.game.player = test_context.create(Player, name="player", state=[
         State("center", methods_to_observe=["move", "reset"]),

@@ -6,7 +6,7 @@
 import random
 import pygame
 import time
-from games_examples.connected_copy.objects import Balls, Coins, Tiles, Particle, Message, Button
+from games_examples.connected_copy.objects import Balls, Coins, Tiles, Particle
 from games_examples.connected_copy.generator import PipeGenerator
 
 # RADIUS = 70
@@ -173,7 +173,7 @@ class Game:
 		pygame.display.update()
 
 	def update_main(self):
-		# print(self.ball.rect,self.coin.x,self.tile.x,"yesok")
+		# print(self.ball.rect,self.coin.py.x,self.tile.x,"yesok")
 
 		# this_click_time = pygame.time.get_ticks()
 		self.win.fill(self.GRAY)
@@ -192,7 +192,7 @@ class Game:
 					self.CENTER[1]-70<(self.ball.rect.y+6)<self.CENTER[1]+70:
 				self.this_click_time = pygame.time.get_ticks()
 
-				print(self.this_click_time, self.last_click_time,"timetime")
+				# print(self.this_click_time, self.last_click_time,"timetime")
 				if self.this_click_time-self.last_click_time>=0:
 					if not self.clicked:
 						self.clicked = True
@@ -232,7 +232,7 @@ class Game:
 			if event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN and self.game_page and \
 					self.CENTER[1]-70<(self.ball.rect.y+6)<self.CENTER[1]+70:
 				self.this_click_time = pygame.time.get_ticks()
-				print(self.this_click_time,self.last_click_time,"timetime")
+				# print(self.this_click_time,self.last_click_time,"timetime")
 				if self.this_click_time-self.last_click_time>=0:
 
 					if not self.clicked:
@@ -384,7 +384,8 @@ class Game:
 				# self.generator.move(self.color)
 				if self.tile_delta < self.delta < self.tile_delta + 100 and self.new_coin and len(self.tile_group)==0:
 				# if self.current_time - self.start_time >= self.tile_delta and len(self.tile_group)==0:
-					self.y = random.choice([self.CENTER[1] - 65, self.CENTER[1], self.CENTER[1] + 65])
+				# 	self.y = random.choice([self.CENTER[1] - 65, self.CENTER[1], self.CENTER[1] + 65])
+					self.y = self.CENTER[1]
 					self.type_ = random.randint(1, 3)
 					self.tile = Tiles(self.y, self.type_, self.win)
 					self.tile_group.add(self.tile)
@@ -392,7 +393,8 @@ class Game:
 					self.new_coin = False
 				if self.current_time - self.start_time >= self.coin_delta and len(self.coin_group) == 0:
 				# if self.coin_delta < self.delta < self.coin_delta + 100 and self.new_coin and len(self.coin_group)==0:
-					self.y = random.randint(self.CENTER[1] - self.RADIUS+3, self.CENTER[1] + self.RADIUS-3)
+				# 	self.y = random.randint(self.CENTER[1] - self.RADIUS+3, self.CENTER[1] + self.RADIUS-3)
+					self.y = self.CENTER[1]
 					self.coin = Coins(self.y, self.win)
 					self.coin_group.add(self.coin)
 

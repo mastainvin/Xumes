@@ -98,7 +98,7 @@ def train_impl(train_context):
         'is_going_to_collide_coin': ([1 if train_context.game.ball.rect.y < train_context.game.coin.y + 16 and \
                     train_context.game.ball.rect.y + 12 > train_context.game.coin.y else 0])
     }
-    # print("R:", train_context.game.ball.rect.x+6,train_context.game.ball.rect.y+6,train_context.game.coin.x+8,train_context.game.coin.y+8,train_context.game.tile.x,train_context.game.tile.y)
+    # print("R:", train_context.game.ball.rect.x+6,train_context.game.ball.rect.y+6,train_context.game.coin.py.x+8,train_context.game.coin.py.y+8,train_context.game.tile.x,train_context.game.tile.y)
     return train_context.states
     #     here use tile instead of t
 
@@ -106,7 +106,7 @@ def train_impl(train_context):
 @reward
 def train_impl(train_context):
     # train_context.ball_y.append(train_context.game.ball.rect.y + 6)
-    # train_context.dis_coin.append(abs(train_context.game.ball.rect.y + 6 - train_context.game.coin.y - 8))
+    # train_context.dis_coin.append(abs(train_context.game.ball.rect.y + 6 - train_context.game.coin.py.y - 8))
     # train_context.dis_tile.append(abs(train_context.game.ball.rect.y + 6 - train_context.game.tile.y))
     if train_context.last_tilex == train_context.game.tile.x:
         train_context.ball_dtheta.clear()
