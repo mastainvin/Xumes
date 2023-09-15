@@ -17,11 +17,12 @@ class Coins:
         self.height = 16
         self.ball = ball
         self.generator=generator
-        self.x = WIDTH + 20
+        self.x = WIDTH+20
         self.dx = -1
         self.s = 1
         self.player_passed=False
         self.rect = pygame.Rect((self.x-8, self.y-8, self.width, self.height))
+        self.h=16
         # print("generated coin", self.x,self.y)
 
     def update(self, dt):
@@ -46,6 +47,7 @@ class Coins:
         if self.x +  self.size/ 2 < 88\
                 and not self.player_passed:
             self.player_passed = True
+            self.ball.penalize()
             self.generator.pipes.remove(self)
 
 
@@ -54,10 +56,10 @@ class Coins:
         if (
                 # player's x coordinate is between the width of the pipe
                 #       100                                           88-
-                94+6>= self.x-round(self.width)  and self.x+round(self.width)>=94-6) and (
+                94+6>= self.x-round(self.width/2)  and self.x+round(self.width/2)>=94-6) and (
                 # player's y coordinate touches one edge of the pipe
-                self.ball.y - 6 < self.y + round(self.height) and \
-                self.ball.y + 6 > self.y - round(self.height)):
+                self.ball.y - 6 < self.y + round(self.height/2) and \
+                self.ball.y + 6 > self.y - round(self.height/2)):
             print(self.rect.left)
             # self.generator.end()
             self.ball.gain_point()

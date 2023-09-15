@@ -27,6 +27,7 @@ def train_impl(train_context):
     train_context.is_going_to_collide_tile = []
     train_context.ball_dtheta = []
     train_context.score = 0
+    train_context.penalty = 0
     train_context.dis_coin = 500
     train_context.last_coinx = 58
     train_context.last_tilex = 30
@@ -71,7 +72,7 @@ def train_impl(train_context):
     # print(train_context.observation_space.shape,"shape")
     train_context.action_space = spaces.Discrete(3)
     train_context.max_episode_length = 3000
-    train_context.total_timesteps = int(200000)
+    train_context.total_timesteps = int(4000000)
     train_context.algorithm_type = "MultiInputPolicy"
     train_context.algorithm = stable_baselines3.PPO
 
@@ -126,13 +127,9 @@ def train_impl(train_context):
     # train_context.ball_y.append(train_context.game.ball.rect.y + 6)
     # train_context.dis_coin.append(abs(train_context.game.ball.rect.y + 6 - train_context.game.coin.py.y - 8))
     # train_context.dis_tile.append(abs(train_context.game.ball.rect.y + 6 - train_context.game.tile.y))
+    # print(train_context.generator.pipes[0], "pipes[0]")
+    # print(train_context.generator.pipes[0].rect[4],"pipes[0].rect[4]")
 
-
-
-    # if train_context.last_tilex == train_context.game.tile.x:
-    #     train_context.ball_dtheta.clear()
-    #     train_context.is_going_to_collide_tile.clear()
-    # train_context.ball_dtheta.append(train_context.game.ball.dtheta)
 
 
 
@@ -148,68 +145,93 @@ def train_impl(train_context):
 
     if train_context.game.terminated:
         train_context.score = 0
+        train_context.penalty = 0
         # train_context.ball_y.clear()
         print("tttttttttttterminated -15")
-        reward -= 15
-    #
-    # # # 若有tile
+        reward -= 25
+    if train_context.ball.penalty >train_context.penalty:
+        train_context.penalty=train_context.ball.penalty
+        reward-=10
+
+    if train_context.ball.dtheta==0:
+        reward-=10
+    # if not len(train_context.generator.pipes)==0:
+    #     is_tile_not_moving=train_context.last_tilex == train_context.generator.pipes[0].rect[4] and train_context.generator.pipes[0].kind =='tile'
+    #     is_tile_in_collision_pos_x= 32<train_context.generator.pipes[0].rect[4]<298 and train_context.generator.pipes[0].kind =='tile'
+    #     is_tile_in_collision_pos_y=train_context.ball.y - 6 < train_context.generator.pipes[0].rect[5] + round(train_context.generator.pipes[0].h / 2) and \
+    #     train_context.ball.y + 6 > train_context.generator.pipes[0].rect[5] - round(train_context.generator.pipes[0].h / 2) and \
+    #                                train_context.generator.pipes[0].kind == 'tile'
+    #     is_coin_not_moving = train_context.last_coinx == train_context.generator.pipes[0].rect[4] and \
+    #                          train_context.generator.pipes[0].kind == 'coin'
+    #     is_coin_in_collision_pos_x=train_context.generator.pipes[0].kind =='coin'
+    #     is_coin_in_collision_pos_y=train_context.ball.y - 6 < train_context.generator.pipes[0].rect[5] + round(train_context.generator.pipes[0].h / 2) and \
+    #     train_context.ball.y + 6 > train_context.generator.pipes[0].rect[5] - round(train_context.generator.pipes[0].h / 2) and \
+    #                                train_context.generator.pipes[0].kind == 'coin'
+        # if is_tile_not_moving:
+        #     train_context.ball_dtheta.clear()
+        #     train_context.is_going_to_collide_tile.clear()
+        # train_context.ball_dtheta.append(train_context.ball.dtheta)
+    # # # # 若有tile
     # # if 32 < train_context.game.tile.x < 298 and not train_context.last_tilex == train_context.game.tile.x:
-    # if 32<train_context.game.tile.x<298 and not train_context.last_tilex == train_context.game.tile.x:
-    #     if train_context.game.ball.rect.y<train_context.game.tile.y+15 and \
-    #             train_context.game.ball.rect.y+12>train_context.game.tile.y-15 and \
-    #                 train_context.game.tile.type==1:
-    #         train_context.tileseq1.append(train_context.tileseq1[-1]+1)
-    #         train_context.tileseq2.append(train_context.tileseq1[-1])
-    #         train_context.tid=train_context.tileseq1[-1]
-    #         # reward -= 0.05
-    #         # print('-0.1  1')
-    #     if train_context.tileseq1[-1]==train_context.tid and train_context.tileseq2[-1]==train_context.tid and not (train_context.game.ball.rect.y<train_context.game.tile.y+15 and \
-    #             train_context.game.ball.rect.y+12>train_context.game.tile.y-15) and train_context.game.tile.type==1:
-    #         train_context.tileseq2.pop()
-    #
-    #     if train_context.game.ball.rect.y<train_context.game.tile.y+30 and \
-    #             train_context.game.ball.rect.y+12>train_context.game.tile.y-30 and \
-    #                 (train_context.game.tile.type==2 or train_context.game.tile.type==3):
-    #         train_context.tileseq1.append(train_context.tileseq1[-1]+1)
-    #         train_context.tileseq2.append(train_context.tileseq1[-1])
-    #         train_context.tid=train_context.tileseq1[-1]
-    #         # reward -= 0.05
-    #         # print('-0.1  2')
-    #     if train_context.tileseq1[-1]==train_context.tid and train_context.tileseq2[-1]==train_context.tid and not (train_context.game.ball.rect.y<train_context.game.tile.y+30 and \
-    #             train_context.game.ball.rect.y+12>train_context.game.tile.y-30) and (train_context.game.tile.type==2 or train_context.game.tile.type==3):
-    #         train_context.tileseq2.pop()
+    #     if is_tile_in_collision_pos_x and not is_tile_not_moving:
+    #         if is_tile_in_collision_pos_y:
+    #             train_context.tileseq1.append(train_context.tileseq1[-1]+1)
+    #             train_context.tileseq2.append(train_context.tileseq1[-1])
+    #             train_context.tid=train_context.tileseq1[-1]
+    #             # reward -= 0.05
+    #             # print('-0.1  1')
+    #         if train_context.tileseq1[-1]==train_context.tid and\
+    #                 train_context.tileseq2[-1]==train_context.tid and \
+    #                 not is_tile_in_collision_pos_y :
+    #             train_context.tileseq2.pop()
     #
     #
-    #     if train_context.tileseq1[-1]==train_context.tid and not train_context.tileseq2[-1]==train_context.tid:
-    #         reward += 7
-    #         print('+10 avoid',train_context.tileseq1[-1], train_context.tid, train_context.tileseq2[-1])
-    #         train_context.tileseq1.append(0)
-    #         train_context.tileseq2.clear()
-    #         train_context.tileseq2.append(-1)
-    # is_going_to_collide_coin = train_context.game.ball.rect.y < train_context.game.coin.y + 16 and \
-    #                            train_context.game.ball.rect.y + 12 > train_context.game.coin.y
-    # coin_on_the_right = train_context.game.ball.rect.x+12<train_context.game.coin.x
-    # if train_context.game.score==0 and coin_on_the_right and 88 < train_context.game.coin.x < 228 and \
-    #   not train_context.last_coinx == train_context.game.coin.x and not (62<train_context.game.tile.x<238 and not train_context.last_tilex == train_context.game.tile.x) and\
-    #   not is_going_to_collide_coin:
-    # # if abs(train_context.game.ball.rect.y+6-train_context.game.coin.py.y-8)<50 and (train_context.game.tile.type==2 or train_context.game.tile.type==3):
-    #     if abs(train_context.game.ball.rect.y+6-train_context.game.coin.y-8)>abs(train_context.game.ball.rect.y+6+train_context.game.ball.dtheta-train_context.game.coin.y-8):
-    #         reward += 0.05
-    #         print('+0.05')
-    #     elif abs(train_context.game.ball.rect.y+6-train_context.game.coin.y-8)<abs(train_context.game.ball.rect.y+6+train_context.game.ball.dtheta-train_context.game.coin.y-8):
-    #         reward-=0.05
-    #         print('-0.05')
     #
     #
-    # train_context.last_tilex = train_context.game.tile.x
-    # train_context.last_coinx = train_context.game.coin.x
+    #         if train_context.tileseq1[-1]==train_context.tid and\
+    #                 not train_context.tileseq2[-1]==train_context.tid:
+    #             reward += 7
+    #             print('+10 avoid',train_context.tileseq1[-1], train_context.tid, train_context.tileseq2[-1])
+    #             train_context.tileseq1.append(0)
+    #             train_context.tileseq2.clear()
+    #             train_context.tileseq2.append(-1)
+    #
+    #         if is_coin_in_collision_pos_x and not is_coin_not_moving:
+    #             if is_coin_in_collision_pos_y:
+    #                 reward += 0.3
+    #             elif not is_coin_in_collision_pos_y:
+    #                 if abs(train_context.generator.pipes[0].rect[5]-train_context.ball.y)-\
+    #                     abs(train_context.generator.pipes[0].rect[5]-train_context.ball.y-train_context.ball.dtheta)>0:
+    #                     reward+=0.4
+        # is_going_to_collide_coin = train_context.game.ball.rect.y < train_context.game.coin.y + 16 and \
+        #                            train_context.game.ball.rect.y + 12 > train_context.game.coin.y
+        # coin_on_the_right = train_context.game.ball.rect.x+12<train_context.game.coin.x
+        # if train_context.game.score==0 and coin_on_the_right and 88 < train_context.game.coin.x < 228 and \
+        #   not train_context.last_coinx == train_context.game.coin.x and not (62<train_context.game.tile.x<238 and not train_context.last_tilex == train_context.game.tile.x) and\
+        #   not is_going_to_collide_coin:
+        # # if abs(train_context.game.ball.rect.y+6-train_context.game.coin.py.y-8)<50 and (train_context.game.tile.type==2 or train_context.game.tile.type==3):
+        #     if abs(train_context.game.ball.rect.y+6-train_context.game.coin.y-8)>abs(train_context.game.ball.rect.y+6+train_context.game.ball.dtheta-train_context.game.coin.y-8):
+        #         reward += 0.05
+        #         print('+0.05')
+        #     elif abs(train_context.game.ball.rect.y+6-train_context.game.coin.y-8)<abs(train_context.game.ball.rect.y+6+train_context.game.ball.dtheta-train_context.game.coin.y-8):
+        #         reward-=0.05
+        #         print('-0.05')
+        #
+        #
+            # if train_context.generator.pipes[0].kind =='tile':
+            #
+            #     train_context.last_tilex = train_context.generator.pipes[0].rect[4]
+            # elif train_context.generator.pipes[0].kind =='coin':
+            #     train_context.last_coinx = train_context.generator.pipes[0].rect[4]
     return reward
 
 
 @terminated
 def train_impl(train_context):
     term = train_context.game.terminated \
-           or train_context.score>=2
+           or train_context.score>=3
+    if term:
+        train_context.score = 0
     return term
 
 

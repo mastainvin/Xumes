@@ -15,18 +15,23 @@ pygame.mixer.init()
 
 class Generator:
 
-    def __init__(self, game=None):
+    def __init__(self, game=None, pattern=random.randint(1,7)):
         self.pipes = []
         self.game = game
         self.time_between = (SPACE_BETWEEN) / SPEED
         self.time_spent = 0
         self.win=self.game.win
         self.next_is_coin=True
-
+        self.terminate_after_generation=False
+        self.pattern = pattern
+        self.count=0
     def reset(self):
         self.pipes = []
         self.time_spent = 0
         self.next_is_coin = True
+        self.pattern=random.randint(1,7)
+        self.terminate_after_generation = False
+        self.count = 0
 
     def gen_coin(self,y):
         # Create a pipe with random height
@@ -44,25 +49,115 @@ class Generator:
 
     def generator(self, dt):
         self.time_spent += dt
+
+        # print(self.pipes,"self.pipes")
         # We wait enough time and create a new pipe
+        is_the_second_coin= False
+        auto_addition = False
 
         # if there is already a pipe on the screen
-        if self.pipes:
-            if WIDTH - self.pipes[-1].x+self.pipes[-1].width/2 + 100 > SPACE_BETWEEN*2:
-                self.time_spent = 0
-                if self.next_is_coin == True:
-                    self.pipes.append(self.gen_coin(CENTER[1]))
-                    self.next_is_coin = False
-                else:
-                    self.pipes.append(self.gen_tile(CENTER[1], 1))
-                    self.next_is_coin = True
-        else:
-            if self.next_is_coin ==True:
+        if self.count==0 and self.time_spent*SPEED>=WIDTH-50:
+            if self.pattern == 1:
+                self.pipes.append(self.gen_coin(CENTER[1] + 40))
+            elif self.pattern == 2:
+                self.pipes.append(self.gen_coin(CENTER[1] + 40))
+            elif self.pattern == 3:
+                self.pipes.append(self.gen_coin(CENTER[1] - 40))
+            elif self.pattern == 4:
+                self.pipes.append(self.gen_coin(CENTER[1] - 40))
+            elif self.pattern == 5:
+                self.pipes.append(self.gen_coin(CENTER[1] - 40))
+            elif self.pattern == 6:
                 self.pipes.append(self.gen_coin(CENTER[1]))
-                self.next_is_coin =False
-            else:
-                self.pipes.append(self.gen_tile(CENTER[1],1))
-                self.next_is_coin = True
+            elif self.pattern == 7:
+                self.pipes.append(self.gen_coin(CENTER[1]))
+            self.count+=1
+            self.time_spent=0
+
+        if self.count==1 and self.time_spent*SPEED>=WIDTH-50:
+            if self.pattern == 1:
+                self.pipes.append(self.gen_tile(CENTER[1] + 40, 1))
+            elif self.pattern == 2:
+                self.pipes.append(self.gen_tile(CENTER[1] + 40, 1))
+            elif self.pattern == 3:
+                self.pipes.append(self.gen_tile(CENTER[1] + 40, 1))
+            elif self.pattern == 4:
+                self.pipes.append(self.gen_tile(CENTER[1], 1))
+            elif self.pattern == 5:
+                self.pipes.append(self.gen_tile(CENTER[1] + 40, 1))
+            elif self.pattern == 6:
+                self.pipes.append(self.gen_tile(CENTER[1] - 40, 1))
+            elif self.pattern == 7:
+                self.pipes.append(self.gen_tile(CENTER[1], 1))
+            self.count+=1
+            self.time_spent = 0
+
+        if self.count==2 and self.time_spent*SPEED>=WIDTH-50:
+            if self.pattern == 1:
+                self.pipes.append(self.gen_coin(CENTER[1] + 40))
+            elif self.pattern == 2:
+                self.pipes.append(self.gen_coin(CENTER[1] - 40))
+            elif self.pattern == 3:
+                self.pipes.append(self.gen_coin(CENTER[1] + 40))
+            elif self.pattern == 4:
+                self.pipes.append(self.gen_coin(CENTER[1] + 40))
+            elif self.pattern == 5:
+                self.pipes.append(self.gen_coin(CENTER[1]))
+            elif self.pattern == 6:
+                self.pipes.append(self.gen_coin(CENTER[1] + 40))
+            elif self.pattern == 7:
+                self.pipes.append(self.gen_coin(CENTER[1]))
+            self.time_spent = 0
+            self.count += 1
+            self.terminate_after_generation = True
+        if self.terminate_after_generation and self.time_spent*SPEED>=WIDTH-50:
+            self.time_spent = 0
+            self.count=0
+            self.game.terminated = True
+
+
+
+        # if self.pipes:
+        #     print(self.pipes,"self.pipes1")
+        #     if WIDTH - self.pipes[-1].x+self.pipes[-1].width/2 + 100 > SPACE_BETWEEN*2:
+        #         self.time_spent = 0
+        #         if self.next_is_coin == True:
+        #
+        #             # self.pipes.append(self.gen_coin(random.randint(CENTER[1]-50,CENTER[1],CENTER[1]+50)))
+        #             # self.next_is_coin = False
+        #
+        #         else:
+        #             if self.terminate_after_generation:
+        #
+        #
+        #
+        #             # self.pipes.append(self.gen_tile(random.randint(CENTER[1]-40,CENTER[1],CENTER[1]+40), 1))
+        #             self.next_is_coin = True
+        # else:
+        #     print(self.pipes,self.next_is_coin,"self.pipes2")
+        #     if self.next_is_coin:
+        #
+        #         # self.pipes.append(self.gen_coin(random.randint(CENTER[1]-50,CENTER[1]+50)))
+        #         self.next_is_coin =False
+
+
+            # else:
+            #     if self.pattern == 1:
+            #         self.pipes.append(self.gen_tile(CENTER[1] + 40, 1))
+            #     elif self.pattern == 2:
+            #         self.pipes.append(self.gen_tile(CENTER[1] + 40, 1))
+            #     elif self.pattern == 3:
+            #         self.pipes.append(self.gen_tile(CENTER[1] + 40, 1))
+            #     elif self.pattern == 4:
+            #         self.pipes.append(self.gen_tile(CENTER[1], 1))
+            #     elif self.pattern == 5:
+            #         self.pipes.append(self.gen_tile(CENTER[1] + 40, 1))
+            #     elif self.pattern == 6:
+            #         self.pipes.append(self.gen_tile(CENTER[1] - 40, 1))
+            #     elif self.pattern == 7:
+            #         self.pipes.append(self.gen_tile(CENTER[1], 1))
+            #     self.next_is_coin = True
+
 
     def move(self, dt):
         pipes_to_delete = []

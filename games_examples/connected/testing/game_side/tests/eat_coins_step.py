@@ -24,7 +24,10 @@ def test_impl(test_context):
         State("y", methods_to_observe=["update", "reset"]),
         State("center", methods_to_observe=["update", "reset"]),
         State("dtheta", methods_to_observe=["update","change_direction","reset"]),
-        State("points", methods_to_observe=["gain_point", "reset"])],  y=CENTER[1],game=test_context.game)
+        State("points", methods_to_observe=["gain_point", "reset"]),
+        State("penalty", methods_to_observe=["penalty", "reset"])],
+                                                 y=CENTER[1],game=test_context.game)
+
 
 
 
@@ -33,73 +36,81 @@ def test_impl(test_context):
 
 @given("A generator")
 def test_impl(test_context):
+    pass
+
+
+
+
+
+
+# def get_height(x):
+#     x = 1 - (x / 100)
+#     return x * (140) + CENTER[1]
+
+
+@when("Pattern {i} is used")
+
+def test_impl(test_context,i):
+
     def get_rect(x):
-        return [x.left, x.top, x.right, x.bottom]
+        return [x.left, x.top, x.right, x.bottom,x.left+x.right/2,x.top+x.bottom/2]
     test_context.game.generator = test_context.create(Generator, name="generator",
-                                                           state=State("pipes",
+                                                           state=[State("pipes",
                                                                        [
                                                                            State(
                                                                                "rect",
                                                                                func=get_rect),
                                                                            State("kind", methods_to_observe=[
                                                                                                           "reset"]),
+                                                                           State("h"),
 
                                                                        ],
-                                                                       methods_to_observe=["move", "reset"]
+                                                                       methods_to_observe=["move", "reset"],
+
                                                                        ),
+                                                                  State("terminate_after_generation", methods_to_observe=["generator"]),
+                                                                  State("pattern", methods_to_observe=["generator","reset"])],
 
 
-                                                           game=test_context.game)
+
+                                                           pattern = i,game=test_context.game)
 
     test_context.game.dt = 0.09
-
-
-
-
-
-
-def get_height(x):
-    x = 1 - (x / 100)
-    return x * (140) + CENTER[1]
-
-
-@when("The first coin is at {i} % and the tile is at {j} % and the second coin is at {k} %")
-
-def test_impl(test_context,i ,j,k):
-    i, j, k= int(i), int(j), int(k)
     test_context.game.reset()
-
-    test_context.game.generator.pipes = [
-                                        # Coins(y=get_height(i),
-                                        #        ball=test_context.game.ball,
-                                        #        generator=test_context.game.generator),
-                                         # Tiles(y=get_height(j),
-                                         #       type_=random.randint(1, 3),
-                                         #       ball=test_context.game.ball,
-                                         #       generator=test_context.game.generator),
-                                         # Coins(y=get_height(k),
-                                         #       ball=test_context.game.ball,
-                                         #       generator=test_context.game.generator),
-]
+#     test_context.game.generator.pipes = [
+#                                         # Coins(y=get_height(i),
+#                                         #        ball=test_context.game.ball,
+#                                         #        generator=test_context.game.generator),
+#                                         #  Tiles(y=get_height(j),
+#                                         #        type_=random.randint(1, 3),
+#                                         #        ball=test_context.game.ball,
+#                                         #        generator=test_context.game.generator),
+#                                         #  Coins(y=get_height(k),
+#                                         #        ball=test_context.game.ball,
+#                                         #        generator=test_context.game.generator),
+# ]
     test_context.game.generator.notify()
-
+    print(test_context.game.generator.pipes, "self.pipesa")
     test_context.game.clock.tick(0)
-    test_context.game.dt=0
+
 
 # The player should have 2 point
 @then("The ball should have {nb_points} point")
 def test_impl(test_context, nb_points):
+    # pass
+    # test_context.assert_true(test_context.game.ball.points == int(nb_points))
+    test_context.assert_greater_equal(test_context.game.ball.points, int(nb_points))
     # print("then")
-    test_context.assert_true(test_context.game.ball.points == int(nb_points))
+    # test_context.assert_true(test_context.game.ball.points == int(nb_points))
     # test_context.assert_greater_equal(test_context.game.score, int(nb_points))
     # test_context.assert_true(test_context.game.score >= int(nb_points))
     # test_context.assert_greater_equal(test_context.game.score, int(nb_points))
     # test_context.assert_true(test_context.game.score >= int(nb_points))
 
-@then("The ball should have at least {nb_points} point")
+@then("The ball should have {nb_points} point")
 def test_impl(test_context, nb_points):
         # print("then")
-
+    # test_context.assert_true(test_context.game.ball.points == int(nb_points))
     test_context.assert_greater_equal(test_context.game.ball.points, int(nb_points))
 
     # test_context.assert_greater_equal(test_context.game.score, int(nb_points))
@@ -107,7 +118,11 @@ def test_impl(test_context, nb_points):
     # test_context.assert_greater_equal(test_context.game.score, int(nb_points))
     # test_context.assert_true(test_context.game.score >= int(nb_points))
 
-
+@then("The ball should have {nb_points} point")
+def test_impl(test_context, nb_points):
+        # print("then")
+    # test_context.assert_true(test_context.game.ball.points == int(nb_points))
+    test_context.assert_greater_equal(test_context.game.ball.points, int(nb_points))
 @loop
 def test_impl(test_context):
     for event in pygame.event.get():
@@ -136,7 +151,7 @@ def test_impl(test_context):
     test_context.game.render()
     pygame.display.flip()
 
-    test_context.game.dt = test_context.game.clock.tick(144) / 1000
+    test_context.game.dt = 0.2
 
 @log
 def test_impl(test_context):

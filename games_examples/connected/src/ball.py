@@ -19,7 +19,7 @@ class Balls:
         self.highscore = 0
         self.dtheta = 0
         self.rect = pygame.Rect (self.x - 6, self.y - 6, 12, 12)
-
+        self.penalty=0
         self.game=game
         self.x=CENTER[0] - 50
         self.y=y
@@ -74,6 +74,7 @@ class Balls:
         self.pos_list = []
         self.step = 0
         self.center=(self.x,self.y)
+        self.penalty=0
 
     def change_direction(self):
         keys = pygame.key.get_pressed()
@@ -109,6 +110,8 @@ class Balls:
     def gain_point(self):
         self.points += 1
         self.reward = True
+    def penalize(self):
+        self.penalty += 1
     # USE DRAW() TO RENDER THE BALL
     def draw(self,win):
         pygame.draw.rect(win, "yellow", (self.x-6, self.y-6,12,12))
