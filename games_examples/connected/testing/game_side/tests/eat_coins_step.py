@@ -24,8 +24,10 @@ def test_impl(test_context):
         State("y", methods_to_observe=["update", "reset"]),
         State("center", methods_to_observe=["update", "reset"]),
         State("dtheta", methods_to_observe=["update","change_direction","reset"]),
-        State("points", methods_to_observe=["gain_point", "reset"]),
+        State("points", methods_to_observe=["gain_point","gain_point_avoid", "reset"]),
+        State("avoid", methods_to_observe=["gain_point", "gain_point_avoid","reset"]),
         State("penalty", methods_to_observe=["penalty", "reset"])],
+
                                                  y=CENTER[1],game=test_context.game)
 
 
@@ -151,7 +153,7 @@ def test_impl(test_context):
     test_context.game.render()
     pygame.display.flip()
 
-    test_context.game.dt = 0.2
+    test_context.game.dt = 0.02
 
 @log
 def test_impl(test_context):

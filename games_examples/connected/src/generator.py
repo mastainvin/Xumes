@@ -56,7 +56,8 @@ class Generator:
         auto_addition = False
 
         # if there is already a pipe on the screen
-        if self.count==0 and self.time_spent*SPEED>=WIDTH-50:
+        # if self.count==0 and self.time_spent*SPEED>=WIDTH-50:
+        if self.count==0 and len(self.pipes)==0:
             if self.pattern == 1:
                 self.pipes.append(self.gen_coin(CENTER[1] + 40))
             elif self.pattern == 2:
@@ -74,7 +75,8 @@ class Generator:
             self.count+=1
             self.time_spent=0
 
-        if self.count==1 and self.time_spent*SPEED>=WIDTH-50:
+        # if self.count==1 and self.time_spent*SPEED>=WIDTH-50:
+        if self.count == 1 and len(self.pipes) == 0:
             if self.pattern == 1:
                 self.pipes.append(self.gen_tile(CENTER[1] + 40, 1))
             elif self.pattern == 2:
@@ -92,7 +94,7 @@ class Generator:
             self.count+=1
             self.time_spent = 0
 
-        if self.count==2 and self.time_spent*SPEED>=WIDTH-50:
+        if self.count==2 and len(self.pipes)==0:
             if self.pattern == 1:
                 self.pipes.append(self.gen_coin(CENTER[1] + 40))
             elif self.pattern == 2:

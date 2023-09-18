@@ -28,6 +28,7 @@ def train_impl(train_context):
     train_context.ball_dtheta = []
     train_context.score = 0
     train_context.penalty = 0
+    train_context.avoid = False
     train_context.dis_coin = 500
     train_context.last_coinx = 58
     train_context.last_tilex = 30
@@ -129,9 +130,8 @@ def train_impl(train_context):
     # train_context.dis_tile.append(abs(train_context.game.ball.rect.y + 6 - train_context.game.tile.y))
     # print(train_context.generator.pipes[0], "pipes[0]")
     # print(train_context.generator.pipes[0].rect[4],"pipes[0].rect[4]")
-
-
-
+    train_context.time2 = time.time()
+    print(train_context.time2-train_context.time1)
 
     #
     reward = 0
@@ -140,42 +140,51 @@ def train_impl(train_context):
     if train_context.ball.points > train_context.score:
         train_context.score = train_context.ball.points
         print("+++++++++++15 eat a coin.py")
-        reward += 15
+        reward += 1
         # return reward
+    if train_context.avoid==False and train_context.ball.avoid:
+        train_context.avoid =True
+        reward+=0.4
 
     if train_context.game.terminated:
         train_context.score = 0
         train_context.penalty = 0
+        train_context.avoid = False
         # train_context.ball_y.clear()
         print("tttttttttttterminated -15")
-        reward -= 25
+        reward -= 1.2
     if train_context.ball.penalty >train_context.penalty:
         train_context.penalty=train_context.ball.penalty
-        reward-=10
+        reward-=1
 
-    if train_context.ball.dtheta==0:
-        reward-=10
-    # if not len(train_context.generator.pipes)==0:
-    #     is_tile_not_moving=train_context.last_tilex == train_context.generator.pipes[0].rect[4] and train_context.generator.pipes[0].kind =='tile'
-    #     is_tile_in_collision_pos_x= 32<train_context.generator.pipes[0].rect[4]<298 and train_context.generator.pipes[0].kind =='tile'
-    #     is_tile_in_collision_pos_y=train_context.ball.y - 6 < train_context.generator.pipes[0].rect[5] + round(train_context.generator.pipes[0].h / 2) and \
-    #     train_context.ball.y + 6 > train_context.generator.pipes[0].rect[5] - round(train_context.generator.pipes[0].h / 2) and \
-    #                                train_context.generator.pipes[0].kind == 'tile'
-    #     is_coin_not_moving = train_context.last_coinx == train_context.generator.pipes[0].rect[4] and \
-    #                          train_context.generator.pipes[0].kind == 'coin'
-    #     is_coin_in_collision_pos_x=train_context.generator.pipes[0].kind =='coin'
-    #     is_coin_in_collision_pos_y=train_context.ball.y - 6 < train_context.generator.pipes[0].rect[5] + round(train_context.generator.pipes[0].h / 2) and \
-    #     train_context.ball.y + 6 > train_context.generator.pipes[0].rect[5] - round(train_context.generator.pipes[0].h / 2) and \
-    #                                train_context.generator.pipes[0].kind == 'coin'
-        # if is_tile_not_moving:
-        #     train_context.ball_dtheta.clear()
-        #     train_context.is_going_to_collide_tile.clear()
-        # train_context.ball_dtheta.append(train_context.ball.dtheta)
+    # if train_context.ball.dtheta==0:
+    #     reward-=2
+    if not len(train_context.generator.pipes)==0:
+        is_tile_not_moving=train_context.last_tilex == train_context.generator.pipes[0].rect[4] and train_context.generator.pipes[0].kind =='tile'
+        is_tile_in_collision_pos_x= 32<train_context.generator.pipes[0].rect[4]<298 and train_context.generator.pipes[0].kind =='tile'
+        is_tile_in_collision_pos_y=train_context.ball.y - 6 < train_context.generator.pipes[0].rect[5] + round(train_context.generator.pipes[0].h / 2) and \
+        train_context.ball.y + 6 > train_context.generator.pipes[0].rect[5] - round(train_context.generator.pipes[0].h / 2) and \
+                                   train_context.generator.pipes[0].kind == 'tile'
+        is_coin_not_moving = train_context.last_coinx == train_context.generator.pipes[0].rect[4] and \
+                             train_context.generator.pipes[0].kind == 'coin'
+        is_coin_in_collision_pos_x=train_context.generator.pipes[0].kind =='coin'
+        is_coin_in_collision_pos_y=train_context.ball.y - 6 < train_context.generator.pipes[0].rect[5] + round(train_context.generator.pipes[0].h / 2) and \
+        train_context.ball.y + 6 > train_context.generator.pipes[0].rect[5] - round(train_context.generator.pipes[0].h / 2) and \
+                                   train_context.generator.pipes[0].kind == 'coin'
+        if is_tile_not_moving:
+            train_context.ball_dtheta.clear()
+            train_context.is_going_to_collide_tile.clear()
+        train_context.ball_dtheta.append(train_context.ball.dtheta)
     # # # # 若有tile
     # # if 32 < train_context.game.tile.x < 298 and not train_context.last_tilex == train_context.game.tile.x:
-    #     if is_tile_in_collision_pos_x and not is_tile_not_moving:
-    #         if is_tile_in_collision_pos_y:
-    #             train_context.tileseq1.append(train_context.tileseq1[-1]+1)
+        if is_tile_in_collision_pos_x and not is_tile_not_moving:
+            if is_tile_in_collision_pos_y:
+                if abs(train_context.generator.pipes[0].rect[5] - train_context.ball.y) - \
+                abs(train_context.generator.pipes[0].rect[5] - train_context.ball.y - train_context.ball.dtheta) < 0:
+                    reward += 0.3
+            else:
+                reward += 0.3
+            #             train_context.tileseq1.append(train_context.tileseq1[-1]+1)
     #             train_context.tileseq2.append(train_context.tileseq1[-1])
     #             train_context.tid=train_context.tileseq1[-1]
     #             # reward -= 0.05
@@ -196,18 +205,18 @@ def train_impl(train_context):
     #             train_context.tileseq2.clear()
     #             train_context.tileseq2.append(-1)
     #
-    #         if is_coin_in_collision_pos_x and not is_coin_not_moving:
-    #             if is_coin_in_collision_pos_y:
-    #                 reward += 0.3
-    #             elif not is_coin_in_collision_pos_y:
-    #                 if abs(train_context.generator.pipes[0].rect[5]-train_context.ball.y)-\
-    #                     abs(train_context.generator.pipes[0].rect[5]-train_context.ball.y-train_context.ball.dtheta)>0:
-    #                     reward+=0.4
+            if is_coin_in_collision_pos_x and not is_coin_not_moving:
+                if is_coin_in_collision_pos_y:
+                    reward += 0.3
+                elif not is_coin_in_collision_pos_y:
+                    if abs(train_context.generator.pipes[0].rect[5]-train_context.ball.y)-\
+                        abs(train_context.generator.pipes[0].rect[5]-train_context.ball.y-train_context.ball.dtheta)>0:
+                        reward+=0.3
         # is_going_to_collide_coin = train_context.game.ball.rect.y < train_context.game.coin.y + 16 and \
         #                            train_context.game.ball.rect.y + 12 > train_context.game.coin.y
         # coin_on_the_right = train_context.game.ball.rect.x+12<train_context.game.coin.x
         # if train_context.game.score==0 and coin_on_the_right and 88 < train_context.game.coin.x < 228 and \
-        #   not train_context.last_coinx == train_context.game.coin.x and not (62<train_context.game.tile.x<238 and not train_context.last_tilex == train_context.game.tile.x) and\
+
         #   not is_going_to_collide_coin:
         # # if abs(train_context.game.ball.rect.y+6-train_context.game.coin.py.y-8)<50 and (train_context.game.tile.type==2 or train_context.game.tile.type==3):
         #     if abs(train_context.game.ball.rect.y+6-train_context.game.coin.y-8)>abs(train_context.game.ball.rect.y+6+train_context.game.ball.dtheta-train_context.game.coin.y-8):
@@ -223,6 +232,7 @@ def train_impl(train_context):
             #     train_context.last_tilex = train_context.generator.pipes[0].rect[4]
             # elif train_context.generator.pipes[0].kind =='coin':
             #     train_context.last_coinx = train_context.generator.pipes[0].rect[4]
+    train_context.time1 = time.time()
     return reward
 
 

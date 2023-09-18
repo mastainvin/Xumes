@@ -21,6 +21,7 @@ class Balls:
         self.rect = pygame.Rect (self.x - 6, self.y - 6, 12, 12)
         self.penalty=0
         self.game=game
+        self.avoid=False
         self.x=CENTER[0] - 50
         self.y=y
         self.center=(self.x,self.y)
@@ -75,6 +76,7 @@ class Balls:
         self.step = 0
         self.center=(self.x,self.y)
         self.penalty=0
+        self.avoid = False
 
     def change_direction(self):
         keys = pygame.key.get_pressed()
@@ -109,6 +111,10 @@ class Balls:
 
     def gain_point(self):
         self.points += 1
+        self.reward = True
+    def gain_point_avoid(self):
+        self.points += 1
+        self.avoid= True
         self.reward = True
     def penalize(self):
         self.penalty += 1

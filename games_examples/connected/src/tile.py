@@ -77,7 +77,8 @@ class Tiles:
                 and not self.player_passed:
             self.player_passed = True
             self.generator.pipes.remove(self)
-            self.ball.gain_point()
+            self.ball.gain_point_avoid()
+
 
     def collision(self):
         # if the pipe collides we stop the game
