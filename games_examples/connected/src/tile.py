@@ -30,12 +30,16 @@ class Tiles:
         if self.type == 1:
             self.width = 50
             self.height = 20
+            self.h = 20
         elif self.type == 2:
             self.width = 20
             self.height = 50
+            self.h = 50
         elif self.type == 3:
             self.width = 50
             self.height = 50
+            self.h = 50
+
         # self.dtheta = 2
 
 
@@ -71,16 +75,17 @@ class Tiles:
         if self.x < 0 and not self.player_passed:
             self.player_passed = True
             self.generator.pipes.remove(self)
-            # self.player.gain_point()
+            self.ball.gain_point_avoid()
+
 
     def collision(self):
         # if the pipe collides we stop the game
         if (
                 # player's x coordinate is between the width of the pipe
-                94+6>= self.x-round(self.width)  and self.x+round(self.width)>=94-6) and (
+                94+6>= self.x-round(self.width/2)  and self.x+round(self.width/2)>=94-6) and (
                 # player's y coordinate touches one edge of the pipe
-                self.ball.y-6 < self.y + round(self.height) and \
-                self.ball.y + 6 > self.y - round(self.height)):
+                self.ball.y-6 < self.y + round(self.height/2) and \
+                self.ball.y + 6 > self.y - round(self.height/2)):
             self.generator.pipes.remove(self)
             self.generator.end()
             return True
