@@ -64,7 +64,6 @@ def get_height(x):
 
 
 @when("The first coin is at {i} % and the tile is at {j} % and the second coin is at {k} %")
-
 def test_impl(test_context,i ,j,k):
     i, j, k= int(i), int(j), int(k)
     test_context.game.reset()
@@ -84,7 +83,7 @@ def test_impl(test_context,i ,j,k):
     test_context.game.generator.notify()
 
     test_context.game.clock.tick(0)
-    test_context.game.dt=0
+    test_context.game.dt=0.09
 
 # The player should have 2 point
 @then("The ball should have {nb_points} point")
@@ -136,7 +135,7 @@ def test_impl(test_context):
     test_context.game.render()
     pygame.display.flip()
 
-    test_context.game.dt = test_context.game.clock.tick(144) / 1000
+    test_context.game.dt = 0.0009
 
 @log
 def test_impl(test_context):

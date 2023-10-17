@@ -10,7 +10,6 @@ from games_examples.connected.src.coin import Coins
 
 from games_examples.connected.src.params import HEIGHT, WIDTH,SPEED,SPACE_BETWEEN,CENTER
 pygame.font.init()
-pygame.mixer.init()
 
 
 class Generator:

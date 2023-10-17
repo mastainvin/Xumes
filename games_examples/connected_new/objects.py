@@ -7,7 +7,6 @@ CENTER = WIDTH //2, HEIGHT // 2
 
 RADIUS = 70
 pygame.font.init()
-pygame.mixer.init()
 
 class Balls(pygame.sprite.Sprite):
 	def __init__(self, pos, radius, angle, win):

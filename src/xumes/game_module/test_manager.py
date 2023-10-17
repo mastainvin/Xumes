@@ -1,3 +1,5 @@
+import time
+
 import multiprocess
 from abc import abstractmethod
 from typing import List, Dict
@@ -68,6 +70,7 @@ class TestManager:
         self._feature_strategy: FeatureStrategy = feature_strategy
         self._assertion_queue = multiprocess.Queue()
         self._do_logs = do_logs
+        self._delta_time = 0
 
     def get_free_port(self, scenario) -> int:
         # Get the port for a given feature and scenario
@@ -122,9 +125,14 @@ class TestManager:
             # Send to the training manager that the training is started
             self._communication_service.start_training(self)
 
+            test_time_start = time.time()
+
             # Wait for all tests to be finished
             while active_processes.value > 0:
                 pass
+
+            test_time_end = time.time()
+            self._delta_time = round(test_time_end - test_time_start, 3)
 
             # Close all processes and delete all game services
             for scenario, scenario_data in self._scenario_datas.items():
@@ -155,7 +163,7 @@ class TestManager:
         # log results
         nb_test = len(results)
         header = f"{bcolors.BOLD}{bcolors.UNDERLINE}{'':15}TEST REPORT{'':15}{bcolors.ENDC}\n"
-        details = f"{successes} tests passed on a total of {nb_test}.\n"
+        details = f"{successes} tests passed on a total of {nb_test} in {self._delta_time}s.\n"
         details += f"Tests passed:\n{tests_passed_names}\n" if successes > 0 else ""
         details += error_logs
 

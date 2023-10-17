@@ -5,7 +5,6 @@ import math
 
 from games_examples.connected.src.params import HEIGHT, WIDTH,SPEED,SPACE_BETWEEN,CENTER
 pygame.font.init()
-pygame.mixer.init()
 
 
 class Tiles:
@@ -69,8 +68,7 @@ class Tiles:
 
     def is_player_passed(self):
         # if the mid point of the pipe passes the x coordinate of the player
-        if self.x +  self.width/ 2 < 88\
-                and not self.player_passed:
+        if self.x < 0 and not self.player_passed:
             self.player_passed = True
             self.generator.pipes.remove(self)
             # self.player.gain_point()

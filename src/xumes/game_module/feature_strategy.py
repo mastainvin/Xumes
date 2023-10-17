@@ -28,6 +28,7 @@ class Feature:
         self.scenarios: List[Scenario] = scenarios
         self.name = name
 
+
 given = create_registry_content()
 when = create_registry_content()
 then = create_registry_content()
@@ -45,12 +46,12 @@ render_registry = render.all
 delete_screen_registry = delete_screen.all
 log_registry = log.all
 
+
 class FeatureStrategy(ABC):
     """
     FeatureStrategy is a class that implements the strategy pattern to define a way to get
     all features.
     """
-
 
     def __init__(self, alpha: float = 0.001):
         self.features: List[Feature] = []
@@ -241,5 +242,3 @@ class FeatureStrategy(ABC):
         Get all features.
         """
         raise NotImplementedError
-
-

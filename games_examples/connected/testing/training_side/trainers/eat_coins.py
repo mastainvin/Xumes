@@ -68,7 +68,6 @@ def train_impl(train_context):
         # 'is_going_to_collide_coin':spaces.Box(0,1,dtype=np.int32,shape=(1,)),
 
     # })
-    # print(train_context.observation_space.shape,"shape")
     train_context.action_space = spaces.Discrete(3)
     train_context.max_episode_length = 3000
     train_context.total_timesteps = int(200000)
@@ -115,7 +114,7 @@ def train_impl(train_context):
         # 'is_going_to_collide_coin': ([1 if train_context.game.ball.rect.y < train_context.game.coin.y + 16 and \
         #             train_context.game.ball.rect.y + 12 > train_context.game.coin.y else 0])
     # }
-    # print("R:", train_context.game.ball.rect.x+6,train_context.game.ball.rect.y+6,train_context.game.coin.py.x+8,train_context.game.coin.py.y+8,train_context.game.tile.x,train_context.game.tile.y)
+    #     # print(train_context.observation_space.shape,"shape")("R:", train_context.game.ball.rect.x+6,train_context.game.ball.rect.y+6,train_context.game.coin.py.x+8,train_context.game.coin.py.y+8,train_context.game.tile.x,train_context.game.tile.y)
     # return train_context.states
     #     here use tile instead of t
 
@@ -142,14 +141,15 @@ def train_impl(train_context):
 
     if train_context.ball.points > train_context.score:
         train_context.score = train_context.ball.points
-        print("+++++++++++15 eat a coin.py")
+        # print(train_context.observation_space.shape,"shape")
+
+
         reward += 15
         # return reward
 
     if train_context.game.terminated:
         train_context.score = 0
         # train_context.ball_y.clear()
-        print("tttttttttttterminated -15")
         reward -= 15
     #
     # # # 若有tile
@@ -162,7 +162,6 @@ def train_impl(train_context):
     #         train_context.tileseq2.append(train_context.tileseq1[-1])
     #         train_context.tid=train_context.tileseq1[-1]
     #         # reward -= 0.05
-    #         # print('-0.1  1')
     #     if train_context.tileseq1[-1]==train_context.tid and train_context.tileseq2[-1]==train_context.tid and not (train_context.game.ball.rect.y<train_context.game.tile.y+15 and \
     #             train_context.game.ball.rect.y+12>train_context.game.tile.y-15) and train_context.game.tile.type==1:
     #         train_context.tileseq2.pop()
@@ -210,6 +209,9 @@ def train_impl(train_context):
 def train_impl(train_context):
     term = train_context.game.terminated \
            or train_context.score>=2
+
+    if term:
+        train_context.score = 0
     return term
 
 

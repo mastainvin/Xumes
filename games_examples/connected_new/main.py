@@ -79,12 +79,6 @@ class Game:
 		current_directory = os.path.dirname(__file__)
 		sounds_directory = os.path.abspath(os.path.join(current_directory, '..', 'connected/Sounds'))
 
-		self.flip_fx = pygame.mixer.Sound(os.path.join(sounds_directory, 'flip.mp3'))
-		self.score_fx = pygame.mixer.Sound(os.path.join(sounds_directory, 'point.mp3'))
-		self.dead_fx = pygame.mixer.Sound(os.path.join(sounds_directory, 'dead.mp3'))
-		self.score_page_fx = pygame.mixer.Sound(os.path.join(sounds_directory, 'score_page.mp3'))
-
-
 
 	# FONTS ***********************************************************************
 
