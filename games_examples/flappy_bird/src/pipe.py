@@ -38,13 +38,17 @@ class Pipe:
     def collision(self):
         # if the pipe collides we stop the game
         if (
+                # player's x coordinate is between the width of the pipe
                 self.position <= SIZE + LEFT_POSITION <= self.position + PIPE_WIDTH or self.position <= LEFT_POSITION <= self.position + PIPE_WIDTH) and (
+                # player's y coordinate touches one edge of the pipe
                 self.player.position <= self.height or self.player.position + SIZE >= self.space_length + self.height):
             self.generator.end()
             return True
         return False
 
     def is_player_passed(self):
-        if self.position + PIPE_WIDTH / 2 <= SIZE + LEFT_POSITION and not self.player_passed:
+        # if the mid point of the pipe passes the x coordinate of the player
+        if self.position + PIPE_WIDTH / 2 <= SIZE + LEFT_POSITION \
+                and not self.player_passed:
             self.player_passed = True
             self.player.gain_point()

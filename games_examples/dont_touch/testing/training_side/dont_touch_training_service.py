@@ -81,6 +81,14 @@ class DontTouchTrainingService(StableBaselinesTrainer):
         direction = ["nothing", "left", "right"]
         position = ["nothing", "up", "down"]
         self.actions = [direction[raws_actions[0]], position[raws_actions[1]]]
+        # need to be changed into :
+        # direction = ["nothing", "left", "right", "up", "down"]
+        # self.actions = [direction[raws_actions[0]]]
+        # but if I do so, self.actions only choose from the first 3 choices in direction
+        # for the former example, the line:
+        # direction = ["nothing", "left", "right", "up", "down"]
+        # is seen as
+        # direction = ["nothing", "left", "right"]
         return self.actions
 
 
@@ -123,7 +131,7 @@ if __name__ == "__main__":
             training_service.train(save_path="./models", log_path="./logs", test_name="test")
             training_service.save("./models/model")
         elif sys.argv[1] == "-play":
-            training_service.load("./models/best_model.zip")
+            training_service.load("./models/best_model_A.zip")
             training_service.play(100000)
 
 

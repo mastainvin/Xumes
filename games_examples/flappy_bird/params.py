@@ -14,7 +14,7 @@ PIPE_SPEED = 300
 PIPE_WIDTH = 80
 PIPE_SPACE = 200
 
-# Pipe generator
+# Pipe generator.py
 SPACE_BETWEEN_PIPES = 400  # easy 400 hard 350
 
 # Lidar
