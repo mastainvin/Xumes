@@ -30,7 +30,7 @@ def train_impl(train_context):
         })
     train_context.action_space = spaces.Discrete(5)
     train_context.max_episode_length = 2000
-    train_context.total_timesteps = int(2e5)
+    train_context.total_timesteps = int(5e4)
     train_context.algorithm_type = "MultiInputPolicy"
     train_context.algorithm = stable_baselines3.PPO
 
@@ -90,7 +90,7 @@ def train_impl(train_context):
 
 @terminated
 def train_impl(train_context):
-    print(train_context.snake.body, "booooool")
+    #print(train_context.snake.body, "booooool")
 
     term =  train_context.game.terminated or  len(train_context.snake.body)>8
     # if term:

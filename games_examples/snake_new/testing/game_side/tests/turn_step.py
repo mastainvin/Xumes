@@ -23,7 +23,7 @@ def test_impl(test_context):
         result = []
         for body in bodies:
             result.extend([body[0], body[1]])
-        print(result,"result")
+        #print(result,"result")
         return result
 
     def get_dir(dir):
@@ -70,7 +70,7 @@ def test_impl(test_context):
 @when("There is one fruit")
 def test_impl(test_context):
     test_context.game.reset()
-    test_context.game.clock.tick(0)
+    #test_context.game.clock.tick(0)
     # pass
 
 @loop
@@ -81,11 +81,12 @@ def test_impl(test_context):
             test_context.game.update()
             # print(test_context.game.snake.body, "test_context.game.snake.body")
 
-    test_context.game.update()
+    #test_context.game.update()
 
 @then("The snake should grow {nb_blocks} block")
 def test_impl(test_context, nb_blocks):
-    print("yes3")
+    print("then")
+    print(len(test_context.game.snake.body))
     a=2+int(nb_blocks)
     test_context.assert_true(len(test_context.game.snake.body)> a)
 
@@ -95,7 +96,7 @@ def test_impl(test_context):
     # whether the screen have been drawn?
     test_context.game.render()
     pygame.display.flip()
-    test_context.game.dt = test_context.game.clock.tick(5)/1000
+    #test_context.game.dt = test_context.game.clock.tick(5)/1000
 
 
 
@@ -106,7 +107,7 @@ def test_impl(test_context):
 def test_impl(test_context):
     return {
 
-        "points": test_context.game.snake.body,
+        "points": [{"x": b[0], "y": b[1]} for b in test_context.game.snake.body],
         "terminated": test_context.game.terminated
 
     }
