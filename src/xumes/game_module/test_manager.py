@@ -106,9 +106,14 @@ class TestManager:
         raise NotImplementedError
 
     def test_all(self) -> None:
+        test_time_start = time.time()
+
+
         # Retrieve features and scenarios
         self._feature_strategy.retrieve_feature()
         features = self._feature_strategy.features
+
+
 
         # For all scenarios, we run the test
         for feature in features:
@@ -138,14 +143,12 @@ class TestManager:
             # Send to the training manager that the training is started
             self._communication_service.start_training(self)
 
-            test_time_start = time.time()
 
             # Wait for all tests to be finished
             while active_processes.value > 0:
                 pass
 
-            test_time_end = time.time()
-            self._delta_time = round(test_time_end - test_time_start, 3)
+
 
             # Close all processes and delete all game services
             for scenario, scenario_data in self._scenario_datas.items():
@@ -154,8 +157,11 @@ class TestManager:
             self._delete_game_services()
             self._communication_service.reset(self)
 
+        test_time_end = time.time()
+        self._delta_time = round(test_time_end - test_time_start, 3)
 
         if self._mode == TEST_MODE or self._mode == RENDER_MODE:
+
             self._assert()
 
         self._communication_service.stop()

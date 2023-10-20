@@ -8,11 +8,10 @@ from games_examples.dont_touch.play import Game
 from games_examples.dont_touch.src.components.hand import Hand
 from games_examples.dont_touch.src.components.hand_side import HandSide
 from games_examples.dont_touch.src.components.scoreboard import Scoreboard
-from games_examples.dont_touch.src.components.player import Player
 from games_examples.dont_touch.src.config import Config
 from games_examples.dont_touch.src.global_state import GlobalState
 from games_examples.dont_touch.src.services.visualization_service import VisualizationService
-from games_examples.dont_touch.src.utils.tools import is_close_app_event, update_background_using_scroll
+from games_examples.dont_touch.src.utils.tools import update_background_using_scroll
 
 
 def _get_pos(pos):
@@ -21,7 +20,6 @@ def _get_pos(pos):
 
 @given("A game with a player")
 def test_impl(test_context):
-
     test_context.game = test_context.create(Game, "game",
                                             state=State("terminated", methods_to_observe=["run", "reset"]))
 
@@ -29,9 +27,9 @@ def test_impl(test_context):
         State("current_score", methods_to_observe="increase_current_score"),
         State("max_score", methods_to_observe="update_max_score")
     ])
-    print(test_context.game.P1)
-    test_context.game.P1 = test_context.bind(test_context.game.P1, name="player", state=State("player_position", func=_get_pos,
-                                                                                  methods_to_observe="update"))
+    test_context.game.P1 = test_context.bind(test_context.game.P1, name="player",
+                                             state=State("player_position", func=_get_pos,
+                                                         methods_to_observe="update"))
 
 
 @given("{nb_left_hand} left hand and {nb_right_hand} right hand")
@@ -51,7 +49,6 @@ def test_impl(test_context, nb_left_hand, nb_right_hand):
         test_context.game.H1 = None
         test_context.game.H2 = create_hand_context(HandSide.RIGHT, "right_hand")
 
-
     if nb_right_hand == 0 and nb_left_hand == 1:
         test_context.game.H1 = create_hand_context(HandSide.LEFT, "left_hand")
         test_context.game.H2 = None
@@ -59,7 +56,6 @@ def test_impl(test_context, nb_left_hand, nb_right_hand):
     if nb_right_hand == 1 and nb_left_hand == 1:
         test_context.game.H1 = create_hand_context(HandSide.LEFT, "left_hand")
         test_context.game.H2 = create_hand_context(HandSide.RIGHT, "right_hand")
-
 
     test_context.game.hands = pygame.sprite.Group()
     test_context.game.all_sprites = pygame.sprite.Group()
@@ -91,25 +87,25 @@ def test_impl(test_context, nb_left_hand, nb_right_hand, left_x, right_x):
         test_context.game.H2.offset_x = right_x
         test_context.game.H2.notify()
     test_context.game.FramePerSec.tick(0)
+    test_context.game.dt = 0.09
 
 
 @loop
 def test_impl(test_context):
-
     for event in pygame.event.get():
         if event.type == pygame.KEYDOWN:
             test_context.game.P1.update(event, test_context.game.dt)
     if test_context.game.H1 is not None:
-        test_context.game.H1.move(test_context.game.scoreboard, test_context.game.P1.player_position, test_context.game.dt)
+        test_context.game.H1.move(test_context.game.scoreboard, test_context.game.P1.player_position,
+                                  test_context.game.dt)
     if test_context.game.H2 is not None:
-        test_context.game.H2.move(test_context.game.scoreboard, test_context.game.P1.player_position, test_context.game.dt)
+        test_context.game.H2.move(test_context.game.scoreboard, test_context.game.P1.player_position,
+                                  test_context.game.dt)
 
     if pygame.sprite.spritecollide(test_context.game.P1, test_context.game.hands, False, pygame.sprite.collide_mask):
         test_context.game.scoreboard.update_max_score()
         test_context.game.end_game()
-        time.sleep(0.5)
 
-    test_context.game.dt = test_context.game.FramePerSec.tick(Config.FPS) / 1000
 
 
 @then("The player should avoid {nb_hands} hands")

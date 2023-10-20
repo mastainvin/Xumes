@@ -1,4 +1,6 @@
 import logging
+from os import wait
+from time import sleep
 
 import pygame
 
@@ -55,6 +57,7 @@ def test_impl(test_context, i, j):
                                                   gravity=0.8)
     test_context.game.mario.notify()
     test_context.game.clock.tick(0)
+    test_context.game.dt = 0.09
 
 
 @loop
@@ -63,19 +66,16 @@ def test_impl(test_context):
     test_context.game.level.drawLevel(test_context.game.mario.camera, test_context.game.dt)
     test_context.game.dashboard.update()
     test_context.game.mario.update(test_context.game.dt)
-    test_context.game.dt = test_context.game.clock.tick(test_context.game.max_frame_rate) / 1000
+
+
 
 
 @then("The player should have passed {nb_pipes} pipes")
 def test_impl(test_context, nb_pipes):
     if int(nb_pipes) == 2:
         test_context.assert_greater(test_context.game.mario.rect.x, 448)
-
-
-@then("The player should have passed at least {nb_pipes} pipes")
-def test_impl(test_context, nb_pipes):
-    if int(nb_pipes) == 1:
-        test_context.assert_greater(test_context.game.mario.rect.x, 320)
+    elif int(nb_pipes) == 0:
+        test_context.assert_less(test_context.game.mario.rect.x, 448)
 
 
 @render

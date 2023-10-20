@@ -70,6 +70,7 @@ def test_impl(test_context, x_left, x_right):
     test_context.game.H2.notify()
 
     test_context.game.FramePerSec.tick(0)
+    test_context.game.dt = 0.09
 
 
 @loop
@@ -86,9 +87,9 @@ def test_impl(test_context):
     if pygame.sprite.spritecollide(test_context.game.P1, test_context.game.hands, False, pygame.sprite.collide_mask):
         test_context.game.scoreboard.update_max_score()
         test_context.game.end_game()
-        time.sleep(0.5)
+        # time.sleep(0.5)
 
-    test_context.game.dt = test_context.game.FramePerSec.tick(Config.FPS) / 1000
+    # test_context.game.dt = test_context.game.FramePerSec.tick(Config.FPS) / 1000
 
 
 @then("The player should avoid {nb_hands} hands")
@@ -109,7 +110,7 @@ def test_impl(test_context):
         test_context.game.H2.draw(GlobalState.SCREEN)
     test_context.game.scoreboard.draw(GlobalState.SCREEN)
 
-    test_context.game.dt = test_context.game.FramePerSec.tick(Config.FPS) / 1000
+    # test_context.game.dt = test_context.game.FramePerSec.tick(Config.FPS) / 1000
     pygame.display.update()
 
 

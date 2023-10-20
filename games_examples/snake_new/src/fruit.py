@@ -14,7 +14,6 @@ class Fruit:
         self.x = None
         self.randomize()
 
-
     def draw_fruit(self, screen):
         fruit_rect = pygame.Rect(
             int(self.pos.x * cell_size), int(self.pos.y * cell_size), cell_size, cell_size)
@@ -26,11 +25,5 @@ class Fruit:
         self.pos = Vector2(self.x, self.y)
 
     def reset(self):
-
         self.randomize()
 
-    # def reset(self,x,y):
-    #     # you can set the coordinates of the fruit
-    #     self.y = y
-    #     self.x = x
-    #     self.pos = Vector2(self.x, self.y)

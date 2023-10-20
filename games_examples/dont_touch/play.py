@@ -110,7 +110,7 @@ class Game:
 
         pygame.display.update()
 
-        #self.dt = self.FramePerSec.tick(Config.FPS) / 1000
+        self.dt = self.FramePerSec.tick(Config.FPS) / 1000
 
     def check_end(self):
         if self.terminated:
@@ -128,7 +128,7 @@ class Game:
             self.H2.reset()
         self.FramePerSec = pygame.time.Clock()
         self.terminated = False
-        time.sleep(0.5)
+        # time.sleep(0.5)
 
 
 if __name__ == "__main__":

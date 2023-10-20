@@ -47,7 +47,6 @@ class Snake:
 
     def reset(self):
         self.body = [Vector2(5, 10), Vector2(4, 10), Vector2(3, 10)]
-        # print("bbbody", self.body)
         self.direction = Vector2(1, 0)
         self.fruit_ate=False
 
@@ -60,11 +59,6 @@ class Snake:
             sys.exit()
         if event.type == pygame.KEYDOWN:
             current_time = pygame.time.get_ticks()
-
-            # time threshold
-            # if current_time - self.last_keydown_time >= 151:   #correction
-            # if True:
-
 
             if event.key == pygame.K_UP:
                 if self.direction.y == 0:

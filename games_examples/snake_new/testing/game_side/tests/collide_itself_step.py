@@ -1,7 +1,10 @@
+from time import sleep
+
 import pygame
 from pygame import Vector2
 from xumes.game_module import State, given, when, loop, then, render, log
 
+from games_examples.snake_new.play import Game
 from games_examples.snake_new.play import GameInherited
 from games_examples.snake_new.src.fruit import Fruit
 from games_examples.snake_new.src.snake import Snake
@@ -16,7 +19,6 @@ def test_impl(test_context):
                                             state=State("terminated", func=get_end,
                                                         methods_to_observe=["reset", "end_game"]))
 
-    # "end_game"
     def get_body(bodies):
         result = []
         for body in bodies:
@@ -43,10 +45,14 @@ def test_impl(test_context):
         State("pos", func=get_fruit, methods_to_observe=["randomize"]),
     ])
 
-@when("There is one fruit")
+
+@when("The snake will collide with his body")
 def test_impl(test_context):
     test_context.game.reset()
-
+    test_context.game.snake.body = [Vector2(3, 1), Vector2(2, 1), Vector2(2, 2), Vector2(2, 3), Vector2(2, 4),
+                                    Vector2(3, 4), Vector2(4, 4), Vector2(4, 3), Vector2(4, 2), Vector2(4, 1),
+                                    Vector2(4, 0), Vector2(3, 0), Vector2(2, 0)]
+    test_context.game.snake.direction = Vector2(0, 1)
 
 @loop
 def test_impl(test_context):
@@ -55,11 +61,9 @@ def test_impl(test_context):
         if event.type == test_context.game.SCREEN_UPDATE:
             test_context.game.update()
 
-
-@then("The snake should grow {nb_blocks} block")
-def test_impl(test_context, nb_blocks):
-    a = 2 * int(nb_blocks)
-    test_context.assert_true(len(test_context.game.snake.body) >= a)
+@then("The snake should die")
+def test_impl(test_context):
+    test_context.assert_true(test_context.game.terminated)
 
 
 @render
@@ -71,8 +75,6 @@ def test_impl(test_context):
 @log
 def test_impl(test_context):
     return {
-
         "points": [{"x": b[0], "y": b[1]} for b in test_context.game.snake.body],
         "terminated": test_context.game.terminated
-
     }

@@ -85,6 +85,7 @@ def test_impl(test_context, i, j, k):
                                                   gravity=0.8)
     test_context.game.mario.notify()
     test_context.game.clock.tick(0)
+    test_context.game.dt = 0.09
 
 
 @loop
@@ -93,7 +94,6 @@ def test_impl(test_context):
     test_context.game.level.drawLevel(test_context.game.mario.camera, test_context.game.dt)
     test_context.game.dashboard.update()
     test_context.game.mario.update(test_context.game.dt)
-    test_context.game.dt = test_context.game.clock.tick(60) / 1000
 
 @then("The player should have passed {nb_pipes} pipes at x {position}")
 def test_impl(test_context, nb_pipes, position):

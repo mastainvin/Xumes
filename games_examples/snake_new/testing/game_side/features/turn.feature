@@ -14,8 +14,19 @@ Feature: Testing the turn
     When There is one fruit
     Then The snake should grow 2 block
 
+  @die
+  Scenario: Collide with wall
+    Given A game with a snake
+    And A fruit
+    When The snake will collide with a wall
+    Then The snake should die
 
-
+  @die
+  Scenario: Collide with itself
+    Given A game with a snake
+    And A fruit
+    When The snake will collide with his body
+    Then The snake should die
 #
 #  @eat_facing
 #  Scenario: To eat a fruit

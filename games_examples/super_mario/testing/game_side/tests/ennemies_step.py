@@ -13,7 +13,6 @@ def test_impl(test_context, i):
 
     def _get_attributes(lst):
         return [{
-            #'type': item.type,
             'position': {
                 'x': item.rect.x,
                 'y': item.rect.y
@@ -54,9 +53,7 @@ def test_impl(test_context, i, j):
         return [rect.x, rect.y]
 
     def _get_attributes(lst):
-        #print('////////////////////// Error //////////////////////')
         return [{
-            #'type': item.type,
             'position': {
                 'x': item.rect.x,
                 'y': item.rect.y
@@ -86,6 +83,8 @@ def test_impl(test_context, i, j):
     test_context.game.mario.notify()
     test_context.game.clock.tick(0)
 
+    test_context.game.dt = 0.09
+
 
 @loop
 def test_impl(test_context):
@@ -93,20 +92,12 @@ def test_impl(test_context):
     test_context.game.level.drawLevel(test_context.game.mario.camera, test_context.game.dt)
     test_context.game.dashboard.update()
     test_context.game.mario.update(test_context.game.dt)
-    test_context.game.dt = test_context.game.clock.tick(60) / 1000
 
 
 @then("The player should have killed {nb_ennemies} ennemies")
 def test_impl(test_context, nb_ennemies):
     if int(nb_ennemies) == 1:
         test_context.assert_greater_equal(test_context.game.mario.dashboard.points, 100)
-        #test_context.assert_true(test_context.game.mario.dashboard.points == nb_ennemies*100)
-
-
-#@then("The player should have killed at least {nb_ennemies} ennemies")
-#def test_impl(test_context, nb_ennemies):
-#    if int(nb_ennemies) == 1:
-#        test_context.assert_greater_equal(test_context.game.mario.dashboard.points, 100)
 
 
 @render
@@ -115,12 +106,9 @@ def test_impl(test_context):
     pygame.display.update()
     test_context.game.clock.tick(test_context.game.max_frame_rate)
 
-    test_context.game.dt = test_context.game.clock.tick(60) / 1000
-
 
 @log
 def test_impl(test_context):
-
     x, y = test_context.game.mario.rect[0], test_context.game.mario.rect[1]
     dct = {
         "player": {
@@ -135,7 +123,6 @@ def test_impl(test_context):
             "coins": test_context.game.mario.dashboard.coins,
         },
     }
-    #print(test_context.game.mario.levelObj.entityList)
     for idx, entity in enumerate(test_context.game.mario.levelObj.entityList):
         dct[f'entity_{idx}_position'] = [entity.rect.x, entity.rect.y]
         dct[f'entity_{idx}_alive'] = entity.alive

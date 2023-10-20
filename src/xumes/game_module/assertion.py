@@ -62,9 +62,12 @@ class Assertion(IAssertionStrategy):
     and compute the hypothesis test for the given data
     """
 
-    def __init__(self, alpha=0.001):
-        self._alpha = alpha
-        self._type = None
+    def __init__(self, value=None):
+        self._value = value
+        if value is not None:
+            self._type = type(value)
+        else:
+            self._type = None
 
     def test(self, data) -> bool:
         if self._type is None:
@@ -77,15 +80,17 @@ class Assertion(IAssertionStrategy):
         return False
 
 
-class AssertionEqual(Assertion):
+class AssertionStatistical(Assertion):
+
+    def __init__(self, value=None, alpha=0.001):
+        super().__init__(value)
+        self._alpha = alpha
+
+
+class AssertionEqualStatistical(AssertionStatistical):
     """
     Overloads the test method of the Assertion class to test if the mean of the data is equal to the given value
     """
-
-    def __init__(self, value, alpha=0.001):
-        super().__init__(alpha=alpha)
-        self._value = value
-        self._type = type(value)
 
     def test(self, data) -> bool:
         super().test(data)
@@ -101,15 +106,22 @@ class AssertionEqual(Assertion):
         return not significant_difference
 
 
-class AssertionBetween(Assertion):
+class AssertionBetweenStatistical(AssertionStatistical):
     """
     Overloads the test method of the Assertion class to test if the mean of the data is between the given values
     """
 
     def __init__(self, min_value, max_value, alpha=0.001):
         super().__init__(alpha=alpha)
-        assert min_value < max_value
-        assert type(min_value) == type(max_value)
+
+        if min_value > max_value:
+            min_value, max_value = max_value, min_value
+        elif min_value == max_value:
+            raise ValueError("min_value and max_value cannot be equal")
+
+        if type(min_value) != type(max_value):
+            raise TypeError("min_value and max_value must have the same type")
+
         self._min_value = min_value
         self._max_value = max_value
         self._type = type(min_value)
@@ -130,15 +142,10 @@ class AssertionBetween(Assertion):
         return not significant_difference
 
 
-class AssertionLessThan(Assertion):
+class AssertionLessThanStatistical(AssertionStatistical):
     """
     Overloads the test method of the Assertion class to test if the mean of the data is less than the given value
     """
-
-    def __init__(self, value, alpha=0.001):
-        super().__init__(alpha=alpha)
-        self._value = value
-        self._type = type(value)
 
     def test(self, data) -> bool:
         super().test(data)
@@ -164,15 +171,10 @@ class AssertionLessThan(Assertion):
                 return np.mean(data) < self._value
 
 
-class AssertionLessThanOrEqual(Assertion):
+class AssertionLessThanOrEqualStatistical(AssertionStatistical):
     """
     Overloads the test method of the Assertion class to test if the mean of the data is less than or equal to the given value
     """
-
-    def __init__(self, value, alpha=0.001):
-        super().__init__(alpha=alpha)
-        self._value = value
-        self._type = type(value)
 
     def test(self, data) -> bool:
         super().test(data)
@@ -197,15 +199,10 @@ class AssertionLessThanOrEqual(Assertion):
                 return np.mean(data) <= self._value
 
 
-class AssertionGreaterThan(Assertion):
+class AssertionGreaterThanStatistical(AssertionStatistical):
     """
     Overloads the test method of the Assertion class to test if the mean of the data is greater than the given value
     """
-
-    def __init__(self, value, alpha=0.001):
-        super().__init__(alpha=alpha)
-        self._value = value
-        self._type = type(value)
 
     def test(self, data) -> bool:
         super().test(data)
@@ -231,15 +228,10 @@ class AssertionGreaterThan(Assertion):
                 return np.mean(data) > self._value
 
 
-class AssertionGreaterThanOrEqual(Assertion):
+class AssertionGreaterThanOrEqualStatistical(AssertionStatistical):
     """
     Overloads the test method of the Assertion class to test if the mean of the data is greater than or equal to the given value
     """
-
-    def __init__(self, value, alpha=0.001):
-        super().__init__(alpha=alpha)
-        self._value = value
-        self._type = type(value)
 
     def test(self, data) -> bool:
         super().test(data)
@@ -261,3 +253,59 @@ class AssertionGreaterThanOrEqual(Assertion):
                 return t_statistic > 0
             else:
                 return np.mean(data) >= self._value
+
+
+class AssertionEqual(Assertion):
+
+    def test(self, data) -> bool:
+        super().test(data)
+        return any([value == self._value for value in data])
+
+
+class AssertionBetween(Assertion):
+
+    def __int__(self, min_value, max_value):
+        super().__init__()
+        if min_value > max_value:
+            min_value, max_value = max_value, min_value
+        elif min_value == max_value:
+            raise ValueError("min_value and max_value cannot be equal")
+
+        if type(min_value) != type(max_value):
+            raise TypeError("min_value and max_value must have the same type")
+
+        self._min_value = min_value
+        self._max_value = max_value
+        self._type = type(min_value)
+
+    def test(self, data) -> bool:
+        super().test(data)
+        return any([self._min_value <= value <= self._max_value for value in data])
+
+
+class AssertionLessThan(Assertion):
+
+    def test(self, data) -> bool:
+        super().test(data)
+        return any([value < self._value for value in data])
+
+
+class AssertionLessThanOrEqual(Assertion):
+
+    def test(self, data) -> bool:
+        super().test(data)
+        return any([value <= self._value for value in data])
+
+
+class AssertionGreaterThan(Assertion):
+
+    def test(self, data) -> bool:
+        super().test(data)
+        return any([value > self._value for value in data])
+
+
+class AssertionGreaterThanOrEqual(Assertion):
+
+    def test(self, data) -> bool:
+        super().test(data)
+        return any([value >= self._value for value in data])

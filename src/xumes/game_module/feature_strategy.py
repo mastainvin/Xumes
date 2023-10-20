@@ -104,8 +104,7 @@ class FeatureStrategy(ABC):
                 self._number_max_of_tests = number_max_of_tests
 
                 self._assertion_bucket = AssertionBucket(test_name=f"{self._feature}/{self._scenario}",
-                                                         queue=test_queue,
-                                                         alpha=alpha)
+                                                         queue=test_queue)
 
                 exec_registry_function(registry=given_r[steps], game_context=self, scenario_name=scenario_name)
 

@@ -66,6 +66,7 @@ def train_impl(game_context):
     reward = 0
     if game_context.mario.dashboard.points > game_context.points:
         reward += 3
+
     if game_context.mario.restart:
         reward -= 5
 

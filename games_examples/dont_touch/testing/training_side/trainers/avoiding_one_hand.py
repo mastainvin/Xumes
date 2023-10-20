@@ -4,9 +4,9 @@ from gymnasium.vector.utils import spaces
 
 from xumes.training_module import observation, reward, terminated, action, config
 
+
 @config
 def train_impl(train_context):
-
     train_context.actions = ["nothing", "nothing"]
     train_context.xDiff = 0
     train_context.score = 0
@@ -31,7 +31,6 @@ def train_impl(train_context):
 
 @observation
 def train_impl(train_context):
-
     return {
         'player_position': np.array([train_context.player.player_position]),
         'scoreboard_current_score': np.array([train_context.scoreboard.current_score]),
@@ -45,11 +44,9 @@ def train_impl(train_context):
 
 @reward
 def train_impl(train_context):
-
     reward = 0
     xHand, yLeft = train_context.hand.new_x, train_context.hand.new_y
     xPlayer, yPlayer = train_context.player.player_position[0], train_context.player.player_position[1]
-
 
     def reward_right(xDiff):
         if xDiff < train_context.xDiff:
@@ -79,7 +76,6 @@ def train_impl(train_context):
     train_context.score = train_context.scoreboard.current_score
 
     return reward
-
 
 
 @terminated
