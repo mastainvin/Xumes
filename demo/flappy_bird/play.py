@@ -1,8 +1,8 @@
 import pygame
 
-from games_examples.flappy_bird.params import HEIGHT, WIDTH
-from games_examples.flappy_bird.src.pipe_generator import PipeGenerator
-from games_examples.flappy_bird.src.player import Player
+from demo.flappy_bird.params import HEIGHT, WIDTH
+from demo.flappy_bird.src.pipe_generator import PipeGenerator
+from demo.flappy_bird.src.player import Player
 
 BACKGROUND_COLOR = (137, 207, 240)
 
@@ -72,8 +72,6 @@ class Game:
 
     def end_game(self):
         self.terminated = True
-
-
 
 
 if __name__ == "__main__":

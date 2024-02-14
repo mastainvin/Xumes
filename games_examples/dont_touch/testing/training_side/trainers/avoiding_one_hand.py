@@ -24,7 +24,7 @@ def train_impl(train_context):
     train_context.observation_space = spaces.Dict(dct)
     train_context.action_space = spaces.MultiDiscrete([3, 3])
     train_context.max_episode_length = 1000
-    train_context.total_timesteps = int(30000)
+    train_context.total_timesteps = int(60000)
     train_context.algorithm_type = "MultiInputPolicy"
     train_context.algorithm = stable_baselines3.PPO
 

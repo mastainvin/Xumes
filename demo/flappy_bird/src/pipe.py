@@ -1,8 +1,6 @@
-import logging
-
 import pygame
 
-from games_examples.flappy_bird.params import PIPE_WIDTH, PIPE_SPACE, HEIGHT, PIPE_SPEED, LEFT_POSITION, BIRD_HEIGHT, \
+from demo.flappy_bird.params import PIPE_WIDTH, PIPE_SPACE, HEIGHT, PIPE_SPEED, LEFT_POSITION, BIRD_HEIGHT, \
     BIRD_WIDTH
 
 
@@ -17,10 +15,10 @@ class Pipe:
         self.player = player
         self.generator = generator
         self.rect1 = pygame.Rect(self.position, 0, self.width, height)
-        self.image1 = pygame.image.load("./assets/pipe_top.png")
+        self.image1 = pygame.image.load("/home/vincent/Documents/Xumes/demo/flappy_bird/assets/pipe_top.png")
         self.image1 = pygame.transform.scale(self.image1, (self.width, self.height))
         self.rect2 = pygame.Rect(self.position, self.space_length + self.height, self.width, HEIGHT - self.height)
-        self.image2 = pygame.image.load("./assets/pipe_bottom.png")
+        self.image2 = pygame.image.load("/home/vincent/Documents/Xumes/demo/flappy_bird/assets/pipe_bottom.png")
         self.image2 = pygame.transform.scale(self.image2, (self.width, HEIGHT - self.height))
 
     def draw(self, canvas):

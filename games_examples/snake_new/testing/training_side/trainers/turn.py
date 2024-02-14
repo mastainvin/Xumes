@@ -90,19 +90,7 @@ def train_impl(train_context):
 
 @terminated
 def train_impl(train_context):
-    #print(train_context.snake.body, "booooool")
-
     term = train_context.game.terminated or len(train_context.snake.body)>28
-    # if term:
-    if train_context.game.terminated:
-        print("term1")
-    if len(train_context.snake.body)>28:
-        print(train_context.snake.body)
-        print("term3")
-        # train_context.snake.body=train_context.snake.body[0:6]
-        # print(len(train_context.snake.body), "booooool2")
-    # if term:
-        # train_context.snake.body=[5.0, 10.0, 4.0, 10.0, 3.0, 10.0]
     return term
 
 

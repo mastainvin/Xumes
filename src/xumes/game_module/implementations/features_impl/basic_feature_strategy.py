@@ -7,7 +7,7 @@ class BasicFeatureStrategy(FeatureStrategy):
 
     def retrieve_feature(self):
         """
-        Get features and scenarios from a feature file ".feature" in the testing directory.
+        Get features and scenarios from a feature file ".feature" in the test directory.
         The feature file must be in the following format:
         Feature: <feature_name>
             Scenario: <scenario_name>

@@ -7,7 +7,6 @@ from demo.flappy_bird.params import LEFT_POSITION, PIPE_SPACE, HEIGHT, JUMP_SPEE
 
 PLAYER_COLOR = "yellow"
 
-
 class Player:
     speedup = 0
     points = 0
@@ -19,7 +18,7 @@ class Player:
         self.position = position
         self.game = game
         self.reward = False
-        self.image = pygame.image.load("./assets/bird.png")
+        self.image = pygame.image.load("/home/vincent/Documents/Xumes/demo/flappy_bird/assets/bird.png")
         self.image = pygame.transform.scale(self.image, (BIRD_WIDTH, BIRD_HEIGHT))
 
     def reset(self):

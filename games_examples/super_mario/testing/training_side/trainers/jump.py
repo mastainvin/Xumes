@@ -24,7 +24,7 @@ def train_impl(game_context):
     game_context.observation_space = spaces.Dict(dct)
     game_context.action_space = spaces.MultiBinary(4)
     game_context.max_episode_length = 500
-    game_context.total_timesteps = int(12228)
+    game_context.total_timesteps = int(40000)
     game_context.algorithm_type = "MultiInputPolicy"
     game_context.algorithm = stable_baselines3.PPO
     game_context.random_reset_rate = 0.0

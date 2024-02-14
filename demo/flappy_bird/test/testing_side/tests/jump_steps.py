@@ -1,10 +1,10 @@
 import pygame
 
-from games_examples.flappy_bird.params import HEIGHT, LEFT_POSITION, SPACE_BETWEEN_PIPES, PIPE_SPACE, PIPE_WIDTH, SIZE
-from games_examples.flappy_bird.play import Game, BACKGROUND_COLOR
-from games_examples.flappy_bird.src.pipe import Pipe
-from games_examples.flappy_bird.src.pipe_generator import PipeGenerator
-from games_examples.flappy_bird.src.player import Player
+from demo.flappy_bird.params import HEIGHT, LEFT_POSITION, SPACE_BETWEEN_PIPES, PIPE_SPACE, PIPE_WIDTH, BIRD_WIDTH
+from demo.flappy_bird.play import Game, BACKGROUND_COLOR
+from demo.flappy_bird.src.pipe import Pipe
+from demo.flappy_bird.src.pipe_generator import PipeGenerator
+from demo.flappy_bird.src.player import Player
 
 from xumes.game_module import State, given, when, loop, then, render, log
 
@@ -54,11 +54,11 @@ def test_impl(test_context, i, j):
     test_context.game.pipe_generator.pipes = [Pipe(player=test_context.game.player,
                                                    generator=test_context.game.pipe_generator,
                                                    height=get_height(i),
-                                                   position=LEFT_POSITION + SIZE / 2 + SPACE_BETWEEN_PIPES - PIPE_WIDTH / 2),
+                                                   position=LEFT_POSITION + BIRD_WIDTH / 2 + SPACE_BETWEEN_PIPES - PIPE_WIDTH / 2),
                                               Pipe(player=test_context.game.player,
                                                    generator=test_context.game.pipe_generator,
                                                    height=get_height(j),
-                                                   position=LEFT_POSITION + SIZE / 2 + 2 * SPACE_BETWEEN_PIPES - PIPE_WIDTH / 2)]
+                                                   position=LEFT_POSITION + BIRD_WIDTH / 2 + 2 * SPACE_BETWEEN_PIPES - PIPE_WIDTH / 2)]
     test_context.game.pipe_generator.notify()
 
     test_context.game.clock.tick(0)
@@ -75,14 +75,10 @@ def test_impl(test_context):
     test_context.game.player.move(test_context.game.dt)
     test_context.game.pipe_generator.move(test_context.game.dt)
 
+
 @then("The player should have passed {nb_pipes} pipes")
 def test_impl(test_context, nb_pipes):
     test_context.assert_true(test_context.game.player.points == int(nb_pipes))
-
-
-@then("The player should have passed at least {nb_pipes} pipes")
-def test_impl(test_context, nb_pipes):
-    test_context.assert_greater_equal(test_context.game.player.points, int(nb_pipes))
 
 
 @render
@@ -92,15 +88,3 @@ def test_impl(test_context):
     pygame.display.flip()
 
     test_context.game.dt = test_context.game.clock.tick(60) / 1000
-
-
-@log
-def test_impl(test_context):
-    x, y = test_context.game.player.center
-    return {
-        "player": {
-            "points": test_context.game.player.points,
-            "x": x,
-            "y": y,
-        },
-    }
