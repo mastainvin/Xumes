@@ -1,4 +1,4 @@
-from xumes.training_module import IStateEntity
+from xumes.trainer import IStateEntity
 
 
 class BatEntity(IStateEntity):

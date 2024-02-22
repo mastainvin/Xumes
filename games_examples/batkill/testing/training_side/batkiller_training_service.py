@@ -7,7 +7,7 @@ from gymnasium import spaces
 
 from games_examples.batkill.testing.training_side.entites.batkiller_entity_manager import BatKillerEntityManager
 from games_examples.batkill.play import worldx, worldy, nb_bats
-from xumes.training_module import StableBaselinesTrainer, CommunicationServiceTrainingMq, JsonGameElementStateConverter, \
+from xumes.trainer import StableBaselinesTrainer, CommunicationServiceTrainingMq, JsonGameElementStateConverter, \
     EntityManager
 
 

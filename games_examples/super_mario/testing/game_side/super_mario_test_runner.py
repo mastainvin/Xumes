@@ -6,7 +6,7 @@ import pygame
 from games_examples.super_mario.entities.Mario import Mario
 from games_examples.super_mario.main import Game
 
-from xumes.game_module import TestRunner, GameService, PygameEventFactory, CommunicationServiceGameMq, State
+from xumes.test_runner import TestRunner, GameService, PygameEventFactory, CommunicationServiceGameMq, State
 
 class SuperMarioTestRunner(TestRunner):
 
@@ -49,7 +49,7 @@ class SuperMarioTestRunner(TestRunner):
 
         while True:
 
-            self.test_client.wait()
+            self.test_client.loop()
             self.game.level.drawLevel(self.game.mario.camera)
             self.game.dashboard.update()
             self.game.mario.update()
@@ -69,7 +69,7 @@ class SuperMarioTestRunner(TestRunner):
 
         while not self.game.mario.restart:
 
-            self.test_client.wait()
+            self.test_client.loop()
             self.game.level.drawLevel(self.game.mario.camera)
             self.game.dashboard.update()
             self.game.mario.update()
@@ -115,7 +115,7 @@ if __name__ == "__main__":
                                    event_factory=PygameEventFactory(),
                                    communication_service=CommunicationServiceGameMq(ip="localhost"))
         if sys.argv[1] == "-test":
-            game_service.run()
+            game_service.init_socket()
         if sys.argv[1] == "-render":
             game_service.run_render()
 

@@ -3,11 +3,11 @@ import random
 import pygame
 
 import pygame
-from xumes.game_module.game_service import GameService
-from xumes.game_module.implementations.mq_impl.communication_service_game_mq import CommunicationServiceGameMq
-from xumes.game_module.implementations.pygame_impl.pygame_event_factory import PygameEventFactory
-from xumes.game_module.implementations.rest_impl.json_game_state_observer import JsonGameStateObserver
-from xumes.game_module.implementations.rest_impl.json_test_runner import JsonTestRunner
+from xumes.test_runner.game_service import GameService
+from xumes.test_runner.implementations.mq_impl.communication_service_game_mq import CommunicationServiceGameMq
+from xumes.test_runner.implementations.pygame_impl.pygame_event_factory import PygameEventFactory
+from xumes.test_runner.implementations.rest_impl.json_game_state_observer import JsonGameStateObserver
+from xumes.test_runner.implementations.rest_impl.json_test_runner import JsonTestRunner
 
 from games_examples.batkill.play import Game, worldx, bat_sprite_path, nb_bats, background
 from games_examples.batkill.src.backend_player import MOVE_LEFT, MOVE_RIGHT, JUMP, ATTACK
@@ -73,7 +73,7 @@ class BatKillerTestRunner(Game, JsonTestRunner):
 
     def run_test(self) -> None:
         while True:
-            self.test_client.wait()
+            self.test_client.loop()
 
             attained_score = 0
             action = self.input()
@@ -125,7 +125,7 @@ class BatKillerTestRunner(Game, JsonTestRunner):
 
     def run_test_render(self) -> None:
         while True:
-            self.test_client.wait()
+            self.test_client.loop()
 
             attained_score = 0
             action = self.input()
@@ -222,7 +222,7 @@ if __name__ == "__main__":
                                    event_factory=PygameEventFactory(),
                                    communication_service=CommunicationServiceGameMq(ip="localhost"))
         if sys.argv[1] == "-test":
-            game_service.run()
+            game_service.init_socket()
         if sys.argv[1] == "-render":
             game_service.run_render()
 

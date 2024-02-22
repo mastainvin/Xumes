@@ -1,6 +1,6 @@
 from games_examples.batkill.testing.training_side.entites.player_entity import PlayerEntity
 from games_examples.batkill.testing.training_side.entites.bat_entity import BatEntity
-from xumes.training_module import EntityManager
+from xumes.trainer import EntityManager
 
 
 class BatKillerEntityManager(EntityManager):

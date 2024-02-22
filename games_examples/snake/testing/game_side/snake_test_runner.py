@@ -12,7 +12,7 @@ from games_examples.snake.src.fruit import Fruit
 from games_examples.snake.src.snake import Snake
 
 
-from xumes.game_module import TestRunner, GameService, PygameEventFactory, CommunicationServiceGameMq, State
+from xumes.test_runner import TestRunner, GameService, PygameEventFactory, CommunicationServiceGameMq, State
 
 cell_size = 30
 cell_number = 15
@@ -69,7 +69,7 @@ class SnakeTestRunner(TestRunner):
 
     def run_test(self) -> None:
         while self.game.running:
-            self.test_client.wait()
+            self.test_client.loop()
             for event in pygame.event.get():
                 self.game.check_events(event)
             a = self.game.update()
@@ -79,7 +79,7 @@ class SnakeTestRunner(TestRunner):
     def run_test_render(self) -> None:
         # self.game.run()
         while self.game.running:
-            self.test_client.wait()
+            self.test_client.loop()
             for event in pygame.event.get():
                 self.game.check_events(event)
             a = self.game.update()
@@ -117,7 +117,7 @@ if __name__ == "__main__":
                                    event_factory=PygameEventFactory(),
                                    communication_service=CommunicationServiceGameMq(ip="localhost"))
         if sys.argv[1] == "-test":
-            game_service.run()
+            game_service.init_socket()
         if sys.argv[1] == "-render":
             game_service.run_render()
 

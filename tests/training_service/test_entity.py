@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from xumes.training_module.entity_manager import EntityBoolAdapter, EntityIntAdapter, EntityFloatAdapter, \
+from xumes.trainer.entity_manager import EntityBoolAdapter, EntityIntAdapter, EntityFloatAdapter, \
     EntityComplexAdapter, EntityStrAdapter, \
     EntityListAdapter, EntityTupleAdapter, EntitySetAdapter, EntityDictAdapter, EntityObject
 

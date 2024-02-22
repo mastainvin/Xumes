@@ -2,7 +2,7 @@ import time
 
 import pygame
 
-from xumes.game_module import State, given, when, loop, then, render, log
+from xumes.test_runner import State, given, when, loop, then, render, log
 
 from games_examples.dont_touch.play import Game
 from games_examples.dont_touch.src.components.hand import Hand

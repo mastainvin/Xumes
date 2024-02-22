@@ -1,6 +1,6 @@
 import pygame
 
-from xumes.game_module import State, given, when, loop, then, render, log
+from xumes.test_runner import State, given, when, loop, then, render, log
 
 from games_examples.super_mario.entities.Mario import Mario
 from games_examples.super_mario.main import Game

@@ -6,11 +6,11 @@ from multiprocess import set_start_method
 import click
 
 from xumes.core.modes import TRAIN_MODE, TEST_MODE, RENDER_MODE, FEATURE_MODE, SCENARIO_MODE
-from xumes.game_module.implementations import CommunicationServiceTestManagerRestApi
-from xumes.game_module.implementations.features_impl.gherkin_feature_strategy import GherkinFeatureStrategy
-from xumes.game_module.test_manager import PygameTestManager
-from xumes.training_module import VecStableBaselinesTrainerManager, StableBaselinesTrainerManager
-from xumes.training_module.implementations.rest_impl.communication_service_trainer_manager_rest_api import \
+from xumes.test_runner.implementations import CommunicationServiceTestManagerRestApi
+from xumes.test_runner.implementations.features_impl.gherkin_feature_strategy import GherkinFeatureStrategy
+from xumes.test_runner.test_manager import PygameTestManager
+from xumes.trainer import VecStableBaselinesTrainerManager, StableBaselinesTrainerManager
+from xumes.trainer.implementations.rest_impl.communication_service_trainer_manager_rest_api import \
     CommunicationServiceTrainerManagerRestApi
 
 

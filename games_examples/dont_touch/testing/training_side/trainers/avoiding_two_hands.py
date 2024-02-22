@@ -2,7 +2,7 @@ import numpy as np
 import stable_baselines3
 from gymnasium.vector.utils import spaces
 
-from xumes.training_module import observation, reward, terminated, action, config
+from xumes.trainer import observation, reward, terminated, action, config
 
 from games_examples.dont_touch.src.config import Config
 

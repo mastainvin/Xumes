@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from xumes.training_module.entity_manager import EntityObject, AutoEntityManager, choose_delegate, \
+from xumes.trainer.entity_manager import EntityObject, AutoEntityManager, choose_delegate, \
     EntityIntAdapter
 
 

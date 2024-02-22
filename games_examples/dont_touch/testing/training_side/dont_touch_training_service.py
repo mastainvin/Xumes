@@ -8,7 +8,7 @@ from gymnasium import spaces
 
 from games_examples.dont_touch.src.config import Config
 
-from src.xumes.training_module import StableBaselinesTrainer, JsonGameElementStateConverter, \
+from src.xumes.trainer import StableBaselinesTrainer, JsonGameElementStateConverter, \
                                         CommunicationServiceTrainingMq, AutoEntityManager
 
 

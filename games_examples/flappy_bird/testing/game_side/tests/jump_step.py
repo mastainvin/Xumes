@@ -6,7 +6,7 @@ from games_examples.flappy_bird.src.pipe import Pipe
 from games_examples.flappy_bird.src.pipe_generator import PipeGenerator
 from games_examples.flappy_bird.src.player import Player
 
-from xumes.game_module import State, given, when, loop, then, render, log
+from xumes.test_runner import State, given, when, loop, then, render, log
 
 
 @given("A game with a player")

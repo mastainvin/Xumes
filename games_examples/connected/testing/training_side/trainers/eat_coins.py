@@ -5,13 +5,13 @@ import stable_baselines3
 from gymnasium.vector.utils import spaces
 
 
-from xumes.training_module import observation, reward, terminated, action, config
+from xumes.trainer import observation, reward, terminated, action, config
 from games_examples.connected.src.params import HEIGHT, WIDTH,SPEED,SPACE_BETWEEN,CENTER
 from games_examples.connected.src.generator import Generator
 from games_examples.connected.src.tile import Tiles
 from games_examples.connected.src.ball import Balls
 from games_examples.connected.src.coin import Coins
-from xumes.training_module import observation, reward, terminated, action, config
+from xumes.trainer import observation, reward, terminated, action, config
 from games_examples.connected.testing.training_side.helpers.lidar import Lidar
 from games_examples.connected.src.params import LIDAR_MAX_DIST
 

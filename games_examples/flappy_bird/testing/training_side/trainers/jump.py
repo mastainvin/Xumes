@@ -4,7 +4,7 @@ from gymnasium.vector.utils import spaces
 from games_examples.flappy_bird.testing.training_side.helpers.lidar import Lidar
 from games_examples.flappy_bird.params import LIDAR_MAX_DIST
 
-from xumes.training_module import observation, reward, terminated, action, config
+from xumes.trainer import observation, reward, terminated, action, config
 
 
 @config

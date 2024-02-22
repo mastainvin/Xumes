@@ -14,7 +14,7 @@ from games_examples.dont_touch.src.services.visualization_service import Visuali
 from games_examples.dont_touch.src.utils.tools import is_close_app_event, update_background_using_scroll
 from games_examples.dont_touch.src.components.hand_side import HandSide
 
-from xumes.game_module import TestRunner, GameService, PygameEventFactory, CommunicationServiceGameMq, State
+from xumes.test_runner import TestRunner, GameService, PygameEventFactory, CommunicationServiceGameMq, State
 
 
 class DontTouchTestRunner(TestRunner):
@@ -57,7 +57,7 @@ class DontTouchTestRunner(TestRunner):
 
         while self.game.running:
 
-            self.test_client.wait()
+            self.test_client.loop()
             events = pygame.event.get()
 
             for event in events:
@@ -82,7 +82,7 @@ class DontTouchTestRunner(TestRunner):
     def run_test_render(self) -> None:
 
         while self.game.running:
-            self.test_client.wait()
+            self.test_client.loop()
 
             events = pygame.event.get()
 
@@ -125,7 +125,7 @@ if __name__ == "__main__":
                                    event_factory=PygameEventFactory(),
                                    communication_service=CommunicationServiceGameMq(ip="localhost"))
         if sys.argv[1] == "-test":
-            game_service.run()
+            game_service.init_socket()
         if sys.argv[1] == "-render":
             game_service.run_render()
 

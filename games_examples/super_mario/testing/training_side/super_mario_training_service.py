@@ -7,7 +7,7 @@ import stable_baselines3
 from gymnasium.vector.utils import spaces
 from games_examples.super_mario.classes.Level import nb_entites
 
-from xumes.training_module import StableBaselinesTrainer, JsonGameElementStateConverter, CommunicationServiceTrainingMq, AutoEntityManager
+from xumes.trainer import StableBaselinesTrainer, JsonGameElementStateConverter, CommunicationServiceTrainingMq, AutoEntityManager
 
 
 class SuperMarioTrainingService(StableBaselinesTrainer):

@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from xumes.game_module.state_observable import State
+from xumes.test_runner.state_observable import State
 
 
 class TestState(TestCase):

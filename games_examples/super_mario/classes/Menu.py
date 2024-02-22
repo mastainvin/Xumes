@@ -246,7 +246,7 @@ class Menu:
                     else:
                         if self.state == 0:
                             if self.music:
-                                self.sound.music_channel.stop()
+                                self.sound.music_channel.stop_socket()
                                 self.music = False
                             else:
                                 self.sound.music_channel.play(self.sound.soundtrack, loops=-1)

@@ -1,7 +1,7 @@
 from abc import ABC
 
-from xumes.game_module.game_element_state import GameElementState
-from xumes.game_module.state_observable import StateObservable
+from xumes.test_runner.game_element_state import GameElementState
+from xumes.test_runner.state_observable import StateObservable
 
 from games_examples.batkill.src.backend_player import StandardPlayer
 from games_examples.batkill.src.spriteful_bat import Bat

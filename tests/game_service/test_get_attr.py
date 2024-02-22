@@ -1,7 +1,7 @@
 import unittest
 
-from xumes.game_module.errors.state_conversion_error import StateConversionError
-from xumes.game_module.state_observable import get_object_from_attributes, State
+from xumes.test_runner.errors.state_conversion_error import StateConversionError
+from xumes.test_runner.state_observable import get_object_from_attributes, State
 
 
 class TestGetattr(unittest.TestCase):

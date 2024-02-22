@@ -34,7 +34,7 @@ class MainTestRunner(Main, JsonTestRunner, ABC):
 
     def run_test(self) -> None:
         while True:
-            self.test_client.wait()
+            self.test_client.loop()
             for event in pygame.event.get():
                 self.check_events(event)
             self.update()
@@ -42,7 +42,7 @@ class MainTestRunner(Main, JsonTestRunner, ABC):
 
     def run_test_render(self) -> None:
         while True:
-            self.test_client.wait()
+            self.test_client.loop()
             for event in pygame.event.get():
                 self.check_events(event)
             self.update()

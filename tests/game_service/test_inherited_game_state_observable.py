@@ -2,8 +2,8 @@ from typing import List
 from unittest import TestCase
 from unittest.mock import Mock, MagicMock
 
-from xumes.game_module import State
-from xumes.game_module.test_runner import TestRunner
+from xumes.test_runner import State
+from xumes.test_runner.test_runner import TestRunner
 
 
 class TestInheritedGameStateObservable(TestCase):

@@ -1,7 +1,7 @@
-from xumes.game_module import given
+from xumes.test_runner import given
 import random
 from games_examples.connected.main import Game
-from xumes.game_module import State, given, when, loop, then, render, log
+from xumes.test_runner import State, given, when, loop, then, render, log
 import pygame
 from games_examples.connected.src.params import HEIGHT, WIDTH,SPEED,SPACE_BETWEEN,CENTER
 from games_examples.connected.src.generator import Generator

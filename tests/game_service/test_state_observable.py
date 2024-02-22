@@ -1,7 +1,7 @@
 from unittest import TestCase
 from unittest.mock import Mock, patch
 
-from xumes.game_module.state_observable import StateObservable, State
+from xumes.test_runner.state_observable import StateObservable, State
 
 
 class TestStateObservable(TestCase):

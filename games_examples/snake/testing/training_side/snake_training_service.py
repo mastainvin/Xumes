@@ -6,7 +6,7 @@ import numpy as np
 import stable_baselines3
 from gymnasium import spaces
 
-from src.xumes.training_module import StableBaselinesTrainer, JsonGameElementStateConverter, \
+from src.xumes.trainer import StableBaselinesTrainer, JsonGameElementStateConverter, \
                                         CommunicationServiceTrainingMq, AutoEntityManager
 
 cell_size = 30

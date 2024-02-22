@@ -2,7 +2,7 @@ from time import sleep
 
 import pygame
 from pygame import Vector2
-from xumes.game_module import State, given, when, loop, then, render, log
+from xumes.test_runner import State, given, when, loop, then, render, log
 
 from games_examples.snake_new.play import Game
 from games_examples.snake_new.play import GameInherited

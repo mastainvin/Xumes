@@ -1,7 +1,7 @@
 import numpy as np
 import stable_baselines3
 from gymnasium.vector.utils import spaces
-from xumes.training_module import observation, config, reward, action, terminated
+from xumes.trainer import observation, config, reward, action, terminated
 
 
 from games_examples.snake_new.src import snake, fruit

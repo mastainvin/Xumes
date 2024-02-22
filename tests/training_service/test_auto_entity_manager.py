@@ -1,7 +1,7 @@
 from unittest import TestCase
 
-from xumes.training_module.entity_manager import AutoEntityManager, choose_delegate
-from xumes.training_module.implementations import JsonGameElementStateConverter
+from xumes.trainer.entity_manager import AutoEntityManager, choose_delegate
+from xumes.trainer.implementations import JsonGameElementStateConverter
 
 
 class TestAutoEntityManager(TestCase):

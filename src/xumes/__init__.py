@@ -1,3 +1,3 @@
-import xumes.game_module
-import xumes.training_module
+import xumes.test_runner
+import xumes.trainer
 

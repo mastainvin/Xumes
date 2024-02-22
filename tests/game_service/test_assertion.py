@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from xumes.game_module.assertion import AssertionEqual, AssertionBetween, AssertionLessThan, AssertionGreaterThan, \
+from xumes.test_runner.assertion import AssertionEqual, AssertionBetween, AssertionLessThan, AssertionGreaterThan, \
     AssertionLessThanOrEqual, AssertionGreaterThanOrEqual
 
 

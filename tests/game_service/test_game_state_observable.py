@@ -2,7 +2,7 @@ import types
 from unittest import TestCase
 from unittest.mock import Mock
 
-from xumes.game_module.state_observable import ComposedGameStateObservable, State, InheritedGameStateObservable
+from xumes.test_runner.state_observable import ComposedGameStateObservable, State, InheritedGameStateObservable
 
 
 class TestGameStateObservable(TestCase):
