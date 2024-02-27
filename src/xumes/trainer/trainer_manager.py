@@ -9,12 +9,12 @@ from typing import List, Dict
 
 from xumes.core.modes import TEST_MODE, TRAIN_MODE
 from xumes.core.registry import create_registry
+from xumes.test_runner.test_runner import TestRunner
 from xumes.trainer.entity_manager import AutoEntityManager
-from xumes.trainer.i_communication_service_trainer_manager import ICommunicationServiceTrainerManager
 from xumes.trainer.i_trainer import ITrainer
-from xumes.trainer.implementations import JsonGameElementStateConverter, CommunicationServiceTrainingMq
 from xumes.trainer.implementations.gym_impl.stable_baselines_trainer import OBST, StableBaselinesTrainer
 from xumes.trainer.implementations.gym_impl.vec_stable_baselines_trainer import VecStableBaselinesTrainer
+from xumes.trainer.implementations.json_impl.json_game_element_state_converter import JsonGameElementStateConverter
 
 observation = create_registry()
 action = create_registry()
@@ -34,17 +34,15 @@ class TrainerManager:
     Base class for trainer managers.
 
     Args:
-        communication_service (ICommunicationServiceTrainerManager): The communication service for the trainer manager.
         mode (str, optional): The mode of the trainer manager. Defaults to TEST_MODE.
         port (int, optional): The port number for the communication service. Defaults to 5000.
     """
 
-    def __init__(self, communication_service: ICommunicationServiceTrainerManager, mode: str = TEST_MODE,
-                 port: int = 5000, do_logs: bool = False, model_path: str = None, logging_level=logging.NOTSET):
-        self._load_trainers()
+    def __init__(self, mode: str = TEST_MODE,
+                 port: int = 5000, do_logs: bool = False, model_path: str = None, logging_level=logging.NOTSET, trainers_path=None):
+        self._load_trainers(trainers_path)
         self._trainer_processes: Dict[str, multiprocess.Process] = {}
         self._mode = mode
-        self._communication_service = communication_service
         self._port = port
         self._do_logs = do_logs
         self._previous_model_path = model_path
@@ -52,19 +50,16 @@ class TrainerManager:
 
     # noinspection DuplicatedCode
     @staticmethod
-    def _load_trainers():
-        for file in os.listdir("./trainers"):
+    def _load_trainers(path: str = "./"):
+        for file in os.listdir(path):
             if file.endswith(".py"):
-                module_path = os.path.join("./trainers", file)
+                module_path = os.path.join(path, file)
                 module_path = os.path.abspath(module_path)
                 module_name = os.path.basename(module_path)[:-3]
 
                 spec = importlib.util.spec_from_file_location(module_name, module_path)
                 module_dep = importlib.util.module_from_spec(spec)
                 spec.loader.exec_module(module_dep)
-
-    def start(self):
-        self._communication_service.init_socket(self, self._port)
 
     def run(self):
         if self._mode == TRAIN_MODE:
@@ -80,7 +75,7 @@ class TrainerManager:
     #  for the moment. TODO find a pattern to avoid this
 
     @abstractmethod
-    def connect_trainer(self, feature: str, scenario: str, port: int) -> None:
+    def connect_trainer(self, feature: str, scenario: str) -> None:
         # Create a new process to train or use an agent
         raise NotImplementedError
 
@@ -90,12 +85,12 @@ class TrainerManager:
         raise NotImplementedError
 
     @abstractmethod
-    def create_and_train(self, feature: str, scenario: str, port: int, queue: multiprocess.Queue):
+    def create_and_train(self, feature: str, scenario: str, queue: multiprocess.Queue):
         # Create a new trainer and train it
         raise NotImplementedError
 
     @abstractmethod
-    def create_and_play(self, feature: str, scenario: str, port: int, queue: multiprocess.Queue):
+    def create_and_play(self, feature: str, scenario: str, queue: multiprocess.Queue):
         # Create a new trainer and play it
         raise NotImplementedError
 
@@ -112,7 +107,7 @@ class TrainerManager:
         raise NotImplementedError
 
     @abstractmethod
-    def create_trainer(self, feature: str, scenario: str, port: int, observation_r, action_r, reward_r, terminated_r,
+    def create_trainer(self, test_runner: TestRunner, feature: str, scenario: str, observation_r, action_r, reward_r, terminated_r,
                        config_r) -> ITrainer:
         # Abstract method to create a trainer for a specific feature and scenario
         # This method should be implemented by the concrete trainer manager
@@ -146,7 +141,7 @@ class StableBaselinesTrainerManager(TrainerManager):
     def train(self):
         pass
 
-    def create_trainer(self, feature: str, scenario: str, port: int, observation_r, action_r, reward_r, terminated_r,
+    def create_trainer(self, test_runner: TestRunner, feature: str, scenario: str, observation_r, action_r, reward_r, terminated_r,
                        config_r) -> ITrainer:
         # We use the decorators to implement the trainer's methods
 
@@ -164,8 +159,7 @@ class StableBaselinesTrainerManager(TrainerManager):
                 return action_r[feature](self, raws_actions)
 
         try:
-            trainer = ConcreteTrainer(entity_manager=AutoEntityManager(JsonGameElementStateConverter()),
-                                      communication_service=CommunicationServiceTrainingMq(port=port))
+            trainer = ConcreteTrainer(entity_manager=AutoEntityManager(JsonGameElementStateConverter()), test_runner=test_runner,)
 
             config_r[feature](trainer)
             trainer.make()
@@ -174,8 +168,8 @@ class StableBaselinesTrainerManager(TrainerManager):
 
         return trainer
 
-    def connect_trainer(self, feature: str, scenario: str, port: int) -> None:
-        # Create a new process to train or use an agent
+    def connect_trainer(self, feature: str, scenario: str) -> None:
+        # Create a new process to train or  use an agent
         name = self._trainer_name(feature, scenario)
 
         registry_queue = multiprocess.Queue()
@@ -183,15 +177,9 @@ class StableBaselinesTrainerManager(TrainerManager):
             (observation_registry, action_registry, reward_registry, terminated_registry, config_registry))
 
         if self._mode == TRAIN_MODE:
-            process = multiprocess.Process(target=self.create_and_train,
-                                           args=(feature, scenario, port, registry_queue,))
-            process.start()
-            self._trainer_processes[name] = process
-
+            self.create_and_train(feature, scenario, registry_queue)
         elif self._mode == TEST_MODE:
-            process = multiprocess.Process(target=self.create_and_play, args=(feature, scenario, port, registry_queue,))
-            process.start()
-            self._trainer_processes[name] = process
+            self.create_and_play(feature, scenario, registry_queue)
 
     def disconnect_trainer(self, feature: str, scenario: str) -> None:
         # Terminate the process
@@ -201,22 +189,22 @@ class StableBaselinesTrainerManager(TrainerManager):
             self._trainer_processes[name].join()
             del self._trainer_processes[name]
 
-    def create_and_train(self, feature: str, scenario: str, port: int, queue: multiprocess.Queue):
+    def create_and_train(self, feature: str, scenario: str, queue: multiprocess.Queue):
         self._init_logger()
         # Create a new trainer and train it
         observation_r, action_r, reward_r, terminated_r, config_r = queue.get()
-        trainer = self.create_trainer(feature, scenario, port, observation_r, action_r, reward_r, terminated_r,
+        trainer = self.create_trainer(feature, scenario, observation_r, action_r, reward_r, terminated_r,
                                       config_r)
         trainer.train(self._model_path(feature, scenario),
                       logs_path=self._model_path(feature, scenario) + "/../_logs" if self._do_logs else None,
                       logs_name=scenario, previous_model_path=self._previous_model_path)
 
-    def create_and_play(self, feature: str, scenario: str, port: int, queue: multiprocess.Queue):
+    def create_and_play(self, feature: str, scenario: str, queue: multiprocess.Queue):
         self._init_logger()
         # Create a new trainer and play it
         logging.basicConfig(format='%(levelname)s:%(message)s', level=self._logging_level)
         observation_r, action_r, reward_r, terminated_r, config_r = queue.get()
-        trainer = self.create_trainer(feature, scenario, port, observation_r, action_r, reward_r, terminated_r,
+        trainer = self.create_trainer(feature, scenario, observation_r, action_r, reward_r, terminated_r,
                                       config_r)
         trainer.load(self._model_path(feature, scenario) + "/best_model")
         trainer.play(timesteps=None)
@@ -234,9 +222,9 @@ class VecStableBaselinesTrainerManager(StableBaselinesTrainerManager):
     Use to train all agents on the same model
     """
 
-    def __init__(self, communication_service: ICommunicationServiceTrainerManager, port: int,
+    def __init__(self, port: int,
                  mode=TEST_MODE, do_logs=False, model_path: str = None, logging_level=logging.NOTSET):
-        super().__init__(communication_service, mode=mode, port=port, do_logs=do_logs, model_path=model_path,
+        super().__init__(mode=mode, port=port, do_logs=do_logs, model_path=model_path,
                          logging_level=logging_level)
 
         # Create a vectorized trainer
@@ -246,11 +234,11 @@ class VecStableBaselinesTrainerManager(StableBaselinesTrainerManager):
         self._trained_feature = None
         self._process = None
 
-    def connect_trainer(self, feature: str, scenario: str, port: int) -> None:
+    def connect_trainer(self, feature: str, scenario: str) -> None:
         # Add a new training service to the vectorized trainer
         if self._trained_feature is None:
             self._trained_feature = feature
-        self._training_services_datas.add((feature, scenario, port))
+        self._training_services_datas.add((feature, scenario))
 
     def reset_trainer(self):
         self._process.terminate()
@@ -265,9 +253,7 @@ class VecStableBaselinesTrainerManager(StableBaselinesTrainerManager):
         registry_queue = multiprocess.Queue()
         registry_queue.put(
             (observation_registry, action_registry, reward_registry, terminated_registry, config_registry))
-        process = multiprocess.Process(target=self._train_agent, args=(registry_queue,))
-        process.start()
-        self._process = process
+        self._train_agent(registry_queue)
 
     def _init_vec_trainer(self, registry_queue):
         self._init_logger()

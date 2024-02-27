@@ -4,7 +4,7 @@ from xumes.test_runner.i_communication_service_game import ICommunicationService
 
 class TestRunner:
     """
-    The `GameService` class is a central component of Xumes. It manages communication between communication service,
+    The `TestRunner` class is a central component of Xumes. It manages communication between communication service,
     the execution of the game itself, and external events that can modify the game state.
 
     Attributes:
@@ -23,30 +23,17 @@ class TestRunner:
     def __init__(self,
                  communication_service: ICommunicationServiceGame,
                  ):
-
-        self.inputs = []
-
         self.communication_service = communication_service
-
         self.is_finished = False
 
     def run_communication_service(self, port: int):
         self.communication_service.init_socket(port)
 
     def run(self, port: int):
-        """
-        - The communication service thread, used to send state and get actions.\n
-        """
         self.run_communication_service(port)
 
     def stop(self):
-        """
-        Stop the communication service.
-        """
         self.communication_service.stop_socket()
-
-    def reset(self):
-        self.communication_service.push_event("reset")
 
     def finish(self):
         self.communication_service.push_event("finish")
@@ -57,3 +44,14 @@ class TestRunner:
     def get_state(self):
         return self.communication_service.get_state()
 
+    def given(self):
+        self.communication_service.push_event("given")
+
+    def when(self):
+        self.communication_service.push_event("when")
+
+    def then(self):
+        self.communication_service.push_event("then")
+
+    def run_loop(self):
+        self.communication_service.push_event("run")

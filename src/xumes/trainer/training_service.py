@@ -39,7 +39,7 @@ class TrainingService:
 
     @final
     def reset(self):
-        self._test_runner.reset()
+        self._test_runner.when()
 
     @final
     def push_actions(self, actions):
@@ -55,9 +55,10 @@ class TrainingService:
         """
         Call the game service and update the state.
         """
+        self._test_runner.run_loop()
         states = self._test_runner.get_state()
         logging.debug(f"Received states: {states}")
-        for state in states:
+        for state in states.items():
             self._entity_manager.convert(state)
 
     @final
@@ -77,6 +78,7 @@ class TrainingService:
 
     def __del__(self):
         self.close_communication()
+
 
 
 class MarkovTrainingService(TrainingService, ITrainer, ABC):  # TODO Move class to implementations folder

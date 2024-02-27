@@ -10,9 +10,9 @@ from stable_baselines3.common.monitor import Monitor
 # noinspection PyUnresolvedReferences
 import xumes
 from xumes.core.errors.running_ends_error import RunningEndsError
+from xumes.test_runner.test_runner import TestRunner
 
 from xumes.trainer.entity_manager import EntityManager
-from xumes.trainer.i_communication_service_training import ICommunicationServiceTraining
 from xumes.trainer.training_service import MarkovTrainingService
 
 OBST = TypeVar("OBST")
@@ -22,7 +22,7 @@ class StableBaselinesTrainer(MarkovTrainingService, ABC):
 
     def __init__(self,
                  entity_manager: EntityManager,
-                 communication_service: ICommunicationServiceTraining,
+                 test_runner: TestRunner,
                  observation_space=None,
                  action_space=None,
                  max_episode_length: int = 1000,
@@ -30,7 +30,7 @@ class StableBaselinesTrainer(MarkovTrainingService, ABC):
                  algorithm_type: str = "MultiInputPolicy",
                  algorithm=stable_baselines3.PPO,
                  ):
-        super().__init__(entity_manager, communication_service)
+        super().__init__(entity_manager, test_runner)
         if observation_space is not None and action_space is not None:
             self.env = Monitor(gym.make(
                 id="xumes-v0",

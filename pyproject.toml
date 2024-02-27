@@ -1,6 +1,6 @@
 [project]
 name="xumes"
-version="0.0.42"
+version="0.1.0"
 authors = [
   { name="Vincent Mastain", email="vincentmastain@gmail.com" },
 ]

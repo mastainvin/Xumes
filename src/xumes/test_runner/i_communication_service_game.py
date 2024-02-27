@@ -1,3 +1,6 @@
+from typing import Any, Dict
+
+
 class ICommunicationServiceGame:
     """
       Communication between the test_runner and the game.
@@ -7,7 +10,7 @@ class ICommunicationServiceGame:
           run: Start the communication service (e.g., start the app of a REST API).
     """
 
-    def get_state(self) -> None:
+    def get_state(self) -> Dict[str, Any]:
         """
         Receive the game state from the server.
         """
@@ -35,5 +38,23 @@ class ICommunicationServiceGame:
     def stop_socket(self) -> None:
         """
         Used to stop the communication service.
+        """
+        raise NotImplementedError
+
+    def given(self) -> None:
+        """
+        Send the given step to the training server.
+        """
+        raise NotImplementedError
+
+    def when(self) -> None:
+        """
+        Send the when step to the training server.
+        """
+        raise NotImplementedError
+
+    def then(self) -> None:
+        """
+        Send the then step to the training server.
         """
         raise NotImplementedError
