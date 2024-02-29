@@ -31,10 +31,11 @@ class GymAdapter(gym.Env):
         return self._training_service.get_obs(), {}
 
     def step(self, action: ActType) -> Tuple[ObsType, SupportsFloat, bool, bool, Dict[str, Any]]:
-        self._training_service.push_raw_actions(action)
-        obs = self._training_service.get_obs()
+        obs = self._training_service.push_actions_and_get_obs(action)
         reward = self._training_service.reward()
         terminated = self._training_service.terminated()
+        if terminated:
+            self._training_service.on_episode_end()
         return obs, reward, terminated, False, {}
 
     def render(self) -> RenderFrame | list[RenderFrame] | None:

@@ -19,5 +19,6 @@ trainer_manager = StableBaselinesTrainerManager(mode=TRAIN_MODE, trainers_path="
 
 trainer = trainer_manager.create_trainer(test_runner, "jump", "scenario", observation_registry, action_registry, reward_registry, terminated_registry, config_registry)
 
-trainer.train(save_path="/home/vincent/Documents/Xumes_project/flappy_bird/test/pipe_size_delta/trainers/pretrained")
-# trainer.save("/home/vincent/Documents/Xumes_project/flappy_bird/test/pipe_size_delta/trainers/pretrained")
+
+trainer.train(previous_model_path="/home/vincent/Documents/Xumes_project/flappy_bird/test/pipe_size_delta/trainers/pretrained")
+trainer.save("/home/vincent/Documents/Xumes_project/flappy_bird/test/pipe_size_delta/trainers/pretrained2")

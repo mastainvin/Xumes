@@ -1,3 +1,4 @@
+from abc import abstractmethod
 from typing import List
 from xumes.test_runner.i_communication_service_game import ICommunicationServiceGame
 
@@ -36,22 +37,37 @@ class TestRunner:
         self.communication_service.stop_socket()
 
     def finish(self):
-        self.communication_service.push_event("finish")
+        self.communication_service.push_dict({"event": "finish"})
+        self.communication_service.get_int()
 
-    def push_actions(self, actions: List):
-        self.communication_service.push_action(actions)
+    def push_actions_and_get_state(self, actions: List):
+        self.communication_service.push_dict({"event": "action", "inputs": actions})
+        return self.communication_service.get_dict()
 
     def get_state(self):
-        return self.communication_service.get_state()
+        self.communication_service.push_dict({"event": "get_state"})
+        return self.communication_service.get_dict()
 
     def given(self):
-        self.communication_service.push_event("given")
+        self.communication_service.push_dict({"event": "given"})
+        self.communication_service.get_int()
 
     def when(self):
-        self.communication_service.push_event("when")
+        self.communication_service.push_dict({"event": "when"})
+        self.communication_service.get_int()
 
     def then(self):
-        self.communication_service.push_event("then")
+        self.communication_service.push_dict({"event": "then"})
+        return self.communication_service.get_dict()
 
-    def run_loop(self):
-        self.communication_service.push_event("run")
+    def get_steps(self):
+        self.communication_service.push_dict({"event": "get_steps"})
+        return self.communication_service.get_dict()
+
+    def push_args(self, args):
+        self.communication_service.push_dict({"event": "args", "args": args})
+        self.communication_service.get_int()
+
+    @abstractmethod
+    def episode_finished(self) -> bool:
+        raise NotImplementedError

@@ -15,40 +15,25 @@ class CommunicationServiceGameSocket(ICommunicationServiceGame):
         self.addr = None
         self.is_running = False
 
-    def get_state(self) -> Dict[str, Any]:
+    def push_dict(self, dictionary) -> None:
+        if self.is_running:
+            self.socket.sendall(json.dumps(dictionary).encode())
+
+    def get_dict(self) -> Dict[str, Any]:
         data = {}
         if self.is_running:
-            r = {
-                "event": "get_state"
-            }
-            self.socket.sendall(json.dumps(r).encode())
             data = self.socket.recv(1024)
             data = data.decode()
             data = json.loads(data)
             data = parse_json_with_eval(data)
         return data
 
-    def push_action(self, action) -> None:
+    def get_int(self) -> int:
+        data = 0
         if self.is_running:
-            r = {
-                "inputs": action,
-            }
-            self.socket.sendall(json.dumps(r).encode())
-            response = self.socket.recv(1024)
-            response = eval(response)
-            if response < 0:
-                raise Exception("Error comm")
-
-    def push_event(self, event) -> None:
-        if self.is_running:
-            r = {
-                "event": event,
-            }
-            self.socket.sendall(json.dumps(r).encode())
-            response = self.socket.recv(1024)
-            response = eval(response)
-            if response < 0:
-                raise Exception("Error comm")
+            data = self.socket.recv(1024)
+            data = eval(data)
+        return data
 
     def init_socket(self, port) -> None:
         self.socket = socket(AF_INET, SOCK_STREAM)

@@ -1,17 +1,17 @@
 import logging
 import os
 import platform
-from multiprocess import set_start_method
+from multiprocessing import set_start_method
 
 import click
 
 from xumes.core.modes import TRAIN_MODE, TEST_MODE, RENDER_MODE, FEATURE_MODE, SCENARIO_MODE
-from xumes.test_runner.implementations import CommunicationServiceTestManagerRestApi
-from xumes.test_runner.implementations.features_impl.gherkin_feature_strategy import GherkinFeatureStrategy
-from xumes.test_runner.test_manager import PygameTestManager
+from xumes.test_runner.feature_strategy import Feature, Scenario, DummyFeatureStrategy
+from xumes.test_runner.implementations.socket_impl.communication_service_game_socket import \
+    CommunicationServiceGameSocket
 from xumes.trainer import VecStableBaselinesTrainerManager, StableBaselinesTrainerManager
-from xumes.trainer.implementations.rest_impl.communication_service_trainer_manager_rest_api import \
-    CommunicationServiceTrainerManagerRestApi
+from xumes.trainer.trainer_manager import observation_registry, action_registry, reward_registry, terminated_registry, \
+    config_registry
 
 
 @click.group()
@@ -30,8 +30,6 @@ def get_debug_level(debug, info):
 
 @cli.command()
 @click.option("--render", is_flag=True, help="Render the game.")
-@click.option("--test", is_flag=True, help="Test mode.")
-@click.option("--train", is_flag=True, help="Train mode.")
 @click.option("--timesteps", "-ts", default=None, help="Number of timesteps to test the game.")
 @click.option("--iterations", "-i", default=None, help="Number of iterations to test the game.")
 @click.option("--features", "-f", default=None, help="List of features to test.")
@@ -42,26 +40,19 @@ def get_debug_level(debug, info):
 @click.option("--info", is_flag=True, help="Info debug level.")
 @click.option("--ip", default="localhost", help="IP of the training server.")
 @click.option("--port", default=5000, help="Port of the training server.")
-@click.option("--path", default=None, type=click.Path(), help="Path of the ./tests folder.")
+@click.option("--features_path", default=None, type=click.Path(), help="Path of the ./features folder.")
+@click.option("--trainers_path", default=None, type=click.Path(), help="Path of the ./trainers folder.")
+@click.option("--model_path", default=None, type=click.Path(), help="Path of the model.")
 @click.option("--alpha", "-a", default=0.001, help="Alpha of the training.")
-def tester(train, debug, render, test, ip, port, path, timesteps, iterations, info, log, alpha, features, scenarios,
-           tags):
+def test(debug, render, ip, port, model_path, features_path, trainers_path, timesteps, iterations, info, log, alpha, features,
+         scenarios,
+         tags):
     # change start method to fork to avoid errors with multiprocessing
     # Windows does not support the fork start method
     if platform.system() != "Windows":
         set_start_method('fork')
 
-    if path:
-        os.chdir(path)
-    else:
-        print("You must choose a path to save the model.")
-        return
-
-    if not train and not test:
-        print("You must choose between --train or --test.")
-        return
-
-    if test and not timesteps and not iterations:
+    if not timesteps and not iterations:
         print("You must choose a number of timesteps or iterations to test the game.")
         return
 
@@ -73,12 +64,7 @@ def tester(train, debug, render, test, ip, port, path, timesteps, iterations, in
     logging_level = get_debug_level(debug, info)
     logging.basicConfig(format='%(levelname)s:%(message)s', level=logging_level)
 
-    if train:
-        mode = TRAIN_MODE
-    else:
-        mode = TEST_MODE
-    if render:
-        mode = RENDER_MODE
+    mode = TEST_MODE
 
     if timesteps:
         timesteps = int(timesteps)
@@ -101,68 +87,71 @@ def tester(train, debug, render, test, ip, port, path, timesteps, iterations, in
         tags = tags.split(",")
         tags = [t.strip() for t in tags]
 
-    test_manager = PygameTestManager(communication_service=CommunicationServiceTestManagerRestApi(ip=ip, port=port),
-                                     feature_strategy=GherkinFeatureStrategy(alpha=alpha, features_names=features,
-                                                                             scenarios_names=scenarios, tags=tags,
-                                                                             ),
-                                     mode=mode, timesteps=timesteps, iterations=iterations, do_logs=log,
-                                     logging_level=logging_level)
-    test_manager.test_all()
+    communication_service = CommunicationServiceGameSocket(host='127.0.0.1')
+
+    feature = Feature(name="PipeSizeDelta")
+    scenario = Scenario(feature=feature, name="0_100")
+    feature_strategy = DummyFeatureStrategy()
+    feature_strategy.retrieve_feature(features_path)
+
+    test_runner = feature_strategy.build_test_runner(scenario=scenario, iterations=iterations, mode=TEST_MODE,
+                                                     comm_service=communication_service)
+    test_runner.run(port=8081)
+
+    trainer_manager = StableBaselinesTrainerManager(mode=TEST_MODE,
+                                                    trainers_path=trainers_path)
+
+    trainer = trainer_manager.create_trainer(test_runner, "PipeSizeTest", "scenario", observation_registry, action_registry,
+                                             reward_registry, terminated_registry, config_registry)
+
+    trainer.load(model_path)
+    trainer.play()
 
 
 @cli.command()
-@click.option("--test", is_flag=True, help="Test mode")
-@click.option("--train", is_flag=True, help="Train mode.")
 @click.option("--mode", default=FEATURE_MODE, help="Mode of the training. (scenario, feature=default)")
 @click.option("--tensorboard", "-tb", is_flag=True, help="Save logs to _logs folder to be use with the tensorboard.")
 @click.option("--debug", is_flag=True, help="Debug debug level.")
 @click.option("--info", is_flag=True, help="Info debug level.")
 @click.option("--port", default=5000, help="Port of the training server.")
-@click.option("--path", default=None, type=click.Path(), help="Path of the ./trainers.rst folder.")
+@click.option("--features_path", default=None, type=click.Path(), help="Path of the ./features folder.")
+@click.option("--trainers_path", default=None, type=click.Path(), help="Path of the ./trainers folder.")
 @click.option("--model", default=None, type=click.Path(),
               help="Path of the model to load if you want to use a base model for your training.")
-def trainer(train, debug, test, path, mode, port, info, tensorboard, model):
+def train(debug, trainers_path, mode, port, info, tensorboard, model, features_path):
     # change start method to fork to avoid errors with multiprocessing
     # Windows does not support the fork start method
     if platform.system() != "Windows":
         set_start_method('fork')
 
-    if path:
-        os.chdir(path)
-    if not path:
-        print("You must choose a path to save the model.")
-        return
-
     logging_level = get_debug_level(debug, info)
     logging.basicConfig(format='%(levelname)s:%(message)s', level=logging_level)
-
-    if not train and not test:
-        print("You must choose between --train or --test.")
-        return
 
     if mode == "scenario":
         model_mode = SCENARIO_MODE
     else:
         model_mode = FEATURE_MODE
 
-    if train:
-        mode = TRAIN_MODE
-    else:
-        mode = TEST_MODE
+    mode = TRAIN_MODE
 
     training_manager = None
 
-    if model_mode == FEATURE_MODE:
-        training_manager = VecStableBaselinesTrainerManager(CommunicationServiceTrainerManagerRestApi(), port,
-                                                            mode=mode, do_logs=tensorboard, model_path=model,
-                                                            logging_level=logging_level)
-    elif model_mode == SCENARIO_MODE:
-        training_manager = StableBaselinesTrainerManager(CommunicationServiceTrainerManagerRestApi(), mode=mode,
-                                                         do_logs=tensorboard, model_path=model,
-                                                         logging_level=logging_level)
+    communication_service = CommunicationServiceGameSocket(host='127.0.0.1')
 
-    if training_manager:
-        training_manager.start()
-    else:
-        print("You must choose between --scenario or --feature.")
-        return
+    feature = Feature(name="PipeSizeDelta")
+    scenario = Scenario(feature=feature, name="0_100")
+    feature_strategy = DummyFeatureStrategy()
+
+    test_runner = feature_strategy.build_test_runner(scenario=scenario, iterations=100, mode=mode,
+                                                     comm_service=communication_service)
+    test_runner.run(port=8081)
+
+    trainer_manager = StableBaselinesTrainerManager(mode=mode,
+                                                    trainers_path=trainers_path)
+
+    trainer = trainer_manager.create_trainer(test_runner, "PipeSizeTest", "scenario", observation_registry, action_registry,
+                                             reward_registry, terminated_registry, config_registry)
+
+    trainer.train(
+        save_path=trainers_path+"/models")
+

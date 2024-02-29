@@ -47,6 +47,18 @@ class TrainingService:
         self._test_runner.push_actions(actions)
 
     @final
+    def push_action_and_get_state(self, actions):
+        logging.debug(f"Pushing actions: {actions}")
+        states = self._test_runner.push_actions_and_get_state(actions)
+        logging.debug(f"Received states: {states}")
+        for state in states.items():
+            self._entity_manager.convert(state)
+
+    @final
+    def on_episode_end(self):
+        self._test_runner.episode_finished()
+
+    @final
     def finished(self):
         return self._test_runner.finish()
 
@@ -55,7 +67,7 @@ class TrainingService:
         """
         Call the game service and update the state.
         """
-        self._test_runner.run_loop()
+        # self._test_runner.run_loop()
         states = self._test_runner.get_state()
         logging.debug(f"Received states: {states}")
         for state in states.items():
@@ -76,10 +88,6 @@ class TrainingService:
     def __getattr__(self, item):
         return self.get_entity(item)
 
-    def __del__(self):
-        self.close_communication()
-
-
 
 class MarkovTrainingService(TrainingService, ITrainer, ABC):  # TODO Move class to implementations folder
 
@@ -98,6 +106,11 @@ class MarkovTrainingService(TrainingService, ITrainer, ABC):  # TODO Move class 
     @final
     def get_obs(self) -> OBST:
         self.retrieve_state()
+        return self.convert_obs()
+
+    @final
+    def push_actions_and_get_obs(self, actions) -> OBST:
+        self.push_action_and_get_state(self.convert_actions(actions))
         return self.convert_obs()
 
     @abstractmethod

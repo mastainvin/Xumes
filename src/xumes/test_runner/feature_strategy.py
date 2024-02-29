@@ -6,6 +6,7 @@ from abc import ABC, abstractmethod
 from typing import List
 
 from xumes.core.modes import TEST_MODE, RENDER_MODE
+from xumes.test_runner.assertion import AssertionEqual
 from xumes.test_runner.assertion_bucket import AssertionBucket
 from xumes.test_runner.i_communication_service_game import ICommunicationServiceGame
 from xumes.test_runner.test_runner import TestRunner
@@ -49,71 +50,62 @@ class FeatureStrategy(ABC):
 
         class ConcreteTestRunner(TestRunner):
             def __init__(self, number_max_of_steps: int = None, number_max_of_tests: int = None,
-                         communication_service: ICommunicationServiceGame = None):
+                         communication_service: ICommunicationServiceGame = None, mode: str = TEST_MODE, ):
                 super().__init__(communication_service)
                 self._feature = feature_name
                 self._scenario = scenario_name
                 self._mode = mode
                 self._number_of_steps = 0
                 self._number_max_of_steps = number_max_of_steps
-                self._number_of_tests = 0
+                self._number_of_tests = 1
                 self._number_max_of_tests = number_max_of_tests
 
                 self._assertion_bucket = AssertionBucket(test_name=f"{self._feature}/{self._scenario}",
                                                          queue=test_queue)
-                # exec given
+
+            def run(self, port: int):
+                super().run(port)
+                self.push_args({
+                    "when": {
+                        "first_pipe": 1,
+                        "second_pipe": 0
+                    }})
                 self.given()
-                # exec when
                 self.when()
 
-            def _continue_test(self) -> bool:
-                return (self._number_max_of_steps is None or self._number_of_steps < self._number_max_of_steps) and (
-                        self._number_max_of_tests is None or self._number_of_tests < self._number_max_of_tests)
+            def _test_finished(self) -> bool:
+                return self._number_of_tests >= self._number_max_of_tests
 
-            def _make_loop(self) -> bool:
-                # Loop content method return False if the test is finished
+            def episode_finished(self) -> bool:
+                # when an episode is finished, we collect the assertions
+                finished = self._test_finished()
+                self._number_of_tests += 1
+                if self._mode == TEST_MODE:
+                    if finished:
+                        self._do_assert()
+                        exit(0)
 
-                # Check if the test is finished
-                finished = not self._continue_test()
-                self._number_of_steps += 1
-                if finished:
-                    # If the test is finished, we send to the training manager that the test is finished
-                    # self._assertion_bucket.collect_mode()
-                    # self._assertion_bucket.do_collect()
-                    try:
-                        self.is_finished = True
-                    finally:
-                        return False
+                    else:
+                        try:
+                            assertions_dicts = self.then()
+                            self._assertion_bucket.assert_from_dict(assertions_dicts)
+                        except KeyError:
+                            pass
 
                 return True
 
-            def run_test(self) -> None:
-                while True:
-                    if not self._make_loop():
-                        break
-                self._do_assert_and_log()
+            def _do_assert(self) -> None:
+                assertions_dicts = self.then()
+                self._assertion_bucket.assert_from_dict(assertions_dicts)
 
-            def _do_assert_and_log(self) -> None:
-                if self._mode == TEST_MODE or self._mode == RENDER_MODE:
-                    # If the test is finished, we assert the test
-                    self._assertion_bucket.assertion_mode()
+                self._assertion_bucket.assertion_mode()
+                self._assertion_bucket.assert_from_dict(assertions_dicts)
 
-                    # if
-                    # exec_registry_function(registry=then_r[steps], game_context=self, scenario_name=scenario_name)
+                self._assertion_bucket.send_results()
+                self._assertion_bucket.clear()
+                self._assertion_bucket.collect_mode()
 
-                    self._assertion_bucket.send_results()
-                    self._assertion_bucket.clear()
-                    self._assertion_bucket.collect_mode()
-
-            def reset(self) -> None:
-                if self._mode == TEST_MODE or self._mode == RENDER_MODE:
-                    # then
-                    self._assertion_bucket.reset_iterator()
-                # when
-                self.when()
-                self._number_of_tests += 1
-
-        return ConcreteTestRunner(timesteps, iterations, comm_service)
+        return ConcreteTestRunner(timesteps, iterations, comm_service, mode)
 
     @abstractmethod
     def retrieve_feature(self, path: str):
@@ -121,3 +113,8 @@ class FeatureStrategy(ABC):
         Get all features.
         """
         raise NotImplementedError
+
+
+class DummyFeatureStrategy(FeatureStrategy):
+    def retrieve_feature(self, path: str):
+        pass

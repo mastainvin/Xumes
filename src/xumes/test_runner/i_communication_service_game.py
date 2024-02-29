@@ -10,21 +10,21 @@ class ICommunicationServiceGame:
           run: Start the communication service (e.g., start the app of a REST API).
     """
 
-    def get_state(self) -> Dict[str, Any]:
+    def push_dict(self, dictionary) -> None:
         """
-        Receive the game state from the server.
-        """
-        raise NotImplementedError
-
-    def push_action(self, action) -> None:
-        """
-        Send an action to the game.
+        Send a dictionary to the game.
         """
         raise NotImplementedError
 
-    def push_event(self, event) -> None:
+    def get_dict(self) -> Dict[str, Any]:
         """
-        Push event to the game.
+        Receive a dictionary from the game.
+        """
+        raise NotImplementedError
+
+    def get_int(self) -> int:
+        """
+        Receive an integer from the game.
         """
         raise NotImplementedError
 
@@ -41,20 +41,3 @@ class ICommunicationServiceGame:
         """
         raise NotImplementedError
 
-    def given(self) -> None:
-        """
-        Send the given step to the training server.
-        """
-        raise NotImplementedError
-
-    def when(self) -> None:
-        """
-        Send the when step to the training server.
-        """
-        raise NotImplementedError
-
-    def then(self) -> None:
-        """
-        Send the then step to the training server.
-        """
-        raise NotImplementedError

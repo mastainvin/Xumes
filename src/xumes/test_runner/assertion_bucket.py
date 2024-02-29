@@ -1,7 +1,7 @@
 import time
 
 import multiprocess
-from typing import List
+from typing import List, Dict
 
 from xumes.test_runner.assertion import IAssertionStrategy
 from xumes.test_runner.assertion_factory import AssertionFactory
@@ -85,6 +85,12 @@ class AssertionBucket:
     def _collect_or_assert(self, data, expected, assertion_strategy: IAssertionStrategy, opposite=False):
         self._state.action(data=data, expected=expected, assertion_strategy=assertion_strategy, opposite=opposite)
 
+    def assert_from_dict(self, assertion_dicts: List[Dict]):
+        for assertion_dict in assertion_dicts:
+            if assertion_dict['type'] == 'assert_equal':
+                self.assert_equal(data=assertion_dict['actual'], expected=assertion_dict['expected'])
+        self.reset_iterator()
+
     def assert_true(self, data):
         self._state.action(data=data, expected=True, assertion_strategy=self._assertion_factory.assertion_equal(True),
                            opposite=False)
@@ -159,11 +165,19 @@ class AssertionBucket:
                               f"{'Actual':10}: {assertion_result.actual} \n" \
                               f"{'Expected':10}: {assertion_result.expected}\n"
 
-        self._queue.put(AssertionReport(passed=self._passed,
-                                        error_logs=error_logs,
-                                        test_name=self._test_name
-                                        ))
-        time.sleep(0.5)
+        assertion_report = AssertionReport(passed=self._passed,
+                                           error_logs=error_logs,
+                                           test_name=self._test_name
+                                           )
+
+        # XXX This is a print statement that should be removed
+        if assertion_report.passed:
+            print(f"\033[92m{assertion_report.test_name} passed\033[0m")
+        else:
+            print(assertion_report.error_logs)
+
+        # self._queue.put(assertion_report)
+        # time.sleep(0.5)
 
     def clear(self):
         self._data.clear()
