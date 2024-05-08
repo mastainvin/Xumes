@@ -1,6 +1,6 @@
 from abc import abstractmethod
 from typing import List
-from xumes.test_runner.i_communication_service_game import ICommunicationServiceGame
+from xumes.test_runner.i_communication_service import ICommunicationService
 
 
 class TestRunner:
@@ -9,7 +9,7 @@ class TestRunner:
     the execution of the game itself, and external events that can modify the game state.
 
     Attributes:
-        communication_service (ICommunicationServiceGame): An object responsible for communication with other the training service.
+        communication_service (ICommunicationService): An object responsible for communication with other the training service.
 
     Methods:
         run_communication_service(): Starts the communication service thread.
@@ -22,7 +22,7 @@ class TestRunner:
     """
 
     def __init__(self,
-                 communication_service: ICommunicationServiceGame,
+                 communication_service: ICommunicationService,
                  ):
         self.communication_service = communication_service
         self.is_finished = False
@@ -31,7 +31,9 @@ class TestRunner:
         self.communication_service.init_socket(port)
 
     def run(self, port: int):
+        print("Running test runner")
         self.run_communication_service(port)
+        print("Communication service started")
 
     def stop(self):
         self.communication_service.stop_socket()
@@ -48,18 +50,6 @@ class TestRunner:
         self.communication_service.push_dict({"event": "get_state"})
         return self.communication_service.get_dict()
 
-    def given(self):
-        self.communication_service.push_dict({"event": "given"})
-        self.communication_service.get_int()
-
-    def when(self):
-        self.communication_service.push_dict({"event": "when"})
-        self.communication_service.get_int()
-
-    def then(self):
-        self.communication_service.push_dict({"event": "then"})
-        return self.communication_service.get_dict()
-
     def get_steps(self):
         self.communication_service.push_dict({"event": "get_steps"})
         return self.communication_service.get_dict()
@@ -67,6 +57,22 @@ class TestRunner:
     def push_args(self, args):
         self.communication_service.push_dict({"event": "args", "args": args})
         self.communication_service.get_int()
+
+    def reset(self):
+        self.communication_service.push_dict({"event": "reset"})
+        self.communication_service.get_int()
+
+    @abstractmethod
+    def given(self):
+        raise NotImplementedError
+
+    @abstractmethod
+    def when(self):
+        raise NotImplementedError
+
+    @abstractmethod
+    def then(self):
+        raise NotImplementedError
 
     @abstractmethod
     def episode_finished(self) -> bool:

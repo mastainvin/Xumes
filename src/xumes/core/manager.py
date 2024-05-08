@@ -19,8 +19,8 @@ from xumes.core.modes import TEST_MODE, TRAIN_MODE, RENDER_MODE
 from xumes.test_runner.assertion_bucket import AssertionReport
 from xumes.test_runner.feature_strategy import FeatureStrategy, Scenario
 from xumes.test_runner.i_communication_service_test_manager import ICommunicationServiceTestManager
-from xumes.test_runner.implementations.socket_impl.communication_service_game_socket import \
-    CommunicationServiceGameSocket
+from xumes.test_runner.implementations.socket_impl.communication_service_socket import \
+    CommunicationServiceSocket
 from xumes.test_runner.test_runner import TestRunner
 
 observation = create_registry()
@@ -90,7 +90,7 @@ class Manager:
         test_runner = self._feature_strategy.build_test_runner(mode=self._mode, timesteps=self._timesteps,
                                                                iterations=self._iterations, scenario=scenario,
                                                                test_queue=assertion_queue,
-                                                               comm_service=CommunicationServiceGameSocket(),
+                                                               comm_service=CommunicationServiceSocket(),
                                                                )
         scenario_data.test_runner = test_runner
         return test_runner

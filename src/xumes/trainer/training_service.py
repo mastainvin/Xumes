@@ -39,7 +39,7 @@ class TrainingService:
 
     @final
     def reset(self):
-        self._test_runner.when()
+        self._test_runner.reset()
 
     @final
     def push_actions(self, actions):

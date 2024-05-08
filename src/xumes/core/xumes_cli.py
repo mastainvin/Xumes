@@ -7,8 +7,10 @@ import click
 
 from xumes.core.modes import TRAIN_MODE, TEST_MODE, RENDER_MODE, FEATURE_MODE, SCENARIO_MODE
 from xumes.test_runner.feature_strategy import Feature, Scenario, DummyFeatureStrategy
-from xumes.test_runner.implementations.socket_impl.communication_service_game_socket import \
-    CommunicationServiceGameSocket
+from xumes.test_runner.implementations.features_impl.gherkin_feature_strategy import GherkinFeatureStrategy
+from xumes.test_runner.implementations.socket_impl.communication_service_socket import \
+    CommunicationServiceSocket
+from xumes.test_runner.test_manager import TestManager
 from xumes.trainer import VecStableBaselinesTrainerManager, StableBaselinesTrainerManager
 from xumes.trainer.trainer_manager import observation_registry, action_registry, reward_registry, terminated_registry, \
     config_registry
@@ -44,7 +46,8 @@ def get_debug_level(debug, info):
 @click.option("--trainers_path", default=None, type=click.Path(), help="Path of the ./trainers folder.")
 @click.option("--model_path", default=None, type=click.Path(), help="Path of the model.")
 @click.option("--alpha", "-a", default=0.001, help="Alpha of the training.")
-def test(debug, render, ip, port, model_path, features_path, trainers_path, timesteps, iterations, info, log, alpha, features,
+def test(debug, render, ip, port, model_path, features_path, trainers_path, timesteps, iterations, info, log, alpha,
+         features,
          scenarios,
          tags):
     # change start method to fork to avoid errors with multiprocessing
@@ -87,7 +90,7 @@ def test(debug, render, ip, port, model_path, features_path, trainers_path, time
         tags = tags.split(",")
         tags = [t.strip() for t in tags]
 
-    communication_service = CommunicationServiceGameSocket(host='127.0.0.1')
+    communication_service = CommunicationServiceSocket(host='127.0.0.1')
 
     feature = Feature(name="PipeSizeDelta")
     scenario = Scenario(feature=feature, name="0_100")
@@ -101,7 +104,8 @@ def test(debug, render, ip, port, model_path, features_path, trainers_path, time
     trainer_manager = StableBaselinesTrainerManager(mode=TEST_MODE,
                                                     trainers_path=trainers_path)
 
-    trainer = trainer_manager.create_trainer(test_runner, "PipeSizeTest", "scenario", observation_registry, action_registry,
+    trainer = trainer_manager.create_trainer(test_runner, "PipeSizeTest", "scenario", observation_registry,
+                                             action_registry,
                                              reward_registry, terminated_registry, config_registry)
 
     trainer.load(model_path)
@@ -116,9 +120,10 @@ def test(debug, render, ip, port, model_path, features_path, trainers_path, time
 @click.option("--port", default=5000, help="Port of the training server.")
 @click.option("--features_path", default=None, type=click.Path(), help="Path of the ./features folder.")
 @click.option("--trainers_path", default=None, type=click.Path(), help="Path of the ./trainers folder.")
+@click.option("--steps_path", default=None, type=click.Path(), help="Path of the ./steps folder.")
 @click.option("--model", default=None, type=click.Path(),
               help="Path of the model to load if you want to use a base model for your training.")
-def train(debug, trainers_path, mode, port, info, tensorboard, model, features_path):
+def train(debug, trainers_path, mode, steps_path, port, info, tensorboard, model, features_path):
     # change start method to fork to avoid errors with multiprocessing
     # Windows does not support the fork start method
     if platform.system() != "Windows":
@@ -134,24 +139,14 @@ def train(debug, trainers_path, mode, port, info, tensorboard, model, features_p
 
     mode = TRAIN_MODE
 
-    training_manager = None
-
-    communication_service = CommunicationServiceGameSocket(host='127.0.0.1')
-
-    feature = Feature(name="PipeSizeDelta")
-    scenario = Scenario(feature=feature, name="0_100")
-    feature_strategy = DummyFeatureStrategy()
-
-    test_runner = feature_strategy.build_test_runner(scenario=scenario, iterations=100, mode=mode,
-                                                     comm_service=communication_service)
-    test_runner.run(port=8081)
-
     trainer_manager = StableBaselinesTrainerManager(mode=mode,
                                                     trainers_path=trainers_path)
 
-    trainer = trainer_manager.create_trainer(test_runner, "PipeSizeTest", "scenario", observation_registry, action_registry,
-                                             reward_registry, terminated_registry, config_registry)
+    test_manager = TestManager(trainer_manager=trainer_manager,
+                               feature_strategy=GherkinFeatureStrategy(steps_path=steps_path),
+                               mode=mode,
+                               logging_level=logging_level,
+                               comm_service=CommunicationServiceSocket(host="127.0.0.1")
+                               )
 
-    trainer.train(
-        save_path=trainers_path+"/models")
-
+    test_manager.test_all(features_path)

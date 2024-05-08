@@ -8,11 +8,14 @@ from typing import List, Dict
 from xumes.core.colors import bcolors
 from xumes.core.modes import TEST_MODE, TRAIN_MODE, RENDER_MODE
 from xumes.test_runner.assertion_bucket import AssertionReport
-from xumes.test_runner.feature_strategy import FeatureStrategy, Scenario
-from xumes.test_runner.i_communication_service_test_manager import ICommunicationServiceTestManager
-from xumes.test_runner.implementations.socket_impl.communication_service_game_socket import \
-    CommunicationServiceGameSocket
+from xumes.test_runner.feature_strategy import FeatureStrategy, Scenario, given_registry, when_registry, then_registry
+from xumes.test_runner.i_communication_service import ICommunicationService
+from xumes.test_runner.implementations.socket_impl.communication_service_socket import \
+    CommunicationServiceSocket
+
 from xumes.test_runner.test_runner import TestRunner
+
+from xumes.trainer.trainer_manager import TrainerManager
 
 
 class ScenarioData:
@@ -43,15 +46,15 @@ class TestManager:
     Methods:
         get_port(feature: str, scenario: str) -> int:
             Retrieves the port number for a given feature and scenario.
-        add_game_service_data(steps: str, ip: str, port: int) -> None:
+        add_test_runner_data(steps: str, ip: str, port: int) -> None:
             Adds game service data to the list of game services data.
-        create_game_service(steps: str, ip: str, port: int) -> GameService:
+        create_test_runner(steps: str, ip: str, port: int) -> GameService:
             Creates a game service instance with the specified steps, IP, and port.
-        _build_game_service(test_runner, ip, port) -> GameService:
+        _build_test_runner(test_runner, ip, port) -> GameService:
             Abstract method to build a game service instance. Must be implemented by subclasses.
         test_all() -> None:
             Runs all the tests in the game environment.
-        delete_game_services() -> None:
+        delete_test_runners() -> None:
             Deletes all game service instances.
         run_test(steps: str, active_processes) -> None:
             Runs a test with the given steps.
@@ -59,11 +62,12 @@ class TestManager:
             Runs a test in render mode with the given steps.
     """
 
-    def __init__(self, communication_service: ICommunicationServiceTestManager, feature_strategy: FeatureStrategy,
+    def __init__(self, trainer_manager: TrainerManager, comm_service: ICommunicationService,
+                 feature_strategy: FeatureStrategy,
                  mode: str = TEST_MODE, timesteps=None, iterations=None, do_logs: bool = False,
                  logging_level=logging.NOTSET):
-
-        self._communication_service = communication_service
+        self.trainer_manager = trainer_manager
+        self._comm_service = comm_service
         self._scenario_datas: Dict[Scenario, ScenarioData] = {}
         self._mode = mode
         self._timesteps = timesteps
@@ -74,6 +78,8 @@ class TestManager:
         self._logging_level = logging_level
         self._delta_time = 0
 
+        self._comm_service.init_socket(5000)  # TODO : hardcoded port
+
     def get_free_port(self, scenario) -> int:
         # Get the port for a given feature and scenario
         if scenario not in self._scenario_datas:
@@ -81,26 +87,27 @@ class TestManager:
         else:
             return self._scenario_datas[scenario].port
 
-    def add_game_service_data(self, scenario: Scenario, ip: str, port: int):
+    def add_test_runner_data(self, scenario: Scenario, ip: str, port: int):
         # Add a game service data to the list of game services data
         self._scenario_datas[scenario] = ScenarioData(ip=ip, port=port)
 
-    def create_game_service(self, scenario: Scenario, scenario_data: ScenarioData, assertion_queue: multiprocess.Queue,
-                            ) -> TestRunner:
-        game_service = self._build_game_service(
-            self._feature_strategy.build_test_runner(mode=self._mode, timesteps=self._timesteps,
-                                                     iterations=self._iterations, scenario=scenario,
-                                                     test_queue=assertion_queue,
-                                                     do_logs=self._do_logs,
-                                                     ), scenario_data.ip, scenario_data.port, )
-        scenario_data.test_runner = game_service
-        return game_service
+    def create_test_runner(self, scenario: Scenario, assertion_queue: multiprocess.Queue,
+                           registry_queue: multiprocess.Queue
+                           ) -> TestRunner:
+        test_runner = self._feature_strategy.build_test_runner(mode=self._mode,
+                                                               timesteps=self._timesteps,
+                                                               iterations=self._iterations,
+                                                               scenario=scenario,
+                                                               test_queue=assertion_queue,
+                                                               registry_queue=registry_queue,
+                                                               comm_service=CommunicationServiceSocket(
+                                                                   host="127.0.0.1"))
+        # scenario_data.test_runner = test_runner
+
+        return test_runner
 
     def _init_logging(self):
         logging.basicConfig(format='%(levelname)s:%(message)s', level=self._logging_level)
-
-    def _build_game_service(self, test_runner, ip, port) -> TestRunner:
-        return TestRunner(communication_service=CommunicationServiceGameSocket(host="127.0.0.1"), )
 
     def test_all(self, path) -> None:
         test_time_start = time.time()
@@ -116,24 +123,24 @@ class TestManager:
 
             for scenario in feature.scenarios:
 
-                self._communication_service.connect_trainer(self, scenario)
+                self.add_test_runner_data(scenario=scenario, ip="127.0.0.1", port=0)
+
+                registry_queue = multiprocess.Queue()
+                registry_queue.put((given_registry, when_registry, then_registry))
 
                 if self._mode == TEST_MODE or self._mode == TRAIN_MODE:  # no render
                     process = multiprocess.Process(target=self.run_test, args=(
-                        scenario, active_processes, self._assertion_queue,
-                        self._scenario_datas[scenario].registry_queue,))
+                        scenario, self._scenario_datas[scenario], active_processes, self._assertion_queue,
+                        registry_queue,))
                 else:  # render
                     process = multiprocess.Process(target=self.run_test_render,
-                                                   args=(scenario, active_processes,
+                                                   args=(scenario, self._scenario_datas[scenario], active_processes,
                                                          self._assertion_queue,
-                                                         self._scenario_datas[scenario].registry_queue,
+                                                         registry_queue,
                                                          ))
                 process.start()
                 active_processes.value += 1
                 self._scenario_datas[scenario].process = process
-
-            # Send to the training manager that the training is started
-            self._communication_service.start_training(self)
 
             # Wait for all tests to be finished
             while active_processes.value > 0:
@@ -142,17 +149,14 @@ class TestManager:
             # Close all processes and delete all game services
             for scenario, scenario_data in self._scenario_datas.items():
                 scenario_data.process.kill()
-                self._communication_service.disconnect_trainer(self, scenario)
-            self._delete_game_services()
-            self._communication_service.reset(self)
+                self.trainer_manager.disconnect_trainer(scenario.feature.name, scenario.name)
+            self._delete_test_runners()
 
         test_time_end = time.time()
         self._delta_time = round(test_time_end - test_time_start, 3)
 
         if self._mode == TEST_MODE or self._mode == RENDER_MODE:
             self._assert()
-
-        self._communication_service.stop()
 
     def _assert(self):
 
@@ -186,31 +190,44 @@ class TestManager:
             print(f"{bcolors.OKGREEN}{header}")
             print(f"{bcolors.OKGREEN}{details}")
 
-    def _delete_game_services(self) -> None:
+    def _delete_test_runners(self) -> None:
         self._scenario_datas.clear()
 
-    def run_test(self, scenario: Scenario, active_processes, assertion_queue: multiprocess.Queue,
+    def run_test(self, scenario: Scenario, scenario_data: ScenarioData, active_processes,
+                 assertion_queue: multiprocess.Queue,
                  registry_queue: multiprocess.Queue) -> None:
         self._init_logging()
-        game_service = self.create_game_service(scenario, self._scenario_datas[scenario], assertion_queue,
-                                                registry_queue)
-        game_service.init_socket()
+
+        test_runner = self.create_test_runner(scenario, assertion_queue, registry_queue)
+
+        self._comm_service.push_dict({
+            "command": "start_scenario",
+            "name": scenario.feature.name,
+        })
+
+        port = self._comm_service.get_dict()["port"]
+        print("port", port)
+
+        scenario_data.port = port
+        test_runner.run(port)
+
+        self.trainer_manager.connect_trainer(test_runner, scenario.feature.name, scenario.name)
 
         with active_processes.get_lock():
             active_processes.value -= 1
 
-        game_service.stop_socket()
+        test_runner.stop()
 
-    def run_test_render(self, scenario: Scenario, active_processes, assertion_queue: multiprocess.Queue,
+    def run_test_render(self, scenario: Scenario, scenario_data: ScenarioData, active_processes,
+                        assertion_queue: multiprocess.Queue,
                         registry_queue: multiprocess.Queue) -> None:
         self._init_logging()
-        game_service = self.create_game_service(scenario, self._scenario_datas[scenario], assertion_queue,
-                                                registry_queue)
-        game_service.run_render()
+        test_runner = self.create_test_runner(scenario, assertion_queue, registry_queue)
+        test_runner.run(8081)
+
+        self.trainer_manager.connect_trainer(test_runner, scenario.feature.name, scenario.name)
 
         with active_processes.get_lock():
             active_processes.value -= 1
 
-        game_service.stop_socket()
-
-
+        test_runner.stop()

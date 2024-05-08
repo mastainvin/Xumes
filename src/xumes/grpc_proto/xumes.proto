@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+message Request {
+    string command = 1;
+    string name = 2;
+}
+
+message Response {
+    int32 port = 1;
+}
+
+service GameService {
+    rpc StartScenario(Request) returns (Response);
+}

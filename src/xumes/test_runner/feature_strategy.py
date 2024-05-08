@@ -6,9 +6,9 @@ from abc import ABC, abstractmethod
 from typing import List
 
 from xumes.core.modes import TEST_MODE, RENDER_MODE
-from xumes.test_runner.assertion import AssertionEqual
+from xumes.core.registry import create_registry_content, exec_registry_function
 from xumes.test_runner.assertion_bucket import AssertionBucket
-from xumes.test_runner.i_communication_service_game import ICommunicationServiceGame
+from xumes.test_runner.i_communication_service import ICommunicationService
 from xumes.test_runner.test_runner import TestRunner
 
 
@@ -29,28 +29,58 @@ class Feature:
         self.name = name
 
 
+given = create_registry_content()
+when = create_registry_content()
+then = create_registry_content()
+
+given_registry = given.all
+when_registry = when.all
+then_registry = then.all
+
+
 class FeatureStrategy(ABC):
     """
     FeatureStrategy is a class that implements the strategy pattern to define a way to get
     all features.
     """
 
-    def __init__(self, alpha: float = 0.001):
+    def __init__(self, alpha: float = 0.001, steps_path: str = "./"):
         self.features: List[Feature] = []
         self._steps_files: List[str] = []
 
+        self.given = given
+        self.when = when
+        self.then = then
+
         self._alpha = alpha
+        self._load_tests(steps_path)
+
+    def _load_tests(self, path: str = "./"):
+        for file in os.listdir(path):
+            if file.endswith(".py"):
+                module_path = os.path.join(path, file)
+                module_path = os.path.abspath(module_path)
+                module_name = os.path.basename(module_path)[:-3]
+
+                spec = importlib.util.spec_from_file_location(module_name, module_path)
+                module_dep = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(module_dep)
+
+                self._steps_files.append(file[:-3])
 
     def build_test_runner(self, timesteps: int = None, iterations: int = None,
                           mode: str = TEST_MODE, scenario: Scenario = None, test_queue: multiprocess.Queue = None,
-                          comm_service: ICommunicationServiceGame = None):
+                          comm_service: ICommunicationService = None, registry_queue: multiprocess.Queue = None):
         # Get steps
+        steps = scenario.steps
         feature_name = scenario.feature.name
         scenario_name = scenario.name
 
+        given_r, when_r, then_r = registry_queue.get()
+
         class ConcreteTestRunner(TestRunner):
             def __init__(self, number_max_of_steps: int = None, number_max_of_tests: int = None,
-                         communication_service: ICommunicationServiceGame = None, mode: str = TEST_MODE, ):
+                         communication_service: ICommunicationService = None, mode: str = TEST_MODE, ):
                 super().__init__(communication_service)
                 self._feature = feature_name
                 self._scenario = scenario_name
@@ -63,18 +93,56 @@ class FeatureStrategy(ABC):
                 self._assertion_bucket = AssertionBucket(test_name=f"{self._feature}/{self._scenario}",
                                                          queue=test_queue)
 
+            def given(self):
+                return exec_registry_function(registry=given_r[steps], game_context=self, scenario_name=scenario_name)
+
+            def when(self):
+                return exec_registry_function(registry=when_r[steps], game_context=self, scenario_name=scenario_name)
+
+            def then(self):
+                return exec_registry_function(registry=then_r[steps], game_context=self, scenario_name=scenario_name)
+
             def run(self, port: int):
                 super().run(port)
-                self.push_args({
-                    "when": {
-                        "first_pipe": 1,
-                        "second_pipe": 0
-                    }})
                 self.given()
                 self.when()
 
+            def assert_true(self, condition: bool) -> None:
+                self._assertion_bucket.assert_true(data=condition)
+
+            def assert_false(self, condition: bool) -> None:
+                self._assertion_bucket.assert_false(data=condition)
+
+            def assert_equal(self, actual, expected) -> None:
+                self._assertion_bucket.assert_equal(data=actual, expected=expected)
+
+            def assert_not_equal(self, actual, expected) -> None:
+                self._assertion_bucket.assert_not_equal(data=actual, expected=expected)
+
+            def assert_greater(self, actual, expected) -> None:
+                self._assertion_bucket.assert_greater_than(data=actual, expected=expected)
+
+            def assert_greater_equal(self, actual, expected) -> None:
+                self._assertion_bucket.assert_greater_than_or_equal(data=actual, expected=expected)
+
+            def assert_less(self, actual, expected) -> None:
+                self._assertion_bucket.assert_less_than(data=actual, expected=expected)
+
+            def assert_less_equal(self, actual, expected) -> None:
+                self._assertion_bucket.assert_less_than_or_equal(data=actual, expected=expected)
+
+            def assert_between(self, actual, expected_min, expected_max) -> None:
+                self._assertion_bucket.assert_between(data=actual, expected_min=expected_min, expected_max=expected_max)
+
+            def assert_not_between(self, actual, expected_min, expected_max) -> None:
+                self._assertion_bucket.assert_not_between(data=actual, expected_min=expected_min,
+                                                          expected_max=expected_max)
+
             def _test_finished(self) -> bool:
-                return self._number_of_tests >= self._number_max_of_tests
+                if self._mode == TEST_MODE:
+                    return self._number_of_steps >= self._number_max_of_steps
+                else:
+                    return False
 
             def episode_finished(self) -> bool:
                 # when an episode is finished, we collect the assertions

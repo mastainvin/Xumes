@@ -15,8 +15,8 @@ class GherkinFeatureStrategy(FeatureStrategy):
     It also implements a way to filter the features and scenarios that we want to run.
     """
     def __init__(self, alpha: float = 0.001, features_names: List[str] = None, scenarios_names: List[str] = None,
-                 tags: List[str] = None):
-        super().__init__(alpha)
+                 tags: List[str] = None, steps_path: str = "./"):
+        super().__init__(alpha, steps_path)
         self._selected_features: List[str] = features_names
         self._selected_scenarios: List[str] = scenarios_names
         self._selected_tags: List[str] = tags
@@ -44,8 +44,8 @@ class GherkinFeatureStrategy(FeatureStrategy):
         for feature_file in feature_files:
             if self._selected_features is None or feature_file[:-8] in self._selected_features:
                 # We open the feature file and compile him
-                path = os.path.join("./features", feature_file)
-                with open(path, 'r') as file:
+                feature_path = os.path.join(path, feature_file)
+                with open(feature_path, 'r') as file:
                     feature = parser.parse(TokenScanner(file.read()))['feature']
 
                     # We create a Feature object

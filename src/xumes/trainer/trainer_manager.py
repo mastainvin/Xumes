@@ -75,7 +75,7 @@ class TrainerManager:
     #  for the moment. TODO find a pattern to avoid this
 
     @abstractmethod
-    def connect_trainer(self, feature: str, scenario: str) -> None:
+    def connect_trainer(self, test_runner: TestRunner, feature: str, scenario: str) -> None:
         # Create a new process to train or use an agent
         raise NotImplementedError
 
@@ -85,12 +85,12 @@ class TrainerManager:
         raise NotImplementedError
 
     @abstractmethod
-    def create_and_train(self, feature: str, scenario: str, queue: multiprocess.Queue):
+    def create_and_train(self, test_runner: TestRunner, feature: str, scenario: str, queue: multiprocess.Queue):
         # Create a new trainer and train it
         raise NotImplementedError
 
     @abstractmethod
-    def create_and_play(self, feature: str, scenario: str, queue: multiprocess.Queue):
+    def create_and_play(self, test_runner: TestRunner, feature: str, scenario: str, queue: multiprocess.Queue):
         # Create a new trainer and play it
         raise NotImplementedError
 
@@ -168,7 +168,7 @@ class StableBaselinesTrainerManager(TrainerManager):
 
         return trainer
 
-    def connect_trainer(self, feature: str, scenario: str) -> None:
+    def connect_trainer(self, test_runner: TestRunner, feature: str, scenario: str) -> None:
         # Create a new process to train or  use an agent
         name = self._trainer_name(feature, scenario)
 
@@ -177,9 +177,9 @@ class StableBaselinesTrainerManager(TrainerManager):
             (observation_registry, action_registry, reward_registry, terminated_registry, config_registry))
 
         if self._mode == TRAIN_MODE:
-            self.create_and_train(feature, scenario, registry_queue)
+            self.create_and_train(test_runner, feature, scenario, registry_queue)
         elif self._mode == TEST_MODE:
-            self.create_and_play(feature, scenario, registry_queue)
+            self.create_and_play(test_runner, feature, scenario, registry_queue)
 
     def disconnect_trainer(self, feature: str, scenario: str) -> None:
         # Terminate the process
@@ -189,22 +189,22 @@ class StableBaselinesTrainerManager(TrainerManager):
             self._trainer_processes[name].join()
             del self._trainer_processes[name]
 
-    def create_and_train(self, feature: str, scenario: str, queue: multiprocess.Queue):
+    def create_and_train(self, test_runner: TestRunner, feature: str, scenario: str, queue: multiprocess.Queue):
         self._init_logger()
         # Create a new trainer and train it
         observation_r, action_r, reward_r, terminated_r, config_r = queue.get()
-        trainer = self.create_trainer(feature, scenario, observation_r, action_r, reward_r, terminated_r,
+        trainer = self.create_trainer(test_runner, feature, scenario, observation_r, action_r, reward_r, terminated_r,
                                       config_r)
         trainer.train(self._model_path(feature, scenario),
                       logs_path=self._model_path(feature, scenario) + "/../_logs" if self._do_logs else None,
                       logs_name=scenario, previous_model_path=self._previous_model_path)
 
-    def create_and_play(self, feature: str, scenario: str, queue: multiprocess.Queue):
+    def create_and_play(self, test_runner: TestRunner, feature: str, scenario: str, queue: multiprocess.Queue):
         self._init_logger()
         # Create a new trainer and play it
         logging.basicConfig(format='%(levelname)s:%(message)s', level=self._logging_level)
         observation_r, action_r, reward_r, terminated_r, config_r = queue.get()
-        trainer = self.create_trainer(feature, scenario, observation_r, action_r, reward_r, terminated_r,
+        trainer = self.create_trainer(test_runner, feature, scenario, observation_r, action_r, reward_r, terminated_r,
                                       config_r)
         trainer.load(self._model_path(feature, scenario) + "/best_model")
         trainer.play(timesteps=None)
@@ -234,7 +234,7 @@ class VecStableBaselinesTrainerManager(StableBaselinesTrainerManager):
         self._trained_feature = None
         self._process = None
 
-    def connect_trainer(self, feature: str, scenario: str) -> None:
+    def connect_trainer(self, test_runner: TestRunner, feature: str, scenario: str) -> None:
         # Add a new training service to the vectorized trainer
         if self._trained_feature is None:
             self._trained_feature = feature

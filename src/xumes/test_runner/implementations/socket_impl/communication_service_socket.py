@@ -4,10 +4,10 @@ from time import sleep
 from typing import Dict, Any
 
 from xumes.core.utils import parse_json_with_eval
-from xumes.test_runner.i_communication_service_game import ICommunicationServiceGame
+from xumes.test_runner.i_communication_service import ICommunicationService
 
 
-class CommunicationServiceGameSocket(ICommunicationServiceGame):
+class CommunicationServiceSocket(ICommunicationService):
 
     def __init__(self, host: str):
         self.host = host
@@ -37,8 +37,13 @@ class CommunicationServiceGameSocket(ICommunicationServiceGame):
 
     def init_socket(self, port) -> None:
         self.socket = socket(AF_INET, SOCK_STREAM)
-        self.socket.settimeout(None)
-        self.socket.connect((self.host, port))
+        self.socket.settimeout(1000)
+        while True:
+            try:
+                self.socket.connect((self.host, port))
+                break
+            except:
+                sleep(0.001)
         self.is_running = True
 
     def stop_socket(self) -> None:
@@ -47,5 +52,3 @@ class CommunicationServiceGameSocket(ICommunicationServiceGame):
         """
         self.is_running = False
         self.socket.close()
-
-

@@ -1,4 +1,6 @@
-from xumes.trainer.trainer_manager import observation, reward, action, config, terminated, StableBaselinesTrainerManager, VecStableBaselinesTrainerManager
+from xumes.trainer.trainer_manager import observation, reward, action, config, terminated, StableBaselinesTrainerManager, VecStableBaselinesTrainerManager, TrainerManager
+
+
 from gymnasium.envs.registration import register
 
 register(
