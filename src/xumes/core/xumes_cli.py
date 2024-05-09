@@ -8,6 +8,7 @@ import click
 from xumes.core.modes import TRAIN_MODE, TEST_MODE, RENDER_MODE, FEATURE_MODE, SCENARIO_MODE
 from xumes.test_runner.feature_strategy import Feature, Scenario, DummyFeatureStrategy
 from xumes.test_runner.implementations.features_impl.gherkin_feature_strategy import GherkinFeatureStrategy
+from xumes.test_runner.implementations.rest_impl.communication_service_rest import CommunicationServiceRest
 from xumes.test_runner.implementations.socket_impl.communication_service_socket import \
     CommunicationServiceSocket
 from xumes.test_runner.test_manager import TestManager
@@ -146,7 +147,7 @@ def train(debug, trainers_path, mode, steps_path, port, info, tensorboard, model
                                feature_strategy=GherkinFeatureStrategy(steps_path=steps_path),
                                mode=mode,
                                logging_level=logging_level,
-                               comm_service=CommunicationServiceSocket(host="127.0.0.1")
+                               comm_service=CommunicationServiceRest(host="127.0.0.1", port=8080)
                                )
 
     test_manager.test_all(features_path)

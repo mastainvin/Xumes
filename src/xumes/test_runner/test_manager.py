@@ -62,7 +62,7 @@ class TestManager:
             Runs a test in render mode with the given steps.
     """
 
-    def __init__(self, trainer_manager: TrainerManager, comm_service: ICommunicationService,
+    def __init__(self, trainer_manager: TrainerManager, comm_service,
                  feature_strategy: FeatureStrategy,
                  mode: str = TEST_MODE, timesteps=None, iterations=None, do_logs: bool = False,
                  logging_level=logging.NOTSET):
@@ -78,7 +78,6 @@ class TestManager:
         self._logging_level = logging_level
         self._delta_time = 0
 
-        self._comm_service.init_socket(5000)  # TODO : hardcoded port
 
     def get_free_port(self, scenario) -> int:
         # Get the port for a given feature and scenario
@@ -200,12 +199,8 @@ class TestManager:
 
         test_runner = self.create_test_runner(scenario, assertion_queue, registry_queue)
 
-        self._comm_service.push_dict({
-            "command": "start_scenario",
-            "name": scenario.feature.name,
-        })
+        port = self._comm_service.start_scenario(scenario.feature.name)
 
-        port = self._comm_service.get_dict()["port"]
         print("port", port)
 
         scenario_data.port = port
