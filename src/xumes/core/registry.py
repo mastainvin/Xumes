@@ -35,8 +35,10 @@ def exec_registry_function(registry: List[Step], game_context, scenario_name: st
     :param registry:  of functions
     :param game_context: where the functions will be executed
     """
+    return_value = {}
     for r in registry:
-        r.func(game_context, **r.params[scenario_name])
+        return_value[r] = r.func(game_context, **r.params[scenario_name])
+    return return_value
 
 
 def get_content_from_registry(registry: List[Step]):

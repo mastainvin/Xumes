@@ -7,38 +7,38 @@ from stable_baselines3.common.vec_env import SubprocVecEnv, DummyVecEnv, VecEnvW
 
 from xumes.core.errors.running_ends_error import RunningEndsError
 from xumes.trainer.i_trainer import ITrainer
-from xumes.trainer.training_service import MarkovTrainingService
+from xumes.trainer.implementations import StableBaselinesTrainer
 
 
 class VecStableBaselinesTrainer(ITrainer):
 
     def __init__(self):
         self._vec_env = None
-        self._markov_training_services: List[MarkovTrainingService] = []
+        self._trainers: List[StableBaselinesTrainer] = []
         self._envs = []
-        self._first_training_service = None
+        self._first_trainer = None
         self.model = None
 
-    def add_training_service(self, training_service):
-        self._markov_training_services.append(training_service)
-        if self._first_training_service is None:
-            self._first_training_service = training_service
-        self._envs.append(lambda: training_service.env)
+    def add_trainer(self, trainer: StableBaselinesTrainer):
+        self._trainers.append(trainer)
+        if self._first_trainer is None:
+            self._first_trainer = trainer
+        self._envs.append(lambda: trainer.env)
 
     def make(self):
         self._vec_env = DummyVecEnv(self._envs)
 
     def train(self, save_path: str = None, eval_freq: int = 10000, logs_path: Optional[str] = None,
               logs_name: Optional[str] = None, previous_model_path: Optional[str] = None):
-        if self._first_training_service is None:
+        if self._first_trainer is None:
             raise Exception("No training services added")
 
         if self._vec_env is None:
             self.make()
 
-        algorithm = self._first_training_service.algorithm
-        algorithm_type = self._first_training_service.algorithm_type
-        total_timesteps = self._first_training_service.total_timesteps
+        algorithm = self._first_trainer.algorithm
+        algorithm_type = self._first_trainer.algorithm_type
+        total_timesteps = self._first_trainer.total_timesteps
 
         eval_callback = None
         if save_path:
@@ -60,21 +60,21 @@ class VecStableBaselinesTrainer(ITrainer):
                 tb_log_name=logs_name
             )
 
-        for training_service in self._markov_training_services:
-            training_service.finished()
+        for trainer in self._trainers:
+            trainer.finished()
 
     def save(self, path: str):
         self.model.save(path)
 
     def load(self, path: str):
-        if self._first_training_service is None:
+        if self._first_trainer is None:
             raise Exception("No training services added")
 
         if self._vec_env is None:
             self.make()
 
-        algorithm = self._first_training_service.algorithm
-        algorithm_type = self._first_training_service.algorithm_type
+        algorithm = self._first_trainer.algorithm
+        algorithm_type = self._first_trainer.algorithm_type
 
         self.model = algorithm(algorithm_type, self._vec_env, verbose=1).load(path, env=self._vec_env)
 

@@ -1,11 +1,13 @@
 import importlib.util
 import json
+import sys
+
 import multiprocess
 import os
 from abc import ABC, abstractmethod
 from typing import List
 
-from xumes.core.modes import TEST_MODE, RENDER_MODE
+from xumes.core.modes import TEST_MODE
 from xumes.core.registry import create_registry_content, exec_registry_function
 from xumes.test_runner.assertion_bucket import AssertionBucket
 from xumes.test_runner.i_communication_service import ICommunicationService
@@ -27,6 +29,7 @@ class Feature:
             scenarios = []
         self.scenarios: List[Scenario] = scenarios
         self.name = name
+        self.processes = []
 
 
 given = create_registry_content()
@@ -56,6 +59,13 @@ class FeatureStrategy(ABC):
         self._load_tests(steps_path)
 
     def _load_tests(self, path: str = "./"):
+        # Récupérer le chemin absolu du répertoire courant
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+
+        # Ajouter le chemin du répertoire parent (contenant les dépendances) au chemin de recherche des modules
+        parent_dir = os.path.abspath(os.path.join(current_dir, ".."))
+        sys.path.insert(0, parent_dir)
+
         for file in os.listdir(path):
             if file.endswith(".py"):
                 module_path = os.path.join(path, file)

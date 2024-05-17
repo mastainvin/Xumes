@@ -31,15 +31,13 @@ class TestRunner:
         self.communication_service.init_socket(port)
 
     def run(self, port: int):
-        print("Running test runner")
         self.run_communication_service(port)
-        print("Communication service started")
 
     def stop(self):
         self.communication_service.stop_socket()
 
     def finish(self):
-        self.communication_service.push_dict({"event": "finish"})
+        self.communication_service.push_dict({"event": "stop"})
         self.communication_service.get_int()
 
     def push_actions_and_get_state(self, actions: List):
