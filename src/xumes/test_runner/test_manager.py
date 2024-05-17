@@ -1,21 +1,18 @@
 import logging
 import time
+from abc import abstractmethod
 
 import multiprocess
-from abc import abstractmethod
 from typing import List, Dict
 
 from xumes.core.colors import bcolors
-from xumes.core.modes import TEST_MODE, TRAIN_MODE, RENDER_MODE
+from xumes.core.modes import TEST_MODE, RENDER_MODE
 from xumes.test_runner.assertion_bucket import AssertionReport
-from xumes.test_runner.feature_strategy import FeatureStrategy, Scenario, given_registry, when_registry, then_registry
-from xumes.test_runner.i_communication_service import ICommunicationService
+from xumes.test_runner.feature_strategy import FeatureStrategy, Scenario
 from xumes.test_runner.implementations.socket_impl.communication_service_socket import \
     CommunicationServiceSocket
 
 from xumes.test_runner.test_runner import TestRunner
-
-from xumes.trainer.trainer_manager import TrainerManager
 
 
 class ScenarioData:
@@ -62,11 +59,10 @@ class TestManager:
             Runs a test in render mode with the given steps.
     """
 
-    def __init__(self, trainer_manager: TrainerManager, comm_service,
+    def __init__(self, comm_service,
                  feature_strategy: FeatureStrategy,
                  mode: str = TEST_MODE, timesteps=None, iterations=None, do_logs: bool = False,
                  logging_level=logging.NOTSET):
-        self.trainer_manager = trainer_manager
         self._comm_service = comm_service
         self._scenario_datas: Dict[Scenario, ScenarioData] = {}
         self._mode = mode
@@ -77,7 +73,6 @@ class TestManager:
         self._do_logs = do_logs
         self._logging_level = logging_level
         self._delta_time = 0
-
 
     def get_free_port(self, scenario) -> int:
         # Get the port for a given feature and scenario
@@ -115,55 +110,41 @@ class TestManager:
         self._feature_strategy.retrieve_feature(path)
         features = self._feature_strategy.features
 
-        # For all scenarios, we run the test
+        # Check if all tests are finished
+        active_processes = multiprocess.Value('i', 0)
+
+        # For all scenarios in each feature, we run the test
         for feature in features:
-            # Check if all tests are finished
-            active_processes = multiprocess.Value('i', 0)
+            self._run_feature(feature, active_processes)
 
-            for scenario in feature.scenarios:
+        # Wait for all tests to be finished
+        while active_processes.value > 0:
+            pass
 
-                self.add_test_runner_data(scenario=scenario, ip="127.0.0.1", port=0)
+        # Close all processes
+        for feature in features:
+            for process in feature.processes:
+                process.kill()
 
-                registry_queue = multiprocess.Queue()
-                registry_queue.put((given_registry, when_registry, then_registry))
-
-                if self._mode == TEST_MODE or self._mode == TRAIN_MODE:  # no render
-                    process = multiprocess.Process(target=self.run_test, args=(
-                        scenario, self._scenario_datas[scenario], active_processes, self._assertion_queue,
-                        registry_queue,))
-                else:  # render
-                    process = multiprocess.Process(target=self.run_test_render,
-                                                   args=(scenario, self._scenario_datas[scenario], active_processes,
-                                                         self._assertion_queue,
-                                                         registry_queue,
-                                                         ))
-                process.start()
-                active_processes.value += 1
-                self._scenario_datas[scenario].process = process
-
-            # Wait for all tests to be finished
-            while active_processes.value > 0:
-                pass
-
-            # Close all processes and delete all game services
-            for scenario, scenario_data in self._scenario_datas.items():
-                scenario_data.process.kill()
-                self.trainer_manager.disconnect_trainer(scenario.feature.name, scenario.name)
-            self._delete_test_runners()
+        # self.trainer_manager.disconnect_trainer(scenario.feature.name, scenario.name) TODO : see if we need to disconnect
 
         test_time_end = time.time()
         self._delta_time = round(test_time_end - test_time_start, 3)
 
         if self._mode == TEST_MODE or self._mode == RENDER_MODE:
             self._assert()
+        else:
+            print(f"{bcolors.OKGREEN}Training finished in {self._delta_time}s.{bcolors.ENDC}")
 
     def _assert(self):
+        # Make assertions
 
         results: List[AssertionReport] = []
         successes = 0
         tests_passed_names = ''
         error_logs = ''
 
+        # Gather all assertion reports
         while not self._assertion_queue.empty():
             assertion_report = self._assertion_queue.get()
             if assertion_report is None:
@@ -189,40 +170,6 @@ class TestManager:
             print(f"{bcolors.OKGREEN}{header}")
             print(f"{bcolors.OKGREEN}{details}")
 
-    def _delete_test_runners(self) -> None:
-        self._scenario_datas.clear()
-
-    def run_test(self, scenario: Scenario, scenario_data: ScenarioData, active_processes,
-                 assertion_queue: multiprocess.Queue,
-                 registry_queue: multiprocess.Queue) -> None:
-        self._init_logging()
-
-        test_runner = self.create_test_runner(scenario, assertion_queue, registry_queue)
-
-        port = self._comm_service.start_scenario(scenario.feature.name)
-
-        print("port", port)
-
-        scenario_data.port = port
-        test_runner.run(port)
-
-        self.trainer_manager.connect_trainer(test_runner, scenario.feature.name, scenario.name)
-
-        with active_processes.get_lock():
-            active_processes.value -= 1
-
-        test_runner.stop()
-
-    def run_test_render(self, scenario: Scenario, scenario_data: ScenarioData, active_processes,
-                        assertion_queue: multiprocess.Queue,
-                        registry_queue: multiprocess.Queue) -> None:
-        self._init_logging()
-        test_runner = self.create_test_runner(scenario, assertion_queue, registry_queue)
-        test_runner.run(8081)
-
-        self.trainer_manager.connect_trainer(test_runner, scenario.feature.name, scenario.name)
-
-        with active_processes.get_lock():
-            active_processes.value -= 1
-
-        test_runner.stop()
+    @abstractmethod
+    def _run_feature(self, feature, active_processes):
+        raise NotImplementedError

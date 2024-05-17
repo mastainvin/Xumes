@@ -10,19 +10,15 @@ from stable_baselines3.common.monitor import Monitor
 # noinspection PyUnresolvedReferences
 import xumes
 from xumes.core.errors.running_ends_error import RunningEndsError
-from xumes.test_runner.test_runner import TestRunner
-
-from xumes.trainer.entity_manager import EntityManager
-from xumes.trainer.training_service import MarkovTrainingService
+from xumes.trainer.implementations.rl_impl.agent_trainer import AgentTrainer
 
 OBST = TypeVar("OBST")
 
 
-class StableBaselinesTrainer(MarkovTrainingService, ABC):
+class StableBaselinesTrainer(AgentTrainer, ABC):
 
     def __init__(self,
-                 entity_manager: EntityManager,
-                 test_runner: TestRunner,
+                 agent,
                  observation_space=None,
                  action_space=None,
                  max_episode_length: int = 1000,
@@ -30,7 +26,7 @@ class StableBaselinesTrainer(MarkovTrainingService, ABC):
                  algorithm_type: str = "MultiInputPolicy",
                  algorithm=stable_baselines3.PPO,
                  ):
-        super().__init__(entity_manager, test_runner)
+        super().__init__(agent)
         if observation_space is not None and action_space is not None:
             self.env = Monitor(gym.make(
                 id="xumes-v0",
@@ -45,6 +41,12 @@ class StableBaselinesTrainer(MarkovTrainingService, ABC):
 
         self.model = None
 
+        self.observation_space = observation_space
+        self.action_space = action_space
+        self.max_episode_length = max_episode_length
+
+        self.made = False
+
     @final
     def make(self):
         if self.observation_space is None or self.action_space is None:
@@ -56,9 +58,14 @@ class StableBaselinesTrainer(MarkovTrainingService, ABC):
             observation_space=self.observation_space,
             action_space=self.action_space,
         ), filename=None, allow_early_resets=True)
+        self.made = True
 
     def train(self, save_path: str = None, eval_freq: int = 10000, logs_path: Optional[str] = None,
               logs_name: Optional[str] = None, previous_model_path: Optional[str] = None):
+
+        if not self.made:
+            self.make()
+
         eval_callback = None
         if save_path:
             eval_callback = EvalCallback(self.env, best_model_save_path=save_path,
@@ -88,6 +95,10 @@ class StableBaselinesTrainer(MarkovTrainingService, ABC):
         self.model = self.algorithm(self.algorithm_type, self.env, verbose=1).load(path, env=self.env)
 
     def play(self, timesteps: Optional[int] = None):
+
+        if not self.made:
+            self.make()
+
         obs, _ = self.env.reset()
 
         def step():
@@ -106,3 +117,6 @@ class StableBaselinesTrainer(MarkovTrainingService, ABC):
         else:
             for _ in range(timesteps):
                 step()
+
+    def finished(self):
+        self.agent.game_service().finished()

@@ -1,15 +1,13 @@
 import logging
-from abc import abstractmethod, ABC
-from typing import TypeVar, final, List
+from typing import TypeVar, final
 
 from xumes.trainer.entity_manager import EntityManager
-from xumes.trainer.i_trainer import ITrainer
 from xumes.test_runner.test_runner import TestRunner
 
 OBST = TypeVar("OBST")
 
 
-class TrainingService:
+class GameService:
     """
     The `TrainingService` class is responsible for managing the training process of a game.
 
@@ -41,10 +39,10 @@ class TrainingService:
     def reset(self):
         self._test_runner.reset()
 
-    @final
-    def push_actions(self, actions):
-        logging.debug(f"Pushing actions: {actions}")
-        self._test_runner.push_actions(actions)
+    # @final
+    # def push_actions(self, actions):
+    #     logging.debug(f"Pushing actions: {actions}")
+    #     self._test_runner.push_actions(actions)
 
     @final
     def push_action_and_get_state(self, actions):
@@ -89,42 +87,3 @@ class TrainingService:
         return self.get_entity(item)
 
 
-class MarkovTrainingService(TrainingService, ITrainer, ABC):  # TODO Move class to implementations folder
-
-    @final
-    def reward(self):
-        return self.convert_reward()
-
-    @final
-    def terminated(self):
-        return self.convert_terminated() or self._entity_manager.game_state == "reset" or self._entity_manager.game_state == "random_reset"
-
-    @final
-    def push_raw_actions(self, actions):
-        self.push_actions(actions=self.convert_actions(actions))
-
-    @final
-    def get_obs(self) -> OBST:
-        self.retrieve_state()
-        return self.convert_obs()
-
-    @final
-    def push_actions_and_get_obs(self, actions) -> OBST:
-        self.push_action_and_get_state(self.convert_actions(actions))
-        return self.convert_obs()
-
-    @abstractmethod
-    def convert_obs(self) -> OBST:
-        raise NotImplementedError
-
-    @abstractmethod
-    def convert_reward(self) -> float:
-        raise NotImplementedError
-
-    @abstractmethod
-    def convert_terminated(self) -> bool:
-        raise NotImplementedError
-
-    @abstractmethod
-    def convert_actions(self, raws_actions) -> List[str]:
-        raise NotImplementedError
