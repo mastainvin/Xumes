@@ -1,9 +1,9 @@
 from abc import abstractmethod
 
 from xumes.test_runner.test_runner import TestRunner
-from xumes.trainer.entity_manager import AutoEntityManager
-from xumes.trainer.game_service import GameService
-from xumes.trainer.implementations.json_impl.json_game_element_state_converter import JsonGameElementStateConverter
+from xumes.behavior.entity_manager import AutoEntityManager
+from xumes.behavior.game_service import GameService
+from xumes.behavior.implementations.json_impl.json_game_element_state_converter import JsonGameElementStateConverter
 
 
 class Behavior:

@@ -40,7 +40,7 @@ When you have implemented your trainers files, you can start the trainer.
 To start the trainer you need to run the following command:
 
 ```bash
-$ python -m xumes trainer [options]
+$ python -m xumes behavior [options]
 ```
 
 The options are:

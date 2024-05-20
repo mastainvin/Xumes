@@ -1,7 +1,7 @@
 import logging
 from typing import TypeVar, final
 
-from xumes.trainer.entity_manager import EntityManager
+from xumes.behavior.entity_manager import EntityManager
 from xumes.test_runner.test_runner import TestRunner
 
 OBST = TypeVar("OBST")
@@ -37,6 +37,7 @@ class GameService:
 
     @final
     def reset(self):
+        self._test_runner.given()
         self._test_runner.reset()
 
     # @final

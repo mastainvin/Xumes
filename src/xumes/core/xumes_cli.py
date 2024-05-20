@@ -1,15 +1,14 @@
 import logging
-import os
 import platform
 from multiprocessing import set_start_method
 
 import click
 
-from xumes.core.modes import TRAIN_MODE, FEATURE_MODE, SCENARIO_MODE
+from xumes.core.modes import TRAIN_MODE
 from xumes.test_runner.implementations.features_impl.gherkin_feature_strategy import GherkinFeatureStrategy
 from xumes.test_runner.implementations.rest_impl.communication_service_rest import CommunicationServiceRest
-from xumes.test_runner.test_manager import TestManager, VecRLTestManager, RLTestManager
-
+from xumes.modules.reinforcement_learning.rl_test_manager import RLTestManager
+from xumes.modules.reinforcement_learning.vec_rl_test_manager import VecRLTestManager
 
 
 @click.group()
@@ -99,12 +98,12 @@ def test(debug, render, ip, port, model_path, features_path, trainers_path, time
     # trainer_manager = StableBaselinesTrainerManager(mode=TEST_MODE,
     #                                                 trainers_path=trainers_path)
     #
-    # trainer = trainer_manager.create_trainer(test_runner, "PipeSizeTest", "scenario", observation_registry,
+    # behavior = trainer_manager.create_trainer(test_runner, "PipeSizeTest", "scenario", observation_registry,
     #                                          action_registry,
     #                                          reward_registry, terminated_registry, config_registry)
     #
-    # trainer.load(model_path)
-    # trainer.play()
+    # behavior.load(model_path)
+    # behavior.play()
 
 
 @cli.command()

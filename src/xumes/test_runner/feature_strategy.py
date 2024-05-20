@@ -8,7 +8,7 @@ from abc import ABC, abstractmethod
 from typing import List
 
 from xumes.core.modes import TEST_MODE
-from xumes.core.registry import create_registry_content, exec_registry_function
+from xumes.core.registry import create_registry_content, exec_registry_function, create_registry
 from xumes.test_runner.assertion_bucket import AssertionBucket
 from xumes.test_runner.i_communication_service import ICommunicationService
 from xumes.test_runner.test_runner import TestRunner
@@ -32,10 +32,12 @@ class Feature:
         self.processes = []
 
 
+config = create_registry()
 given = create_registry_content()
 when = create_registry_content()
 then = create_registry_content()
 
+config_registry = config.all
 given_registry = given.all
 when_registry = when.all
 then_registry = then.all
@@ -54,15 +56,14 @@ class FeatureStrategy(ABC):
         self.given = given
         self.when = when
         self.then = then
+        self.config = config
 
         self._alpha = alpha
         self._load_tests(steps_path)
 
     def _load_tests(self, path: str = "./"):
-        # Récupérer le chemin absolu du répertoire courant
         current_dir = os.path.dirname(os.path.abspath(__file__))
 
-        # Ajouter le chemin du répertoire parent (contenant les dépendances) au chemin de recherche des modules
         parent_dir = os.path.abspath(os.path.join(current_dir, ".."))
         sys.path.insert(0, parent_dir)
 
@@ -86,7 +87,7 @@ class FeatureStrategy(ABC):
         feature_name = scenario.feature.name
         scenario_name = scenario.name
 
-        given_r, when_r, then_r = registry_queue.get()
+        config_r, given_r, when_r, then_r = registry_queue.get()
 
         class ConcreteTestRunner(TestRunner):
             def __init__(self, number_max_of_steps: int = None, number_max_of_tests: int = None,
@@ -103,19 +104,18 @@ class FeatureStrategy(ABC):
                 self._assertion_bucket = AssertionBucket(test_name=f"{self._feature}/{self._scenario}",
                                                          queue=test_queue)
 
+            def config(self):
+                config_r[steps](self)
+                return self.driver()
+
             def given(self):
-                return exec_registry_function(registry=given_r[steps], game_context=self, scenario_name=scenario_name)
+                exec_registry_function(registry=given_r[steps], game_context=self, scenario_name=scenario_name)
 
             def when(self):
                 return exec_registry_function(registry=when_r[steps], game_context=self, scenario_name=scenario_name)
 
             def then(self):
                 return exec_registry_function(registry=then_r[steps], game_context=self, scenario_name=scenario_name)
-
-            def run(self, port: int):
-                super().run(port)
-                self.given()
-                self.when()
 
             def assert_true(self, condition: bool) -> None:
                 self._assertion_bucket.assert_true(data=condition)

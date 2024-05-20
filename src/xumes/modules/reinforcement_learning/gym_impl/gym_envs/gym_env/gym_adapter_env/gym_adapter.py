@@ -6,7 +6,7 @@ import gymnasium as gym
 from gymnasium import Space
 from gymnasium.core import RenderFrame, ActType, ObsType
 
-from xumes.trainer.implementations.rl_impl.agent_trainer import AgentTrainer
+from xumes.modules.reinforcement_learning.agent_trainer import AgentTrainer
 
 
 class GymAdapter(gym.Env):

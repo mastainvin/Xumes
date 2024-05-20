@@ -10,7 +10,7 @@ from stable_baselines3.common.monitor import Monitor
 # noinspection PyUnresolvedReferences
 import xumes
 from xumes.core.errors.running_ends_error import RunningEndsError
-from xumes.trainer.implementations.rl_impl.agent_trainer import AgentTrainer
+from xumes.modules.reinforcement_learning.agent_trainer import AgentTrainer
 
 OBST = TypeVar("OBST")
 
@@ -60,7 +60,7 @@ class StableBaselinesTrainer(AgentTrainer, ABC):
         ), filename=None, allow_early_resets=True)
         self.made = True
 
-    def train(self, save_path: str = None, eval_freq: int = 10000, logs_path: Optional[str] = None,
+    def train(self, save_path: str = None, eval_freq: int = 1000, logs_path: Optional[str] = None,
               logs_name: Optional[str] = None, previous_model_path: Optional[str] = None):
 
         if not self.made:

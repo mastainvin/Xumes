@@ -1,6 +1,12 @@
 from abc import abstractmethod
 from typing import List
+
+from xumes.test_runner.driver import Driver
 from xumes.test_runner.i_communication_service import ICommunicationService
+
+
+class Behavior:
+    pass
 
 
 class TestRunner:
@@ -26,6 +32,7 @@ class TestRunner:
                  ):
         self.communication_service = communication_service
         self.is_finished = False
+        self.driver = Driver()
 
     def run_communication_service(self, port: int):
         self.communication_service.init_socket(port)
@@ -40,8 +47,15 @@ class TestRunner:
         self.communication_service.push_dict({"event": "stop"})
         self.communication_service.get_int()
 
+    def push_methods(self, methods: List):
+        self.communication_service.push_dict({"event": "methods", "methods": methods})
+        # self.communication_service.get_int()
+
     def push_actions_and_get_state(self, actions: List):
-        self.communication_service.push_dict({"event": "action", "inputs": actions})
+        methods = self.driver()
+        data = {"event": "action", "inputs": actions, "methods": methods}
+        # print(data)
+        self.communication_service.push_dict(data)
         return self.communication_service.get_dict()
 
     def get_state(self):
@@ -61,11 +75,18 @@ class TestRunner:
         self.communication_service.get_int()
 
     @abstractmethod
+    def config(self):
+        """
+        Configures the game environment.
+        """
+        raise NotImplementedError
+
+    @abstractmethod
     def given(self):
         raise NotImplementedError
 
     @abstractmethod
-    def when(self):
+    def when(self) -> Behavior:
         raise NotImplementedError
 
     @abstractmethod
