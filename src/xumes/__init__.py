@@ -1,5 +1,5 @@
 import xumes.test_runner
-import xumes.trainer
+import xumes.behavior
 
-from xumes.trainer.implementations.rl_impl.agent import Agent
-from xumes.test_runner import given, when, then
+from xumes.modules.reinforcement_learning.agent import Agent
+from xumes.test_runner import given, when, then, config

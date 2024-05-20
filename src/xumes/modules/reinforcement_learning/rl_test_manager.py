@@ -1,8 +1,8 @@
 import multiprocess
 
-from xumes.test_runner.feature_strategy import given_registry, when_registry, then_registry
+from xumes.test_runner.feature_strategy import given_registry, when_registry, then_registry, config_registry
 from xumes.test_runner.test_manager import TestManager
-from xumes.trainer import Behavior
+from xumes.behavior import Behavior
 
 
 class RLTestManager(TestManager):
@@ -14,11 +14,12 @@ class RLTestManager(TestManager):
             self.add_test_runner_data(scenario=scenario, ip="127.0.0.1", port=0)
 
             registry_queue = multiprocess.Queue()
-            registry_queue.put((given_registry, when_registry, then_registry))
+            registry_queue.put((config_registry, given_registry, when_registry, then_registry))
 
             test_runner = self.create_test_runner(scenario, self._assertion_queue, registry_queue)
 
-            port = self._comm_service.start_scenario(scenario.feature.name)
+            methods = test_runner.config()
+            port = self._comm_service.start_scenario(scenario.feature.name, methods)
             self._scenario_datas[scenario].port = port
             test_runner.run(port)
 

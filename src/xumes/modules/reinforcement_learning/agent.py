@@ -3,9 +3,9 @@ from typing import TypeVar, List, Optional
 
 from xumes.core.model_helper import trainer_name, model_path
 from xumes.core.modes import TEST_MODE, TRAIN_MODE
-from xumes.trainer.behavior import Behavior
-from xumes.trainer.i_trainer import ITrainer
-from xumes.trainer.implementations import StableBaselinesTrainer
+from xumes.behavior.behavior import Behavior
+from xumes.behavior.i_trainer import ITrainer
+from xumes.modules.reinforcement_learning.stable_baselines_trainer import StableBaselinesTrainer
 
 OBST = TypeVar("OBST")
 
@@ -22,7 +22,7 @@ class Agent(Behavior, ABC):
         - `_previous_model_path` (Optional[str]): The path to a pre-trained model, if available.
     """
 
-    def __init__(self, save_path: str = None, eval_freq: int = 10000, logs_path: Optional[str] = None,
+    def __init__(self, save_path: str = None, eval_freq: int = 1000, logs_path: Optional[str] = None,
                  logs_name: Optional[str] = None, previous_model_path: Optional[str] = None, **kwargs):
         super().__init__()
         self._trainer: ITrainer = StableBaselinesTrainer(self, **kwargs)
@@ -33,9 +33,17 @@ class Agent(Behavior, ABC):
         self._logs_name = logs_name
         self._previous_model_path = previous_model_path
 
+    def get_trainer_info(self):
+        return {
+            "eval_freq": self._eval_freq,
+            "logs_path": self._logs_path,
+            "logs_name": self._logs_name,
+            "previous_model_path": self._previous_model_path
+        }
+
     def get_trainer(self) -> ITrainer:
         """
-        Returns the agent's trainer.
+        Returns the agent's behavior.
         """
         return self._trainer
 
@@ -71,7 +79,7 @@ class Agent(Behavior, ABC):
         if self._mode == TRAIN_MODE:
             self._trainer.train(_path + "/" + trainer_name(feature, scenario), self._eval_freq, self._logs_path, self._logs_name, self._previous_model_path)
         elif self._mode == TEST_MODE:
-            self._trainer.load(_path + "/" + "best_model.zip")
+            self._trainer.load(_path + "/" + trainer_name(feature, scenario) + "best_model.zip")
             self._trainer.play()
 
     @abstractmethod

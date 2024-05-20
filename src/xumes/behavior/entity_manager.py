@@ -1,9 +1,9 @@
 from abc import abstractmethod
 from typing import Dict, final
 
-from xumes.trainer.i_state_entity import IStateEntity
-from xumes.trainer.game_element_state import GameElementState
-from xumes.trainer.i_game_element_state_converter import IGameElementStateConverter
+from xumes.behavior.i_state_entity import IStateEntity
+from xumes.behavior.game_element_state import GameElementState
+from xumes.behavior.i_game_element_state_converter import IGameElementStateConverter
 
 
 class EntityManager(IStateEntity):

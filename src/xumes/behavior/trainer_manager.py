@@ -10,11 +10,11 @@ from typing import List, Dict
 from xumes.core.modes import TEST_MODE, TRAIN_MODE
 from xumes.core.registry import create_registry
 from xumes.test_runner.test_runner import TestRunner
-from xumes.trainer.entity_manager import AutoEntityManager
-from xumes.trainer.i_trainer import ITrainer
-from xumes.trainer.implementations.gym_impl.stable_baselines_trainer import OBST, StableBaselinesTrainer
-from xumes.trainer.implementations.gym_impl.vec_stable_baselines_trainer import VecStableBaselinesTrainer
-from xumes.trainer.implementations.json_impl.json_game_element_state_converter import JsonGameElementStateConverter
+from xumes.behavior.entity_manager import AutoEntityManager
+from xumes.behavior.i_trainer import ITrainer
+from xumes.modules.reinforcement_learning.stable_baselines_trainer import OBST, StableBaselinesTrainer
+from xumes.modules.reinforcement_learning.vec_stable_baselines_trainer import VecStableBaselinesTrainer
+from xumes.behavior.implementations.json_impl.json_game_element_state_converter import JsonGameElementStateConverter
 
 observation = create_registry()
 action = create_registry()
@@ -31,10 +31,10 @@ config_registry = config.all
 
 class TrainerManager:
     """
-    Base class for trainer managers.
+    Base class for behavior managers.
 
     Args:
-        mode (str, optional): The mode of the trainer manager. Defaults to TEST_MODE.
+        mode (str, optional): The mode of the behavior manager. Defaults to TEST_MODE.
         port (int, optional): The port number for the communication service. Defaults to 5000.
     """
 
@@ -86,12 +86,12 @@ class TrainerManager:
 
     @abstractmethod
     def create_and_train(self, test_runner: TestRunner, feature: str, scenario: str, queue: multiprocess.Queue):
-        # Create a new trainer and train it
+        # Create a new behavior and train it
         raise NotImplementedError
 
     @abstractmethod
     def create_and_play(self, test_runner: TestRunner, feature: str, scenario: str, queue: multiprocess.Queue):
-        # Create a new trainer and play it
+        # Create a new behavior and play it
         raise NotImplementedError
 
     @abstractmethod
@@ -109,26 +109,26 @@ class TrainerManager:
     @abstractmethod
     def create_trainer(self, test_runner: TestRunner, feature: str, scenario: str, observation_r, action_r, reward_r, terminated_r,
                        config_r) -> ITrainer:
-        # Abstract method to create a trainer for a specific feature and scenario
-        # This method should be implemented by the concrete trainer manager
+        # Abstract method to create a behavior for a specific feature and scenario
+        # This method should be implemented by the concrete behavior manager
         raise NotImplementedError
 
     @abstractmethod
     def _trainer_name(self, feature, scenario) -> str:
-        # Abstract method to create a trainer name for a specific feature and scenario
-        # This method should be implemented by the concrete trainer manager
+        # Abstract method to create a behavior name for a specific feature and scenario
+        # This method should be implemented by the concrete behavior manager
         raise NotImplementedError
 
     @abstractmethod
     def _model_path(self, feature, scenario) -> str:
         # Abstract method to create a model path for a specific feature and scenario
-        # This method should be implemented by the concrete trainer manager
+        # This method should be implemented by the concrete behavior manager
         raise NotImplementedError
 
 
 class StableBaselinesTrainerManager(TrainerManager):
     """
-    Concrete trainer manager for stable baselines trainers.rst
+    Concrete behavior manager for stable baselines trainers.rst
     Use to train each agent on a different model
     """
 
@@ -143,7 +143,7 @@ class StableBaselinesTrainerManager(TrainerManager):
 
     def create_trainer(self, test_runner: TestRunner, feature: str, scenario: str, observation_r, action_r, reward_r, terminated_r,
                        config_r) -> ITrainer:
-        # We use the decorators to implement the trainer's methods
+        # We use the decorators to implement the behavior's methods
 
         class ConcreteTrainer(StableBaselinesTrainer):
             def convert_obs(self) -> OBST:
@@ -164,7 +164,7 @@ class StableBaselinesTrainerManager(TrainerManager):
             config_r[feature](trainer)
             trainer.make()
         except Exception as e:
-            raise Exception(f"Error while creating trainer: {e}")
+            raise Exception(f"Error while creating behavior: {e}")
 
         return trainer
 
@@ -191,7 +191,7 @@ class StableBaselinesTrainerManager(TrainerManager):
 
     def create_and_train(self, test_runner: TestRunner, feature: str, scenario: str, queue: multiprocess.Queue):
         self._init_logger()
-        # Create a new trainer and train it
+        # Create a new behavior and train it
         observation_r, action_r, reward_r, terminated_r, config_r = queue.get()
         trainer = self.create_trainer(test_runner, feature, scenario, observation_r, action_r, reward_r, terminated_r,
                                       config_r)
@@ -201,7 +201,7 @@ class StableBaselinesTrainerManager(TrainerManager):
 
     def create_and_play(self, test_runner: TestRunner, feature: str, scenario: str, queue: multiprocess.Queue):
         self._init_logger()
-        # Create a new trainer and play it
+        # Create a new behavior and play it
         logging.basicConfig(format='%(levelname)s:%(message)s', level=self._logging_level)
         observation_r, action_r, reward_r, terminated_r, config_r = queue.get()
         trainer = self.create_trainer(test_runner, feature, scenario, observation_r, action_r, reward_r, terminated_r,
@@ -218,7 +218,7 @@ class StableBaselinesTrainerManager(TrainerManager):
 
 class VecStableBaselinesTrainerManager(StableBaselinesTrainerManager):
     """
-    Concrete trainer manager for stable baselines trainers.rst
+    Concrete behavior manager for stable baselines trainers.rst
     Use to train all agents on the same model
     """
 
@@ -227,15 +227,15 @@ class VecStableBaselinesTrainerManager(StableBaselinesTrainerManager):
         super().__init__(mode=mode, port=port, do_logs=do_logs, model_path=model_path,
                          logging_level=logging_level)
 
-        # Create a vectorized trainer
-        # This trainer will train all agents on the same model
+        # Create a vectorized behavior
+        # This behavior will train all agents on the same model
         self.vec_trainer = VecStableBaselinesTrainer()
         self._training_services_datas = set()
         self._trained_feature = None
         self._process = None
 
     def connect_trainer(self, test_runner: TestRunner, feature: str, scenario: str) -> None:
-        # Add a new training service to the vectorized trainer
+        # Add a new training service to the vectorized behavior
         if self._trained_feature is None:
             self._trained_feature = feature
         self._training_services_datas.add((feature, scenario))

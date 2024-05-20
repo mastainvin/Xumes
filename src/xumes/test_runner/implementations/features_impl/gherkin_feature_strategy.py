@@ -32,6 +32,7 @@ class GherkinFeatureStrategy(FeatureStrategy):
 
         # Get all feature files
         feature_files = os.listdir(path)
+        feature_files = [file for file in feature_files if file.endswith(".feature")]
 
         # If there is no feature files, raise an exception
         if len(feature_files) == 0:
@@ -45,6 +46,7 @@ class GherkinFeatureStrategy(FeatureStrategy):
             if self._selected_features is None or feature_file[:-8] in self._selected_features:
                 # We open the feature file and compile him
                 feature_path = os.path.join(path, feature_file)
+
                 with open(feature_path, 'r') as file:
                     feature = parser.parse(TokenScanner(file.read()))['feature']
 

@@ -134,7 +134,8 @@ class TestManager:
         if self._mode == TEST_MODE or self._mode == RENDER_MODE:
             self._assert()
         else:
-            print(f"{bcolors.OKGREEN}Training finished in {self._delta_time}s.{bcolors.ENDC}")
+            converted_time = time.strftime("%H:%M:%S", time.gmtime(self._delta_time))
+            print(f"{bcolors.OKGREEN}Training finished in {converted_time}s.{bcolors.ENDC}")
 
     def _assert(self):
         # Make assertions

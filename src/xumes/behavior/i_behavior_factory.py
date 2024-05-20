@@ -3,7 +3,7 @@ import os
 from abc import abstractmethod
 
 from xumes.test_runner.test_runner import TestRunner
-from xumes.trainer.behavior import Behavior
+from xumes.behavior.behavior import Behavior
 
 
 class IBehaviorFactory:

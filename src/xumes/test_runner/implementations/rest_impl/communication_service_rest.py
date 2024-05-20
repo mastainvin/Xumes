@@ -1,5 +1,10 @@
+import json
+import logging
+from typing import Dict, List
+
 import requests
 import time
+
 
 class CommunicationServiceRest:
 
@@ -8,11 +13,11 @@ class CommunicationServiceRest:
         self.port = port
         self.session = requests.Session()
 
-    def start_scenario(self, name: str) -> int:
+    def start_scenario(self, name: str, methods: List[Dict]) -> int:
         port = 0
         # call the REST API to get the port
-        http_response = self.session.get(f"http://{self.host}:{self.port}/start_scenario/{name}")
+        http_response = self.session.post(f"http://{self.host}:{self.port}/start_scenario/", json=methods)
         if http_response.status_code == 200:
             port = http_response.json()
-            print(http_response, port)
+            logging.log(logging.INFO, f"Scenario {name} started on port {port}.")
         return port
