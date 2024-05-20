@@ -6,7 +6,7 @@ from stable_baselines3.common.callbacks import EvalCallback
 from stable_baselines3.common.vec_env import SubprocVecEnv, DummyVecEnv, VecEnvWrapper
 
 from xumes.core.errors.running_ends_error import RunningEndsError
-from xumes.behavior.i_trainer import ITrainer
+from xumes.modules.reinforcement_learning.i_trainer import ITrainer
 from xumes.modules.reinforcement_learning.stable_baselines_trainer import StableBaselinesTrainer
 
 

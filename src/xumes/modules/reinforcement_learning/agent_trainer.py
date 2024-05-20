@@ -1,7 +1,7 @@
 from abc import ABC
 from typing import final, TypeVar
 
-from xumes.behavior.i_trainer import ITrainer
+from xumes.modules.reinforcement_learning.i_trainer import ITrainer
 
 OBST = TypeVar("OBST")
 

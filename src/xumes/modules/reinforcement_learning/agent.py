@@ -4,7 +4,7 @@ from typing import TypeVar, List, Optional
 from xumes.core.model_helper import trainer_name, model_path
 from xumes.core.modes import TEST_MODE, TRAIN_MODE
 from xumes.behavior.behavior import Behavior
-from xumes.behavior.i_trainer import ITrainer
+from xumes.modules.reinforcement_learning.i_trainer import ITrainer
 from xumes.modules.reinforcement_learning.stable_baselines_trainer import StableBaselinesTrainer
 
 OBST = TypeVar("OBST")
