@@ -1,10 +1,11 @@
 import logging
 from typing import TypeVar, final
 
-from xumes.behavior.entity_manager import EntityManager
-from xumes.test_runner.test_runner import TestRunner
-
 OBST = TypeVar("OBST")
+
+
+class TestRunner:
+    pass
 
 
 class GameService:
@@ -28,11 +29,7 @@ class GameService:
         get_entity(name): Retrieves an entity from the entity manager by `name`.
     """
 
-    def __init__(self,
-                 entity_manager: EntityManager,
-                 test_runner: TestRunner
-                 ):
-        self._entity_manager = entity_manager
+    def __init__(self, test_runner: TestRunner):
         self._test_runner = test_runner
 
     @final
@@ -51,11 +48,11 @@ class GameService:
         states = self._test_runner.push_actions_and_get_state(actions)
         logging.debug(f"Received states: {states}")
         for state in states.items():
-            self._entity_manager.convert(state)
+            self._test_runner.get_entity_manager().convert(state)
 
     @final
-    def on_episode_end(self):
-        self._test_runner.episode_finished()
+    def episode_finished(self):
+        return self._test_runner.episode_finished()
 
     @final
     def finished(self):
@@ -70,21 +67,15 @@ class GameService:
         states = self._test_runner.get_state()
         logging.debug(f"Received states: {states}")
         for state in states.items():
-            self._entity_manager.convert(state)
+            self._test_runner.get_entity_manager().convert(state)
 
     @final
     @property
     def game_state(self):
-        return self._entity_manager.game_state
-
-    @final
-    def get_entity(self, name: str):
-        try:
-            return self._entity_manager.get(name)
-        except KeyError:
-            return None
+        return self._test_runner.get_entity_manager()
 
     def __getattr__(self, item):
         return self.get_entity(item)
 
-
+    def get_entity(self, name):
+        return self._test_runner.get_entity(name)

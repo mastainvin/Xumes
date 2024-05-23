@@ -91,7 +91,15 @@ class StableBaselinesTrainer(AgentTrainer, ABC):
     def save(self, path: str):
         self.model.save(path)
 
+    def free(self):
+        if self.env is not None:
+            self.env.close()
+        self.model = None
+
     def load(self, path: str):
+        if not self.made:
+            self.make()
+
         self.model = self.algorithm(self.algorithm_type, self.env, verbose=1).load(path, env=self.env)
 
     def play(self, timesteps: Optional[int] = None):
@@ -101,18 +109,23 @@ class StableBaselinesTrainer(AgentTrainer, ABC):
 
         obs, _ = self.env.reset()
 
+        running = True
+
         def step():
             nonlocal obs
             action, _states = self.model.predict(obs, deterministic=True)
             try:
                 obs, reward, terminated, done, info = self.env.step(action)
                 if done or terminated:
-                    self.env.reset(options={"not_random": True})
+                    self.env.reset()
             except RunningEndsError:
                 logging.info(f"Received stop signal. Closing environment.")
+                self.env.close()
+                nonlocal running
+                running = False
 
         if not timesteps:
-            while True:
+            while running:
                 step()
         else:
             for _ in range(timesteps):
@@ -120,3 +133,10 @@ class StableBaselinesTrainer(AgentTrainer, ABC):
 
     def finished(self):
         self.agent.game_service().finished()
+
+    def predict(self, obs: OBST):
+        """
+        Predicts the action to take given the observation.
+        Method used only when using the model in non-training model, inside a scripted bot.
+        """
+        return self.model.predict(obs)

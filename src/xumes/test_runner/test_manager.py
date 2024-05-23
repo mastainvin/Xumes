@@ -62,7 +62,7 @@ class TestManager:
     def __init__(self, comm_service,
                  feature_strategy: FeatureStrategy,
                  mode: str = TEST_MODE, timesteps=None, iterations=None, do_logs: bool = False,
-                 logging_level=logging.NOTSET):
+                 logging_level=logging.NOTSET, fps_limit=None, render=False):
         self._comm_service = comm_service
         self._scenario_datas: Dict[Scenario, ScenarioData] = {}
         self._mode = mode
@@ -73,13 +73,8 @@ class TestManager:
         self._do_logs = do_logs
         self._logging_level = logging_level
         self._delta_time = 0
-
-    def get_free_port(self, scenario) -> int:
-        # Get the port for a given feature and scenario
-        if scenario not in self._scenario_datas:
-            return 5001 + len(self._scenario_datas)
-        else:
-            return self._scenario_datas[scenario].port
+        self._fps_limit = fps_limit
+        self._render = render
 
     def add_test_runner_data(self, scenario: Scenario, ip: str, port: int):
         # Add a game service data to the list of game services data
@@ -124,7 +119,8 @@ class TestManager:
         # Close all processes
         for feature in features:
             for process in feature.processes:
-                process.kill()
+                process.join()
+                process.terminate()
 
         # self.trainer_manager.disconnect_trainer(scenario.feature.name, scenario.name) TODO : see if we need to disconnect
 
@@ -159,8 +155,9 @@ class TestManager:
 
         # log results
         nb_test = len(results)
+        converted_time = time.strftime("%H:%M:%S", time.gmtime(self._delta_time))
         header = f"{bcolors.BOLD}{bcolors.UNDERLINE}{'':15}TEST REPORT{'':15}{bcolors.ENDC}\n"
-        details = f"{successes} tests passed on a total of {nb_test} in {self._delta_time}s.\n"
+        details = f"{successes} tests passed on a total of {nb_test} in {converted_time}.\n"
         details += f"Tests passed:\n{tests_passed_names}\n" if successes > 0 else ""
         details += error_logs
 

@@ -19,7 +19,7 @@ class RLTestManager(TestManager):
             test_runner = self.create_test_runner(scenario, self._assertion_queue, registry_queue)
 
             methods = test_runner.config()
-            port = self._comm_service.start_scenario(scenario.feature.name, methods)
+            port = self._comm_service.start_scenario(scenario.feature.name, methods, self._fps_limit, self._render)
             self._scenario_datas[scenario].port = port
             test_runner.run(port)
 

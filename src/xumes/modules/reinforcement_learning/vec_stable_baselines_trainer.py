@@ -26,7 +26,8 @@ class VecStableBaselinesTrainer(ITrainer):
         self._envs.append(lambda: trainer.env)
 
     def make(self):
-        self._vec_env = DummyVecEnv(self._envs)
+        self._vec_env = SubprocVecEnv(self._envs, "fork")
+        # self._vec_env = DummyVecEnv(self._envs)
 
     def train(self, save_path: str = None, eval_freq: int = 10000, logs_path: Optional[str] = None,
               logs_name: Optional[str] = None, previous_model_path: Optional[str] = None):
@@ -34,7 +35,7 @@ class VecStableBaselinesTrainer(ITrainer):
             raise Exception("No training services added")
 
         if self._vec_env is None:
-            self.make()
+            self._vec_env = DummyVecEnv(self._envs)
 
         algorithm = self._first_trainer.algorithm
         algorithm_type = self._first_trainer.algorithm_type
@@ -66,12 +67,17 @@ class VecStableBaselinesTrainer(ITrainer):
     def save(self, path: str):
         self.model.save(path)
 
+    def free(self):
+        if self._vec_env is not None:
+            self._vec_env.close()
+            self.model = None
+
     def load(self, path: str):
         if self._first_trainer is None:
             raise Exception("No training services added")
 
         if self._vec_env is None:
-            self.make()
+            self._vec_env = DummyVecEnv(self._envs)
 
         algorithm = self._first_trainer.algorithm
         algorithm_type = self._first_trainer.algorithm_type
@@ -120,7 +126,7 @@ class VecStableBaselinesTrainer(ITrainer):
                         _envs.envs[i].close()
 
         if not timesteps:
-            while True:
+            while any(active_envs):
                 step()
         else:
             for _ in range(timesteps):
