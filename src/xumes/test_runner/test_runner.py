@@ -1,6 +1,8 @@
 from abc import abstractmethod
 from typing import List
 
+from xumes.behavior.entity_manager import AutoEntityManager
+from xumes.behavior.implementations.json_impl.json_game_element_state_converter import JsonGameElementStateConverter
 from xumes.test_runner.driver import Driver
 from xumes.test_runner.i_communication_service import ICommunicationService
 
@@ -31,8 +33,18 @@ class TestRunner:
                  communication_service: ICommunicationService,
                  ):
         self.communication_service = communication_service
+        self._entity_manager = AutoEntityManager(JsonGameElementStateConverter())
         self.is_finished = False
         self.driver = Driver()
+
+    def get_entity(self, name):
+        try:
+            return self._entity_manager.get(name)
+        except KeyError:
+            return None
+
+    def get_entity_manager(self):
+        return self._entity_manager
 
     def run_communication_service(self, port: int):
         self.communication_service.init_socket(port)
@@ -73,6 +85,9 @@ class TestRunner:
     def reset(self):
         self.communication_service.push_dict({"event": "reset"})
         self.communication_service.get_int()
+
+    def __getattr__(self, item):
+        return self.get_entity(item)
 
     @abstractmethod
     def config(self):

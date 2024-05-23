@@ -53,12 +53,6 @@ class Agent(Behavior, ABC):
         """
         return self._save_path
 
-    def __getattr__(self, item):
-        """
-        Retrieves an entity from the game service.
-        """
-        return self._game_service.get_entity(item)
-
     def execute(self, feature, scenario):
         """
         Executes the training or testing process based on the current mode (TRAIN_MODE or TEST_MODE).
@@ -77,10 +71,25 @@ class Agent(Behavior, ABC):
             _path = _path + "/" + feature.name + "/" + scenario.name
 
         if self._mode == TRAIN_MODE:
-            self._trainer.train(_path + "/" + trainer_name(feature, scenario), self._eval_freq, self._logs_path, self._logs_name, self._previous_model_path)
+            self._trainer.train(_path + "/" + trainer_name(feature, scenario), self._eval_freq, self._logs_path,
+                                self._logs_name, self._previous_model_path)
+            self._trainer.free()
         elif self._mode == TEST_MODE:
-            self._trainer.load(_path + "/" + trainer_name(feature, scenario) + "best_model.zip")
+            self._trainer.load(_path + "/" + trainer_name(feature, scenario) + "/best_model")
             self._trainer.play()
+            self._trainer.free()
+
+    def predict(self, observation):
+        """
+        Predicts the next action based on the given observation.
+
+        Args:
+            observation: The observation to predict the next action.
+
+        Returns:
+            The predicted action.
+        """
+        return self._trainer.predict(observation)
 
     @abstractmethod
     def observation(self) -> OBST:

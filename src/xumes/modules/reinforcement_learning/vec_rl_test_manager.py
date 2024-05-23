@@ -1,3 +1,5 @@
+import time
+
 import multiprocess
 
 from xumes import Agent
@@ -16,7 +18,6 @@ class VecRLTestManager(TestManager):
         trainers_info = {}
 
         for scenario in feature.scenarios:
-
             self.add_test_runner_data(scenario=scenario, ip="127.0.0.1", port=0)
 
             registry_queue = multiprocess.Queue()
@@ -25,7 +26,7 @@ class VecRLTestManager(TestManager):
             test_runner = self.create_test_runner(scenario, self._assertion_queue, registry_queue)
 
             methods = test_runner.config()
-            port = self._comm_service.start_scenario(scenario.feature.name, methods)
+            port = self._comm_service.start_scenario(scenario.feature.name, methods, self._fps_limit, self._render)
             self._scenario_datas[scenario].port = port
             test_runner.run(port)
 
@@ -48,14 +49,14 @@ class VecRLTestManager(TestManager):
         def run(_path, nb_processes, vec_trainers):
             if not _path:
                 _path = "./models/" + feature.name
-            else:
-                _path = _path + "/" + feature.name
 
             if self._mode == TEST_MODE:
-                vec_trainers.load(_path + "/best_model.zip")
-                vec_trainers.test()
+                vec_trainers.load(_path + "/best_model")
+                vec_trainers.play()
+                vec_trainers.free()
             else:
                 vec_trainers.train(save_path=_path, **trainers_info)
+                vec_trainers.free()
                 # vec_trainers.save(_path)
 
             nb_processes.value -= 1

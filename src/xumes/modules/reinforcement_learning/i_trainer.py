@@ -29,3 +29,10 @@ class ITrainer:
         :param timesteps: Number maximum of step (action to perform).
         """
         raise NotImplementedError
+
+    @abstractmethod
+    def free(self):
+        """
+        Free the resources.
+        """
+        raise NotImplementedError

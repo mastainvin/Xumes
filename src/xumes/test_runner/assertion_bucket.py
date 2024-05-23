@@ -170,14 +170,8 @@ class AssertionBucket:
                                            test_name=self._test_name
                                            )
 
-        # XXX This is a print statement that should be removed
-        if assertion_report.passed:
-            print(f"\033[92m{assertion_report.test_name} passed\033[0m")
-        else:
-            print(assertion_report.error_logs)
-
-        # self._queue.put(assertion_report)
-        # time.sleep(0.5)
+        self._queue.put(assertion_report)
+        time.sleep(0.5)
 
     def clear(self):
         self._data.clear()

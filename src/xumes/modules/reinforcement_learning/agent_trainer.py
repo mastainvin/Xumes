@@ -20,8 +20,8 @@ class AgentTrainer(ITrainer, ABC):
         self.agent.game_service().reset()
 
     @final
-    def on_episode_end(self):
-        self.agent.game_service().on_episode_end()
+    def episode_finished(self):
+        return self.agent.game_service().episode_finished()
 
     @final
     def get_terminated(self):

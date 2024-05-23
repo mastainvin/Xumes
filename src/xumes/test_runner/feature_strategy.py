@@ -7,6 +7,7 @@ import os
 from abc import ABC, abstractmethod
 from typing import List
 
+from xumes.core.errors.running_ends_error import RunningEndsError
 from xumes.core.modes import TEST_MODE
 from xumes.core.registry import create_registry_content, exec_registry_function, create_registry
 from xumes.test_runner.assertion_bucket import AssertionBucket
@@ -98,7 +99,7 @@ class FeatureStrategy(ABC):
                 self._mode = mode
                 self._number_of_steps = 0
                 self._number_max_of_steps = number_max_of_steps
-                self._number_of_tests = 1
+                self._number_of_tests = 0
                 self._number_max_of_tests = number_max_of_tests
 
                 self._assertion_bucket = AssertionBucket(test_name=f"{self._feature}/{self._scenario}",
@@ -148,37 +149,25 @@ class FeatureStrategy(ABC):
                 self._assertion_bucket.assert_not_between(data=actual, expected_min=expected_min,
                                                           expected_max=expected_max)
 
-            def _test_finished(self) -> bool:
-                if self._mode == TEST_MODE:
-                    return self._number_of_steps >= self._number_max_of_steps
-                else:
-                    return False
-
             def episode_finished(self) -> bool:
                 # when an episode is finished, we collect the assertions
-                finished = self._test_finished()
-                self._number_of_tests += 1
                 if self._mode == TEST_MODE:
-                    if finished:
+                    if self._number_of_tests >= self._number_max_of_tests:
                         self._do_assert()
-                        exit(0)
-
+                        raise RunningEndsError
                     else:
                         try:
-                            assertions_dicts = self.then()
-                            self._assertion_bucket.assert_from_dict(assertions_dicts)
+                            self.then()
+                            self._assertion_bucket.reset_iterator()
                         except KeyError:
                             pass
+                    self._number_of_tests += 1
 
                 return True
 
             def _do_assert(self) -> None:
-                assertions_dicts = self.then()
-                self._assertion_bucket.assert_from_dict(assertions_dicts)
-
                 self._assertion_bucket.assertion_mode()
-                self._assertion_bucket.assert_from_dict(assertions_dicts)
-
+                self.then()
                 self._assertion_bucket.send_results()
                 self._assertion_bucket.clear()
                 self._assertion_bucket.collect_mode()
