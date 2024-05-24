@@ -164,11 +164,11 @@ class TestManager:
         details += error_logs
 
         if successes < nb_test:
-            print(f"{bcolors.FAIL}{header}")
-            print(f"{bcolors.FAIL}{details}")
+            print(f"{bcolors.FAIL}{header}{bcolors.ENDC}")
+            print(f"{bcolors.FAIL}{details}{bcolors.ENDC}")
         else:
-            print(f"{bcolors.OKGREEN}{header}")
-            print(f"{bcolors.OKGREEN}{details}")
+            print(f"{bcolors.OKGREEN}{header}{bcolors.ENDC}")
+            print(f"{bcolors.OKGREEN}{details}{bcolors.ENDC}")
 
     def _run_feature(self, feature, active_processes):
 

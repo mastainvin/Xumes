@@ -76,6 +76,11 @@ def test(debug, render, features_path, steps_path, timesteps, iterations, info, 
 
     render = not headless
 
+    if scenarios is not None:
+        scenarios = scenarios.split(",")
+    if features is not None:
+        features = features.split(",")
+
     test_manager = test_manager_class(
         feature_strategy=GherkinFeatureStrategy(steps_path=steps_path,
                                                 features_names=features,
