@@ -15,3 +15,6 @@ class bcolors:
         self.WARNING = ''
         self.FAIL = ''
         self.ENDC = ''
+        self.BOLD = ''
+        self.UNDERLINE = ''
+
