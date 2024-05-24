@@ -4,32 +4,22 @@ import multiprocess
 
 from xumes import Agent
 from xumes.core.modes import TEST_MODE
-from xumes.test_runner.feature_strategy import given_registry, when_registry, then_registry, config_registry
 from xumes.test_runner.test_manager import TestManager
 from xumes.modules.reinforcement_learning.vec_stable_baselines_trainer import VecStableBaselinesTrainer
 
 
 class VecRLTestManager(TestManager):
 
-    def _run_feature(self, feature, active_processes):
+    def _run_scenarios(self, feature, scenario_datas, active_processes):
+
         vec_sb_trainers = VecStableBaselinesTrainer()
 
         model_path = None
         trainers_info = {}
 
-        for scenario in feature.scenarios:
-            self.add_test_runner_data(scenario=scenario, ip="127.0.0.1", port=0)
+        for scenario in scenario_datas:
 
-            registry_queue = multiprocess.Queue()
-            registry_queue.put((config_registry, given_registry, when_registry, then_registry))
-
-            test_runner = self.create_test_runner(scenario, self._assertion_queue, registry_queue)
-
-            methods = test_runner.config()
-            port = self._comm_service.start_scenario(scenario.feature.name, methods, self._fps_limit, self._render)
-            self._scenario_datas[scenario].port = port
-            test_runner.run(port)
-
+            test_runner = scenario_datas[scenario].test_runner
             when_result = test_runner.when()
             if len(when_result) > 1:
                 raise Exception("Only one when step is allowed")

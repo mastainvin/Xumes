@@ -13,6 +13,7 @@ from xumes.test_runner.implementations.socket_impl.communication_service_socket 
     CommunicationServiceSocket
 
 from xumes.test_runner.test_runner import TestRunner
+from xumes.test_runner.feature_strategy import given_registry, when_registry, then_registry, config_registry
 
 
 class ScenarioData:
@@ -111,6 +112,7 @@ class TestManager:
         # For all scenarios in each feature, we run the test
         for feature in features:
             self._run_feature(feature, active_processes)
+            self._scenario_datas = {}
 
         # Wait for all tests to be finished
         while active_processes.value > 0:
@@ -168,6 +170,37 @@ class TestManager:
             print(f"{bcolors.OKGREEN}{header}")
             print(f"{bcolors.OKGREEN}{details}")
 
-    @abstractmethod
     def _run_feature(self, feature, active_processes):
+
+        scenarios_methods: List[Dict] = []
+
+        for scenario in feature.scenarios:
+            self.add_test_runner_data(scenario=scenario, ip="127.0.0.1", port=0)
+
+            registry_queue = multiprocess.Queue()
+            registry_queue.put((config_registry, given_registry, when_registry, then_registry))
+
+            test_runner = self.create_test_runner(scenario, self._assertion_queue, registry_queue)
+            self._scenario_datas[scenario].test_runner = test_runner
+
+            methods = test_runner.config()
+
+            scenarios_methods.append({
+                "name": scenario.name,
+                "methods": methods,
+                "fps_limit": self._fps_limit,
+                "render": self._render
+            })
+
+        # Make call to api to start the game instances
+        ports: Dict[scenario, int] = self._comm_service.start_scenarios(scenarios_methods, feature.scenarios, self._fps_limit, self._render)
+
+        for scenario in ports:
+            self._scenario_datas[scenario].port = ports[scenario]
+            self._scenario_datas[scenario].test_runner.run(ports[scenario])
+
+        self._run_scenarios(feature=feature, scenario_datas=self._scenario_datas, active_processes=active_processes)
+
+    @abstractmethod
+    def _run_scenarios(self, feature, scenario_datas, active_processes):
         raise NotImplementedError
