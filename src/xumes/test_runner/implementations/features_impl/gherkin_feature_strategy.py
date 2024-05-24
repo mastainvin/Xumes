@@ -56,13 +56,14 @@ class GherkinFeatureStrategy(FeatureStrategy):
 
                     # Iterate over every scenario in the feature file
                     for element in feature['children']:
-                        scenario = element['scenario']
-                        if scenario['keyword'] == 'Scenario Outline':
-                            # Handle Scenario Outline
-                            self._process_scenario_outline(scenario, feature_obj)
-                        elif scenario['keyword'] == 'Scenario':
-                            # Handle regular Scenario
-                            self._process_scenario(scenario, feature_obj)
+                        if 'scenario' in element:
+                            scenario = element['scenario']
+                            if scenario['keyword'] == 'Scenario Outline':
+                                # Handle Scenario Outline
+                                self._process_scenario_outline(scenario, feature_obj)
+                            elif scenario['keyword'] == 'Scenario':
+                                # Handle regular Scenario
+                                self._process_scenario(scenario, feature_obj)
 
                     # Append the feature to the list of features
                     self.features.append(feature_obj)
@@ -90,14 +91,18 @@ class GherkinFeatureStrategy(FeatureStrategy):
         """
         scenario_copy = {
             'name': scenario_name,
-            'steps': scenario_outline['steps'],
+            'steps': [],
             'tags': scenario_outline.get('tags', [])
         }
-        for step in scenario_copy['steps']:
+        for step in scenario_outline['steps']:
             step_text = step['text']
             for placeholder, value in example_values.items():
                 step_text = step_text.replace(f"<{placeholder}>", value)
-            step['text'] = step_text
+            scenario_copy['steps'].append({
+                'keyword': step['keyword'],
+                'keywordType': step['keywordType'],
+                'text': step_text
+            })
         return scenario_copy
 
     def _process_scenario(self, scenario: Dict, feature_obj: Feature, is_outline: bool = False):
@@ -151,7 +156,7 @@ class GherkinFeatureStrategy(FeatureStrategy):
                 raise Exception("When steps not found.")
             try:
                 then = self.then.all[name]
-            except IndexIndexError:
+            except IndexError:
                 raise Exception("Then steps not found.")
 
             given_contents = get_content_from_registry(given)
