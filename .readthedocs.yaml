@@ -13,6 +13,7 @@ python:
 sphinx:
   configuration: docs/source/conf.py
 
-commands:
-  - pip install -e .
-  - make -C docs html
+build:
+  steps:
+    - pip install -e .
+    - make -C docs html
