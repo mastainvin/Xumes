@@ -5,15 +5,9 @@ build:
   tools:
     python: "3.8"
 
-python:
-  install:
-    - method: pip
-      path: .
-
 sphinx:
   configuration: docs/conf.py
 
-jobs:
-  steps:
-    - name: Build documentation
-      run: make -C docs html
+formats:
+  - pdf
+  - epub
