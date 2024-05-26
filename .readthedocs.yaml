@@ -1,10 +1,24 @@
 version: 2
 
 build:
-  os: "ubuntu-20.04"
+  os: ubuntu-20.04
   tools:
     python: "3.8"
 
-formats:
-  - pdf
-  - epub
+repository:
+  url: https://$(GITHUB_TOKEN)@github.com/mastainvin/Xumes.git
+
+jobs:
+  build:
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Build documentation
+        run: |
+          make html
