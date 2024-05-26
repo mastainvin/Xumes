@@ -3,10 +3,10 @@ name: Python Package
 on:
   push:
     branches:
-      - main
+      - rel
   pull_request:
     branches:
-      - main
+      - rel
 
 jobs:
   build:
