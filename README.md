@@ -1,41 +1,18 @@
 # Xumes
 
-Xumes is a game testing tool designed to be used on top of games without the need to modify the game sources. It provides a framework for observing and interacting with game elements, training models, and conducting tests.
+Xumes is a game testing tool designed to be used on top of games without the need to modify the game sources. It provides a framework for observing and interacting with game elements, training models, and conducting tests. For the moment, only the Godot framework has an implemented module for interacting with Xumes. So for the moment, the documentation will be focus on the implementation with godot.
 
-Please check the [documentation](https://xumes.readthedocs.io/en/latest/) for more information.
+<!--- Please check the [documentation](https://xumes.readthedocs.io/en/latest/) for more information. --->
 
 ## Framework usage
 
-The Xumes framework consists of two main components: the "Game side" and the "Training side". These components are implemented as separate Python modules within the framework: `game_module` and `training_module`.
-You will need to implement these modules to use the framework. The following diagram illustrates the architecture of the framework:
+The framework is based on the BDD methodology, that's means that two type of files are needed to be write for conducting tests. Those file are the `feature` files and the `steps` files.
 
-![framework schema](schema.png)
+The following diagram illustrates the architecture of the framework:
 
-## Game side
+![framework schema](https://github.com/mastainvin/Xumes/assets/61213519/7eadf335-4e8d-4797-9d83-98304a78f275)
 
-The steps files and features files are responsible for implementing the tests that will be executed by the framework. They are written in Gherkin, a language that allows you to write tests in a human-readable format. The framework will execute these tests by interacting with the game through the game side component.
 
-## Training side
+## Installation
 
-The training side of the Xumes framework is responsible for predicting actions based on game states. It leverages the `stablebaselines` library, which provides a wide range of reinforcement learning (RL) algorithms to facilitate the implementation of the training process.
-
-## Limitations
-
-- Randomness of the tests due to the stochastic behaviour of AI agents. We are doing t-test and let the user choose $\alpha$, by default $\alpha=0.001$. That means that there are cases of false positives and false negatives which is not good for testing.
-- Training time can be long, especially for big tests.
-
-Those limitations make testing difficult and impose a good definition of the test cases.
-
-## Future work
-
-- [ ] Improve the error handling for the BDD (steps not written yet for instance).
-- [ ] Change the Observable implementation.
-- [ ] Add seed to perform same tests every time.
-- [x] Add tags in feature files.
-- [ ] Improve code coverage with unit tests.
-- [ ] Create an architecture schema for the framework (not a usage schema).
-- [ ] Improve the documentation with descriptions of every class of the framework.
-- [ ] Improve the documentation with advices on how to make good tests and how to choose good alphas.
-- [ ] Convert the documentation to Sphinx.
-- [ ] Add a class to pass data from game to training (for the moment is Dict).
-- [ ] Add behavior observation (observe when a method is called).
+TODO

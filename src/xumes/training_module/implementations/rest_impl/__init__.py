@@ -1,2 +1,0 @@
-from xumes.training_module.implementations.rest_impl.communication_service_training_rest_api import CommunicationServiceTrainingRestApi
-from xumes.training_module.implementations.rest_impl.json_game_element_state_converter import JsonGameElementStateConverter
