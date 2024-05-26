@@ -63,7 +63,7 @@ class TestManager:
     def __init__(self, comm_service,
                  feature_strategy: FeatureStrategy,
                  mode: str = TEST_MODE, timesteps=None, iterations=None, do_logs: bool = False,
-                 logging_level=logging.NOTSET, fps_limit=None, render=False):
+                 logging_level=logging.NOTSET, fps_limit=-1, render=False):
         self._comm_service = comm_service
         self._scenario_datas: Dict[Scenario, ScenarioData] = {}
         self._mode = mode

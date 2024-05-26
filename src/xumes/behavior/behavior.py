@@ -30,3 +30,10 @@ class Behavior:
         Retrieves an entity from the game service.
         """
         return self._game_service.get_entity(item)
+
+    @abstractmethod
+    def terminated(self) -> bool:
+        """
+        Check if the game has terminated.
+        """
+        raise NotImplementedError

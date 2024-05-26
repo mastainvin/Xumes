@@ -72,17 +72,17 @@ class GherkinFeatureStrategy(FeatureStrategy):
         """
         Process a Scenario Outline and generate scenarios for each example row.
         """
-        if self._selected_scenarios is None or scenario_outline['name'] in self._selected_scenarios:
-            examples = scenario_outline['examples']
-            example_count = 0  # Initialize example counter for this scenario outline
-            for example in examples:
-                headers = [cell['value'] for cell in example['tableHeader']['cells']]
-                for row in example['tableBody']:
-                    example_values = {headers[i]: cell['value'] for i, cell in enumerate(row['cells'])}
-                    example_description = ', '.join([f"{key}={value}" for key, value in example_values.items()])
-                    scenario_name = f"{scenario_outline['name']} [{example_count}] - ({example_description})"
-                    example_count += 1  # Increment example counter for this scenario outline
-                    scenario_copy = self._create_scenario_from_outline(scenario_outline, example_values, scenario_name)
+        examples = scenario_outline['examples']
+        example_count = 0  # Initialize example counter for this scenario outline
+        for example in examples:
+            headers = [cell['value'] for cell in example['tableHeader']['cells']]
+            for row in example['tableBody']:
+                example_values = {headers[i]: cell['value'] for i, cell in enumerate(row['cells'])}
+                example_description = ', '.join([f"{key}={value}" for key, value in example_values.items()])
+                scenario_name = f"{scenario_outline['name']} [{example_count}] - ({example_description})"
+                example_count += 1  # Increment example counter for this scenario outline
+                scenario_copy = self._create_scenario_from_outline(scenario_outline, example_values, scenario_name)
+                if self._selected_scenarios is None or scenario_copy['name'] in self._selected_scenarios:
                     self._process_scenario(scenario_copy, feature_obj, is_outline=True)
 
     def _create_scenario_from_outline(self, scenario_outline: Dict, example_values: Dict[str, str], scenario_name: str) -> Dict:
