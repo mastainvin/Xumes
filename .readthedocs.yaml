@@ -5,9 +5,15 @@ build:
   tools:
     python: "3.8"
 
-sphinx:
-  configuration: docs/source/conf.py
+python:
+  install:
+    - method: pip
+      path: .
 
-formats:
-  - pdf
-  - epub
+sphinx:
+  configuration: docs/conf.py
+
+commands:
+  - python -m pip install --upgrade pip
+  - pip install -e .[docs]
+  - make -C docs html
