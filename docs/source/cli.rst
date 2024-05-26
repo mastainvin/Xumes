@@ -1,39 +1,77 @@
 CLI
 ===
 
-Testers
--------
+Play Mode
+---------
 
-Once you have implemented your `.features` file and your `steps` files, you can start the tester.
+This mode allows a human to manually test the game.
 
-To launch the tester, run the following command:
+To launch the play mode, run the following command:
 
 .. code-block:: bash
 
-    $ python -m xumes tester [options]
+    xumes play [options]
 
 Options
 ~~~~~~~
 
-.. option:: --test
+.. option:: --iterations <num>, -i <num>
 
-   Use this flag to enable the test mode. You need to specify the number of steps and/or the number of iterations to perform.
+   [when playing] The number of iterations to perform (Number of games played).
 
-.. option:: --train
+.. option:: --features <name>, -f <name> [Optional]
 
-    To use the train mode. The number of steps will be decided by the trainers.
+   List of features you want to play, separated by commas. All if not specified.
 
-.. option:: --timesteps <steps>, -ts <steps>
+.. option:: --scenarios <name>, -s <name> [Optional]
 
-   [when testing] The number of steps to perform.
+   List of scenarios you want to play, separated by commas. All if not specified.
+
+.. option:: --tags <name> [Optional]
+
+   List of tags you want to play, separated by commas. All if not specified.
+
+.. option:: --log
+
+   Enable logging of the results.
+
+.. option:: --debug [Optional]
+
+   Enable debug messages display.
+
+.. option:: --info [Optional]
+
+   Enable info messages display.
+
+.. option:: --features_path <folder> [Optional]
+
+   The path to the folder where the features are located.
+
+.. option:: --steps_path <folder> [Optional]
+
+   The path to the folder where the steps are located.
+
+Test Mode
+---------
+
+This mode allows you to automatically test the game.
+
+To launch the test mode, run the following command:
+
+.. code-block:: bash
+
+    xumes test [options]
+
+Options
+~~~~~~~
+
+.. option:: --vectorize, -v
+
+   Vectorize the testing.
 
 .. option:: --iterations <num>, -i <num>
 
    [when testing] The number of iterations to perform (Number of games played).
-
-.. option:: --path <folder>
-
-   The path to the folder where the tests are located.
 
 .. option:: --features <name>, -f <name> [Optional]
 
@@ -55,14 +93,6 @@ Options
 
    Enable logging of the results.
 
-.. option:: --ip <ip> [Optional]
-
-   The IP of the training server (default=localhost).
-
-.. option:: --port <ip> [Optional]
-
-   The port of the training server (default=5000).
-
 .. option:: --debug [Optional]
 
    Enable debug messages display.
@@ -70,50 +100,48 @@ Options
 .. option:: --info [Optional]
 
    Enable info messages display.
+
+.. option:: --features_path <folder> [Optional]
+
+   The path to the folder where the features are located.
+
+.. option:: --steps_path <folder> [Optional]
+
+   The path to the folder where the steps are located.
+
+.. option:: --fps <value> [Optional]
+
+   Limit of FPS.
+
+.. option:: --headless [Optional]
+
+   Run the game in headless mode.
 
 .. option:: --render [Optional]
 
    Enable game rendering.
 
-The tester will run the tests and display the results.
+Train Mode
+----------
 
-Trainers
---------
+This mode allows you to train an agent.
 
-Once you have implemented your trainers files, you can start the trainer.
-
-To launch the trainer, run the following command:
+To launch the train mode, run the following command:
 
 .. code-block:: bash
 
-    $ python -m xumes trainer [options]
+    xumes train [options]
 
 Options
 ~~~~~~~
 
-.. option:: --train
-
-   Use this flag to enable the train mode. The number of steps will be determined by the trainers inside the python file.
-
-.. option:: --test
-
-   Use this flag to enable the test mode. The number of steps is determined by the tester.
-
-.. option:: --path <folder>
-
-   The path to the folder where the trainers are located.
-
-.. option:: --tensorboard -tb [Optional]
+.. option:: --tensorboard, -tb [Optional]
 
    Save logs to the ``_logs`` folder to be used with TensorBoard.
 
-.. option:: --model [Optional]
+.. option:: --vectorize, -v
 
-   The path to the previously trained model if you want to train from a model.
-
-.. option:: --mode [Optional]
-
-   Mode of training. (scenario=one model per scenario, feature=one model per feature) [default=feature].
+   Vectorize the training.
 
 .. option:: --debug [Optional]
 
@@ -123,8 +151,34 @@ Options
 
    Enable info messages display.
 
-.. option:: --port [Optional]
+.. option:: --features_path <folder> [Optional]
 
-   The port of the training server.
+   The path to the folder where the features are located.
 
-The trainer will run the agents and save the models in the ``models`` folder.
+.. option:: --steps_path <folder> [Optional]
+
+   The path to the folder where the steps are located.
+
+.. option:: --model <path> [Optional]
+
+   The path to the previously trained model if you want to train from a model.
+
+.. option:: --features <name>, -f <name> [Optional]
+
+   List of features you want to train, separated by commas. All if not specified.
+
+.. option:: --scenarios <name>, -s <name> [Optional]
+
+   List of scenarios you want to train, separated by commas. All if not specified.
+
+.. option:: --tags <name> [Optional]
+
+   List of tags you want to train, separated by commas. All if not specified.
+
+.. option:: --fps <value> [Optional]
+
+   Limit of FPS.
+
+.. option:: --headless [Optional]
+
+   Run the game in headless mode.

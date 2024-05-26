@@ -3,9 +3,9 @@
 # -- Project information
 
 project = 'Xumes'
-copyright = '2023, Vincent Mastain'
+copyright = '2024, Vincent Mastain'
 author = 'Vincent Mastain'
-release = '0.0.32'
+release = '0.1.0'
 
 # -- General configuration
 
@@ -27,11 +27,8 @@ templates_path = ['_templates']
 
 # -- Options for HTML output
 
-html_theme = 'sphinx_rtd_theme'
+html_theme = 'sphinx_book_theme'
 
 # -- Options for EPUB output
 epub_show_urls = 'footnote'
 
-html_theme_options = {
-    'nosidebar': True,
-}

@@ -1,35 +1,40 @@
 Quickstart
-===========
+==========
 
-The Xumes framework consists of two main components: the “Game side” and
-the “Training side”. These components are implemented as separate Python
-modules within the framework: ``game_module`` and ``training_module``.
-You will need to implement these modules to use the framework. The
-following diagram illustrates the architecture of the framework:
+Once `Xumes` and `Godot` are installed, you can test your installation with the Flappy Bird example. First, clone the repository:
 
-.. image:: ./_static/schemas/schema.png
-   :width: 100%
-   :alt: Xumes framework architecture
+.. code-block:: bash
 
-Game side
-~~~~~~~~~
+    git clone https://github.com/mastainvin/Xumes-Examples.git
 
-The steps files and features files are responsible for implementing the
-tests that will be executed by the framework. They are written in
-Gherkin, a language that allows you to write tests in a human-readable
-format. The framework will execute these tests by interacting with the
-game through the game side component.
+Then, navigate to the `FlappyBird` directory:
 
-`How to implement the steps files? <steps.md>`__
+.. code-block:: bash
 
-`How to implement the features file? <features.md>`__
+    cd Xumes-Examples/Godot/flappy_bird/Tests/PipeSizeTest
 
-Training side
-~~~~~~~~~~~~~
+Run the tests with the following command:
 
-The training side of the Xumes framework is responsible for predicting
-actions based on game states. It leverages the ``stablebaselines``
-library, which provides a wide range of reinforcement learning (RL)
-algorithms to facilitate the implementation of the training process.
+.. code-block:: bash
 
-`How to implement the trainers? <trainers.md>`__
+    xumes test --features_path=./features --steps_path=./features/steps -h 10 -i 100 -v
+
+This command will run the tests found in the `features` directory in headless mode (without rendering the game), with a frame rate limit of 10 FPS and 100 iterations. The `-v` flag enables vectorized mode.
+
+You should see the following output:
+
+.. code:: text
+
+                   TEST REPORT
+
+    9 tests passed on a total of 9 in 00:01:16.
+    Tests passed:
+        - PipeSize/Testing the pipe size [2] - (i=0.5, j=1, k=2)
+        - PipeSize/Testing the pipe size easy [1] - (i=0.5, j=0.5, k=2)
+        - PipeSize/Testing the pipe size easy [2] - (i=1, j=1, k=2)
+        - PipeSize/Testing the pipe size hard [1] - (i=1, j=0, k=2)
+        - PipeSize/Testing the pipe size [1] - (i=0.5, j=0, k=2)
+        - PipeSize/Testing the pipe size easy [0] - (i=0, j=0, k=2)
+        - PipeSize/Testing the pipe size hard [0] - (i=0, j=1, k=2)
+        - PipeSize/Testing the pipe size [0] - (i=0, j=0.5, k=2)
+        - PipeSize/Testing the pipe size [3] - (i=1, j=0.5, k=2)

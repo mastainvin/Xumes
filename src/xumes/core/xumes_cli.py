@@ -48,7 +48,6 @@ def split_names(names: str) -> List[str]:
 
 @cli.command()
 @click.option("--vectorize", "-v", is_flag=True, help="Vectorize the training.")
-@click.option("--timesteps", "-ts", default=None, help="Number of timesteps to test the game.")
 @click.option("--iterations", "-i", default=None, help="Number of iterations to test the game.")
 @click.option("--features", "-f", default=None, help="List of features to test.")
 @click.option("--scenarios", "-s", default=None, help="List of scenarios to test.")
@@ -62,7 +61,7 @@ def split_names(names: str) -> List[str]:
 @click.option("--fps", default=-1, help="Limit of FPS.")
 @click.option("--headless", is_flag=False, help="Run the game in headless mode.")
 @click.option("-h", default=-1, help="Headless and fix FPS.")
-def test(debug, features_path, steps_path, timesteps, iterations, info, log, alpha,
+def test(debug, features_path, steps_path, iterations, info, log, alpha,
          features,
          scenarios,
          tags,
@@ -163,7 +162,6 @@ def train(debug, steps_path, info, tensorboard, model, features_path, vectorize,
 
 
 @cli.command()
-@click.option("--timesteps", "-ts", default=None, help="Number of timesteps to test the game.")
 @click.option("--iterations", "-i", default=None, help="Number of iterations to test the game.")
 @click.option("--features", "-f", default=None, help="List of features to test.")
 @click.option("--scenarios", "-s", default=None, help="List of scenarios to test.")
@@ -173,7 +171,7 @@ def train(debug, steps_path, info, tensorboard, model, features_path, vectorize,
 @click.option("--info", is_flag=True, help="Info debug level.")
 @click.option("--features_path", default=None, type=click.Path(), help="Path of the ./features folder.")
 @click.option("--steps_path", default=None, type=click.Path(), help="Path of the ./steps folder.")
-def play(debug, features_path, steps_path, timesteps, iterations, info, log,
+def play(debug, features_path, steps_path, iterations, info, log,
          features,
          scenarios,
          tags):
