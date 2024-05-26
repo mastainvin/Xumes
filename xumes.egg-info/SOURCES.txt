@@ -1,7 +1,0 @@
-README.md
-pyproject.toml
-xumes.egg-info/PKG-INFO
-xumes.egg-info/SOURCES.txt
-xumes.egg-info/dependency_links.txt
-xumes.egg-info/requires.txt
-xumes.egg-info/top_level.txt
