@@ -15,7 +15,5 @@ sphinx:
 
 jobs:
   steps:
-    - name: Install build dependencies
-      run: python -m pip install --upgrade pip
     - name: Build documentation
       run: make -C docs html
