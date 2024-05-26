@@ -14,7 +14,6 @@ classifiers = [
 ]
 dependencies = [
   "gymnasium>=0.28.1",
-  "pygame>=2.4.0",
   "numpy>=1.23.5",
   "sb3_contrib>=2.0.0a1",
   "stable_baselines3>=2.0.0a1",
@@ -22,7 +21,8 @@ dependencies = [
   "statsmodels>=0.14.0",
   "gherkin-official>=24.1.0",
   "multiprocess>=0.70.14",
-  "sphinx-rtd-theme>=1.2.2"
+  "sphinx-rtd-theme>=1.2.2",
+  "click>=8.1.7"
 ]
 
 [build-system]
