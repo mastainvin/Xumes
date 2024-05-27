@@ -18,4 +18,6 @@ Clone the following repository instead of the official one:
 
     git clone https://github.com/mastainvin/godot.git
 
-Once you have compiled Godot, you can use the `godot` executable to run your project.
+.. note::
+
+    Don't forget to checkout to the `xumes` branch before build `Godot`.
