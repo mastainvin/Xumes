@@ -8,28 +8,26 @@ To get started, create a ``features`` directory in the test directory and write 
 The difference with normal BDD usage is in the sense of the keywords:
 
 - ``Given`` is used to set up the game.
-- ``When`` is used to set up the testing situation.
+- ``When`` return a `Behavior` object that will be used to test the game.
 - ``Then`` is used to make assertions after the agent's play.
 
 Here is an example of a feature file:
 
 .. code-block:: gherkin
 
-   Feature: Testing the jump
+    Feature: Flappy Bird Game
 
-     Scenario: Top and bottom
-       Given A game with a player
-       And A pipe generator
-       When The first pipe is at 50 % and the next pipe is at 100 %
-       Then The player should have passed 2 pipes
-       And The player should have passed at least 1 pipe
+        @easy
+        Scenario Outline: Testing the pipe size easy
+            Given first pipe at <i> and second pipe at <j>
+            When bird flies
+            Then bird should have passed <k> pipes
 
-     Scenario: Bottom and top
-       Given A game with a player
-       And A pipe generator
-       When The first pipe is at 100 % and the next pipe is at 50 %
-       Then The player should have passed 2 pipes
-       And The player should have passed at least 1 pipe
+            Examples:
+                | i   | j   | k |
+                | 0   | 0   | 2 |
+                | 0.5 | 0.5 | 2 |
+                | 1   | 1   | 2 |
 
 
-.. important:: As you can see, the ``And`` keyword is used to chain the steps, which means it has the same function as the keyword just before it.
+.. note:: You can check in the documentation of the `Gherkin language <https://cucumber.io/docs/gherkin/reference/>`_  or in the `behave documentation <https://behave.readthedocs.io/>`_ for more information.

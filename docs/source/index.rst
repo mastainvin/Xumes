@@ -2,7 +2,7 @@ Welcome to Xumes Documentation!
 ===============================
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: Getting Started
 
    installation
@@ -10,5 +10,10 @@ Welcome to Xumes Documentation!
    experiments
    cli
 
+.. toctree::
+   :maxdepth: 1
+   :caption: Documentation
 
-
+   features
+   steps
+   behavior

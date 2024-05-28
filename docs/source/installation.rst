@@ -21,3 +21,10 @@ Clone the following repository instead of the official one:
 .. note::
 
     Don't forget to checkout to the `xumes` branch before build `Godot`.
+
+
+To start the `Godot` editor, run the following command:
+
+.. code-block:: bash
+
+    ./bin/godot.x11.tools.64 --editor --path <path_to_godot_project>
