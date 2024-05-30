@@ -5,7 +5,7 @@ Welcome to Xumes Documentation!
 .. image:: _static/architecture.png
    :alt: Xumes Architecture
    :align: center
-
+   :height: auto
 
 .. toctree::
    :maxdepth: 1
