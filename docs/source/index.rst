@@ -2,10 +2,8 @@ Welcome to Xumes Documentation!
 ===============================
 
 
-.. image:: _static/architecture.png
-   :alt: Xumes Architecture
+.. image:: /_static/architecture.png
    :align: center
-   :height: auto
 
 .. toctree::
    :maxdepth: 1

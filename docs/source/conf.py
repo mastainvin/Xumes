@@ -1,4 +1,8 @@
-# Configuration file for the Sphinx documentation builder.
+# conf.py
+import os
+import sys
+sys.path.insert(0, os.path.abspath('.'))
+
 
 # -- Project information
 
@@ -9,12 +13,17 @@ release = '0.1.0'
 
 # -- General configuration
 
+
+
 extensions = [
-    'sphinx.ext.duration',
-    'sphinx.ext.doctest',
     'sphinx.ext.autodoc',
-    'sphinx.ext.autosummary',
+    'sphinx.ext.doctest',
     'sphinx.ext.intersphinx',
+    'sphinx.ext.todo',
+    'sphinx.ext.coverage',
+    'sphinx.ext.mathjax',
+    'sphinx.ext.viewcode',
+    'sphinx.ext.githubpages',
 ]
 
 intersphinx_mapping = {
@@ -33,4 +42,10 @@ html_theme = 'sphinx_book_theme'
 epub_show_urls = 'footnote'
 
 # Ajouter le logo
-html_logo = "_static/logo.webp"
+html_logo = "_static/logo.png"
+
+html_static_path = ['_static']
+
+
+def setup(app):
+    app.add_css_file('custom.css')
