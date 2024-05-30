@@ -38,3 +38,8 @@ You should see the following output:
         - PipeSize/Testing the pipe size hard [0] - (i=0, j=1, k=2)
         - PipeSize/Testing the pipe size [0] - (i=0, j=0.5, k=2)
         - PipeSize/Testing the pipe size [3] - (i=1, j=0.5, k=2)
+
+
+.. note::
+
+    `Here <https://www.youtube.com/watch?v=awXkgS3Pc8s>`_ is the video of godot first build and test execution.

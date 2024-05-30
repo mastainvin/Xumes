@@ -32,3 +32,5 @@ html_theme = 'sphinx_book_theme'
 # -- Options for EPUB output
 epub_show_urls = 'footnote'
 
+# Ajouter le logo
+html_logo = "_static/logo.webp"
