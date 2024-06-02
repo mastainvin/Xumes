@@ -21,7 +21,7 @@ dependencies = [
   "statsmodels>=0.14.0",
   "gherkin-official>=24.1.0",
   "multiprocess>=0.70.14",
-  "sphinx-book-theme",
+  "furo",
   "click>=8.1.7"
 ]
 
