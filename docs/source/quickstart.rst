@@ -11,13 +11,17 @@ Then, navigate to the `FlappyBird` directory:
 
 .. code-block:: bash
 
-    cd Xumes-Examples/Godot/flappy_bird/Tests/PipeSizeTest
+    cd Xumes-Examples/Godot/flappy_bird/
 
 Run the tests with the following command:
 
 .. code-block:: bash
 
-    xumes test --features_path=./features --steps_path=./features/steps -h 10 -i 100 -v
+    python -m xumes test --features_path=./Tests/PipeSizeTest/features --steps_path=./Tests/PipeSizeTest/features/steps -h 10 -i 100 -v
+
+.. warning::
+
+    Always use `python -m xumes` to run the tests. This ensures the use `Xumes` as a module and be able to import other modules in the project.
 
 This command will run the tests found in the `features` directory in headless mode (without rendering the game), with a frame rate limit of 10 FPS and 100 iterations. The `-v` flag enables vectorized mode.
 
