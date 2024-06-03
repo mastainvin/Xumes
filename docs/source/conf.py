@@ -12,14 +12,12 @@ author = 'Vincent Mastain'
 release = '0.1.0'
 
 # -- General configuration
-
-
-
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.doctest',
     'sphinx.ext.intersphinx',
     'sphinx.ext.todo',
+    'sphinx_copybutton',
     'sphinx.ext.coverage',
     'sphinx.ext.mathjax',
     'sphinx.ext.viewcode',
@@ -47,5 +45,3 @@ html_logo = "_static/logo.png"
 html_static_path = ['_static']
 
 
-def setup(app):
-    app.add_css_file('custom.css')
