@@ -12,6 +12,7 @@ class CommunicationServiceRest:
         self.host = host
         self.port = port
         self.session = requests.Session()
+        self.ports = []
 
     def start_scenario(self, name: str, methods: List[Dict], fps_limit: int, render: bool) -> int:
         port = 0
@@ -27,15 +28,26 @@ class CommunicationServiceRest:
         return port
 
     def start_scenarios(self, scenarios_methods, scenarios, fps_limit: int, render: bool) -> Dict[str, int]:
-        ports = {}
-        http_response = self.session.post(f"http://{self.host}:{self.port}/start_scenarios/", json=scenarios_methods)
+        ports_pids = {}
+        http_response = requests.post(f"http://{self.host}:{self.port}/start_scenarios/", json=scenarios_methods)
         if http_response.status_code == 200:
             ports_response = http_response.json()
+            print(ports_response)
             for scenario_method in scenarios_methods:
                 scenario_name = scenario_method["name"]
-                port = ports_response[scenario_name]
+                port_pid = ports_response[scenario_name]
                 scenario = next(scenario for scenario in scenarios if scenario.name == scenario_name) # TODO change this to a dict
-                ports[scenario] = port
-                logging.log(logging.INFO, f"Scenario {scenario_name} started on port {port}.")
+                ports_pids[scenario] = port_pid
+                logging.log(logging.INFO, f"Scenario {scenario_name} started on port {port_pid[0]} with pid {port_pid[1]}.")
 
-        return ports
+        return ports_pids
+
+    def stop_scenario(self, port: int) -> None:
+        http_response = self.session.post(f"http://{self.host}:{self.port}/stop_scenario/", json=port)
+        if http_response.status_code == 200:
+            logging.log(logging.INFO, f"Scenario on port {port} stopped.")
+
+    def stop_scenarios(self, pids: List[int]) -> None:
+        http_response = requests.post(f"http://{self.host}:{self.port}/stop_scenarios/", json=pids)
+        if http_response.status_code == 200:
+            logging.log(logging.INFO, "Scenarios stopped.")

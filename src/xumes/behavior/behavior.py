@@ -3,6 +3,7 @@ from abc import abstractmethod
 from xumes.behavior.game_service import GameService
 
 
+
 class Behavior:
 
     def __init__(self):

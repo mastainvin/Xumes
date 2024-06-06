@@ -4,16 +4,21 @@ from xumes.test_runner.test_manager import TestManager
 
 
 def play(behavior):
-    behavior.game_service().reset()
-    while True:
-        behavior.game_service().push_action_and_get_state([])
+    try:
+        behavior.game_service().reset()
+        while True:
+            behavior.game_service().push_action_and_get_state([])
 
-        if behavior.terminated():
-            try:
-                behavior.game_service().episode_finished()
-                behavior.game_service().reset()
-            except RunningEndsError:
-                break
+            if behavior.terminated():
+                try:
+                    behavior.game_service().episode_finished()
+                    behavior.game_service().reset()
+                except RunningEndsError:
+                    break
+    except Exception as e:
+        print("Error in manual playing: ", e)
+    finally:
+        behavior.game_service().finished()
 
 
 class HumanPlayingTestManager(TestManager):
