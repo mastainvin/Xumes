@@ -3,7 +3,7 @@ import time
 from abc import abstractmethod
 
 import multiprocess
-from typing import List, Dict
+from typing import List, Dict, Tuple
 
 from xumes.core.colors import bcolors
 from xumes.core.modes import TEST_MODE, RENDER_MODE
@@ -19,11 +19,12 @@ from xumes.test_runner.feature_strategy import given_registry, when_registry, th
 class ScenarioData:
 
     def __init__(self, test_runner: TestRunner = None, process: multiprocess.Process = None, ip: str = None,
-                 port: int = None):
+                 port: int = None, pid: int = None):
         self.test_runner = test_runner
         self.process = process
         self.ip = ip
         self.port = port
+        self.pid = pid
 
 
 class TestManager:
@@ -100,40 +101,54 @@ class TestManager:
         logging.basicConfig(format='%(levelname)s:%(message)s', level=self._logging_level)
 
     def test_all(self, path) -> None:
-        test_time_start = time.time()
+        try:
+            test_time_start = time.time()
 
-        # Retrieve features and scenarios
-        self._feature_strategy.retrieve_feature(path)
-        features = self._feature_strategy.features
+            # Retrieve features and scenarios
+            self._feature_strategy.retrieve_feature(path)
+            features = self._feature_strategy.features
 
-        # Check if all tests are finished
-        active_processes = multiprocess.Value('i', 0)
+            # Check if all tests are finished
+            active_processes = multiprocess.Value('i', 0)
 
-        # For all scenarios in each feature, we run the test
-        for feature in features:
-            self._run_feature(feature, active_processes)
-            self._scenario_datas = {}
+            # For all scenarios in each feature, we run the test
+            for feature in features:
+                self._run_feature(feature, active_processes)
 
-        # Wait for all tests to be finished
-        while active_processes.value > 0:
-            pass
+            print([scenario_data.pid for scenario_data in self._scenario_datas.values()])
 
-        # Close all processes
-        for feature in features:
-            for process in feature.processes:
-                process.join()
-                process.terminate()
+            # Wait for all tests to be finished
+            while active_processes.value > 0:
+                pass
 
-        # self.trainer_manager.disconnect_trainer(scenario.feature.name, scenario.name) TODO : see if we need to disconnect
+            # self.trainer_manager.disconnect_trainer(scenario.feature.name, scenario.name) TODO : see if we need to disconnect
 
-        test_time_end = time.time()
-        self._delta_time = round(test_time_end - test_time_start, 3)
+            test_time_end = time.time()
+            self._delta_time = round(test_time_end - test_time_start, 3)
 
-        if self._mode == TEST_MODE or self._mode == RENDER_MODE:
-            self._assert()
-        else:
-            converted_time = time.strftime("%H:%M:%S", time.gmtime(self._delta_time))
-            print(f"{bcolors.OKGREEN}Training finished in {converted_time}s.{bcolors.ENDC}")
+            if self._mode == TEST_MODE or self._mode == RENDER_MODE:
+                self._assert()
+            else:
+                converted_time = time.strftime("%H:%M:%S", time.gmtime(self._delta_time))
+                print(f"{bcolors.OKGREEN}Training finished in {converted_time}s.{bcolors.ENDC}")
+
+        except KeyboardInterrupt as e:
+            print(f"{bcolors.FAIL}Xumes interrupted by user.{bcolors.ENDC}")
+        finally:
+            # Close all game processes
+            self._comm_service.stop_scenarios([scenario_data.pid for scenario_data in self._scenario_datas.values()])
+
+            # Close all processes
+            for feature in features:
+                for process in feature.processes:
+                    process.join()
+                    process.terminate()
+
+
+
+
+
+
 
     def _assert(self):
         # Make assertions
@@ -193,11 +208,12 @@ class TestManager:
             })
 
         # Make call to api to start the game instances
-        ports: Dict[scenario, int] = self._comm_service.start_scenarios(scenarios_methods, feature.scenarios, self._fps_limit, self._render)
+        ports_pids: Dict[scenario, Tuple[int, int]] = self._comm_service.start_scenarios(scenarios_methods, feature.scenarios, self._fps_limit, self._render)
 
-        for scenario in ports:
-            self._scenario_datas[scenario].port = ports[scenario]
-            self._scenario_datas[scenario].test_runner.run(ports[scenario])
+        for scenario in ports_pids:
+            self._scenario_datas[scenario].port = ports_pids[scenario][0]
+            self._scenario_datas[scenario].pid = ports_pids[scenario][1]
+            self._scenario_datas[scenario].test_runner.run(ports_pids[scenario][0])
 
         self._run_scenarios(feature=feature, scenario_datas=self._scenario_datas, active_processes=active_processes)
 

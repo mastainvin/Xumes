@@ -17,6 +17,8 @@ class VecRLTestManager(TestManager):
         model_path = None
         trainers_info = {}
 
+        behaviors: Agent = []
+
         for scenario in scenario_datas:
 
             test_runner = scenario_datas[scenario].test_runner
@@ -36,22 +38,29 @@ class VecRLTestManager(TestManager):
 
             vec_sb_trainers.add_trainer(behavior.get_trainer())
 
-        def run(_path, nb_processes, vec_trainers):
+            # Add behavior to the list in order to free the resources after the training if error occurs
+            behaviors.append(behavior)
+
+        def run(_path, nb_processes, vec_trainers, behaviors):
             if not _path:
                 _path = "./models/" + feature.name
+            try:
+                if self._mode == TEST_MODE:
+                    vec_trainers.load(_path + "/best_model")
+                    vec_trainers.play()
+                else:
+                    vec_trainers.train(save_path=_path, **trainers_info)
+            except Exception as e:
+                print("Error in training: ", e)
+            finally:
+                vec_trainers.free()
 
-            if self._mode == TEST_MODE:
-                vec_trainers.load(_path + "/best_model")
-                vec_trainers.play()
-                vec_trainers.free()
-            else:
-                vec_trainers.train(save_path=_path, **trainers_info)
-                vec_trainers.free()
-                # vec_trainers.save(_path)
+                for agent in behaviors:
+                    agent.game_service().finished()
 
             nb_processes.value -= 1
 
-        process = multiprocess.Process(target=run, args=(model_path, active_processes, vec_sb_trainers))
+        process = multiprocess.Process(target=run, args=(model_path, active_processes, vec_sb_trainers, behaviors))
         process.start()
         feature.processes.append(process)
         active_processes.value += 1

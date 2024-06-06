@@ -61,9 +61,6 @@ class VecStableBaselinesTrainer(ITrainer):
                 tb_log_name=logs_name
             )
 
-        for trainer in self._trainers:
-            trainer.finished()
-
     def save(self, path: str):
         self.model.save(path)
 

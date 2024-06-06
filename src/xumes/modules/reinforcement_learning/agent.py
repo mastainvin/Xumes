@@ -70,14 +70,19 @@ class Agent(Behavior, ABC):
         else:
             _path = _path + "/" + feature.name + "/" + scenario.name
 
-        if self._mode == TRAIN_MODE:
-            self._trainer.train(_path + "/" + trainer_name(feature, scenario), self._eval_freq, self._logs_path,
-                                self._logs_name, self._previous_model_path)
+        try:
+            if self._mode == TRAIN_MODE:
+                self._trainer.train(_path + "/" + trainer_name(feature, scenario), self._eval_freq, self._logs_path,
+                                    self._logs_name, self._previous_model_path)
+                self._trainer.free()
+            elif self._mode == TEST_MODE:
+                self._trainer.load(_path + "/" + trainer_name(feature, scenario) + "/best_model")
+                self._trainer.play()
+        except Exception as e:
+            print(f"Error occurs while {self._mode}: ", e)
+        finally:
             self._trainer.free()
-        elif self._mode == TEST_MODE:
-            self._trainer.load(_path + "/" + trainer_name(feature, scenario) + "/best_model")
-            self._trainer.play()
-            self._trainer.free()
+            self.game_service().finished()
 
     def predict(self, observation):
         """
