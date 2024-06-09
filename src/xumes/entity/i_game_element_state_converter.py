@@ -1,6 +1,6 @@
 from typing import TypeVar
 
-from xumes.behavior.game_element_state import GameElementState
+from xumes.entity.game_element_state import GameElementState
 
 SW = TypeVar("SW")
 

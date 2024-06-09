@@ -1,10 +1,10 @@
-import time
+import logging
 
 import multiprocess
 
 from xumes import Agent
 from xumes.core.modes import TEST_MODE
-from xumes.test_runner.test_manager import TestManager
+from xumes.test_automation.test_manager import TestManager
 from xumes.modules.reinforcement_learning.vec_stable_baselines_trainer import VecStableBaselinesTrainer
 
 
@@ -28,7 +28,7 @@ class VecRLTestManager(TestManager):
 
             behavior: Agent = when_result[next(iter(when_result))]
             behavior.set_mode(self._mode)
-            behavior.set_game_service(test_runner)
+            behavior.set_test_runner(test_runner)
 
             if trainers_info == {}:
                 trainers_info = behavior.get_trainer_info()
@@ -50,15 +50,19 @@ class VecRLTestManager(TestManager):
                     vec_trainers.play()
                 else:
                     vec_trainers.train(save_path=_path, **trainers_info)
+            except SystemExit or KeyboardInterrupt:
+                logging.warning("Training interrupted by user.")
             except Exception as e:
-                print("Error in training: ", e)
+                logging.error(f"Error occurs while {self._mode}: {e}")
             finally:
                 vec_trainers.free()
 
                 for agent in behaviors:
-                    agent.game_service().finished()
+                    agent.test_runner().finished()
 
-            nb_processes.value -= 1
+                nb_processes.value -= 1
+
+                exit(0)
 
         process = multiprocess.Process(target=run, args=(model_path, active_processes, vec_sb_trainers, behaviors))
         process.start()

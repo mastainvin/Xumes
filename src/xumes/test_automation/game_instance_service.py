@@ -1,17 +1,13 @@
-from abc import abstractmethod
 from typing import List
 
-from xumes.behavior.entity_manager import AutoEntityManager
-from xumes.behavior.implementations.json_impl.json_game_element_state_converter import JsonGameElementStateConverter
-from xumes.test_runner.driver import Driver
-from xumes.test_runner.i_communication_service import ICommunicationService
+from xumes.test_automation.i_communication_service import ICommunicationService
 
 
 class Behavior:
     pass
 
 
-class TestRunner:
+class GameInstanceService:
     """
     The `TestRunner` class is a central component of Xumes. It manages communication between communication service,
     the execution of the game itself, and external events that can modify the game state.
@@ -33,24 +29,10 @@ class TestRunner:
                  communication_service: ICommunicationService,
                  ):
         self.communication_service = communication_service
-        self._entity_manager = AutoEntityManager(JsonGameElementStateConverter())
         self.is_finished = False
-        self.driver = Driver()
-
-    def get_entity(self, name):
-        try:
-            return self._entity_manager.get(name)
-        except KeyError:
-            return None
-
-    def get_entity_manager(self):
-        return self._entity_manager
-
-    def run_communication_service(self, port: int):
-        self.communication_service.init_socket(port)
 
     def run(self, port: int):
-        self.run_communication_service(port)
+        self.communication_service.init_socket(port)
 
     def stop(self):
         self.communication_service.stop_socket()
@@ -59,12 +41,7 @@ class TestRunner:
         self.communication_service.push_dict({"event": "stop"})
         self.communication_service.get_int()
 
-    def push_methods(self, methods: List):
-        self.communication_service.push_dict({"event": "methods", "methods": methods})
-        # self.communication_service.get_int()
-
-    def push_actions_and_get_state(self, actions: List):
-        methods = self.driver()
+    def push_actions_and_get_state(self, actions: List, methods):
         data = {"event": "action", "inputs": actions, "methods": methods}
         # print(data)
         self.communication_service.push_dict(data)
@@ -85,29 +62,3 @@ class TestRunner:
     def reset(self):
         self.communication_service.push_dict({"event": "reset"})
         self.communication_service.get_int()
-
-    def __getattr__(self, item):
-        return self.get_entity(item)
-
-    @abstractmethod
-    def config(self):
-        """
-        Configures the game environment.
-        """
-        raise NotImplementedError
-
-    @abstractmethod
-    def given(self):
-        raise NotImplementedError
-
-    @abstractmethod
-    def when(self) -> Behavior:
-        raise NotImplementedError
-
-    @abstractmethod
-    def then(self):
-        raise NotImplementedError
-
-    @abstractmethod
-    def episode_finished(self) -> bool:
-        raise NotImplementedError

@@ -1,4 +1,4 @@
-from xumes.test_runner.assertion import IAssertionStrategy, AssertionEqualStatistical, AssertionBetweenStatistical, \
+from xumes.assertions.assertion import IAssertionStrategy, AssertionEqualStatistical, AssertionBetweenStatistical, \
     AssertionLessThanStatistical, AssertionLessThanOrEqualStatistical, AssertionGreaterThanStatistical, \
     AssertionGreaterThanOrEqualStatistical, AssertionGreaterThanOrEqual, AssertionGreaterThan, AssertionLessThanOrEqual, \
     AssertionLessThan, AssertionBetween, AssertionEqual

@@ -11,8 +11,8 @@ import re
 
 from xumes.core.modes import TRAIN_MODE, TEST_MODE
 from xumes.modules.human.human_playing_test_manager import HumanPlayingTestManager
-from xumes.test_runner.implementations.features_impl.gherkin_feature_strategy import GherkinFeatureStrategy
-from xumes.test_runner.implementations.rest_impl.communication_service_rest import CommunicationServiceRest
+from xumes.test_automation.implementations.features_impl.gherkin_feature_strategy import GherkinFeatureStrategy
+from xumes.test_automation.implementations.rest_impl.communication_service_rest import CommunicationServiceRest
 from xumes.modules.reinforcement_learning.rl_test_manager import RLTestManager
 from xumes.modules.reinforcement_learning.vec_rl_test_manager import VecRLTestManager
 

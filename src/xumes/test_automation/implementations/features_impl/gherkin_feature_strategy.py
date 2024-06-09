@@ -6,7 +6,7 @@ from gherkin.parser import Parser
 from gherkin.token_scanner import TokenScanner
 
 from xumes.core.registry import get_content_from_registry
-from xumes.test_runner.feature_strategy import FeatureStrategy, Feature, Scenario
+from xumes.test_automation.feature_strategy import FeatureStrategy, Feature, Scenario
 
 
 class GherkinFeatureStrategy(FeatureStrategy):

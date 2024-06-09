@@ -4,7 +4,7 @@ from time import sleep
 from typing import Dict, Any
 
 from xumes.core.utils import parse_json_with_eval
-from xumes.test_runner.i_communication_service import ICommunicationService
+from xumes.test_automation.i_communication_service import ICommunicationService
 
 
 class CommunicationServiceSocket(ICommunicationService):

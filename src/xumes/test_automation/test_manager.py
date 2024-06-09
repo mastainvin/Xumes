@@ -7,18 +7,21 @@ from typing import List, Dict, Tuple
 
 from xumes.core.colors import bcolors
 from xumes.core.modes import TEST_MODE, RENDER_MODE
-from xumes.test_runner.assertion_bucket import AssertionReport
-from xumes.test_runner.feature_strategy import FeatureStrategy, Scenario
-from xumes.test_runner.implementations.socket_impl.communication_service_socket import \
+from xumes.assertions.assertion_bucket import AssertionReport
+from xumes.test_automation.feature_strategy import FeatureStrategy, Scenario
+from xumes.test_automation.registries import config_registry, given_registry, \
+    when_registry, then_registry
+
+from xumes.test_automation.implementations.socket_impl.communication_service_socket import \
     CommunicationServiceSocket
 
-from xumes.test_runner.test_runner import TestRunner
-from xumes.test_runner.feature_strategy import given_registry, when_registry, then_registry, config_registry
+from xumes.test_automation.game_instance_service import GameInstanceService
+from xumes.test_automation.test_runner import TestRunner
 
 
 class ScenarioData:
 
-    def __init__(self, test_runner: TestRunner = None, process: multiprocess.Process = None, ip: str = None,
+    def __init__(self, test_runner: GameInstanceService = None, process: multiprocess.Process = None, ip: str = None,
                  port: int = None, pid: int = None):
         self.test_runner = test_runner
         self.process = process
@@ -49,7 +52,7 @@ class TestManager:
             Adds game service data to the list of game services data.
         create_test_runner(steps: str, ip: str, port: int) -> GameService:
             Creates a game service instance with the specified steps, IP, and port.
-        _build_test_runner(test_runner, ip, port) -> GameService:
+        _build_test_runner(test_automation, ip, port) -> GameService:
             Abstract method to build a game service instance. Must be implemented by subclasses.
         test_all() -> None:
             Runs all the tests in the game environment.
@@ -77,25 +80,11 @@ class TestManager:
         self._delta_time = 0
         self._fps_limit = fps_limit
         self._render = render
+        self._features = []
 
     def add_test_runner_data(self, scenario: Scenario, ip: str, port: int):
         # Add a game service data to the list of game services data
         self._scenario_datas[scenario] = ScenarioData(ip=ip, port=port)
-
-    def create_test_runner(self, scenario: Scenario, assertion_queue: multiprocess.Queue,
-                           registry_queue: multiprocess.Queue
-                           ) -> TestRunner:
-        test_runner = self._feature_strategy.build_test_runner(mode=self._mode,
-                                                               timesteps=self._timesteps,
-                                                               iterations=self._iterations,
-                                                               scenario=scenario,
-                                                               test_queue=assertion_queue,
-                                                               registry_queue=registry_queue,
-                                                               comm_service=CommunicationServiceSocket(
-                                                                   host="127.0.0.1"))
-        # scenario_data.test_runner = test_runner
-
-        return test_runner
 
     def _init_logging(self):
         logging.basicConfig(format='%(levelname)s:%(message)s', level=self._logging_level)
@@ -106,22 +95,18 @@ class TestManager:
 
             # Retrieve features and scenarios
             self._feature_strategy.retrieve_feature(path)
-            features = self._feature_strategy.features
+            self._features = self._feature_strategy.features
 
             # Check if all tests are finished
             active_processes = multiprocess.Value('i', 0)
 
             # For all scenarios in each feature, we run the test
-            for feature in features:
+            for feature in self._features:
                 self._run_feature(feature, active_processes)
-
-            print([scenario_data.pid for scenario_data in self._scenario_datas.values()])
 
             # Wait for all tests to be finished
             while active_processes.value > 0:
                 pass
-
-            # self.trainer_manager.disconnect_trainer(scenario.feature.name, scenario.name) TODO : see if we need to disconnect
 
             test_time_end = time.time()
             self._delta_time = round(test_time_end - test_time_start, 3)
@@ -133,22 +118,18 @@ class TestManager:
                 print(f"{bcolors.OKGREEN}Training finished in {converted_time}s.{bcolors.ENDC}")
 
         except KeyboardInterrupt as e:
-            print(f"{bcolors.FAIL}Xumes interrupted by user.{bcolors.ENDC}")
+            logging.info(f"{bcolors.FAIL}Xumes interrupted by user.{bcolors.ENDC}")
+        except Exception as e:
+            logging.error(f"{bcolors.FAIL}Error occurs while testing: {e}{bcolors.ENDC}")
         finally:
             # Close all game processes
             self._comm_service.stop_scenarios([scenario_data.pid for scenario_data in self._scenario_datas.values()])
 
             # Close all processes
-            for feature in features:
+            for feature in self._features:
                 for process in feature.processes:
                     process.join()
                     process.terminate()
-
-
-
-
-
-
 
     def _assert(self):
         # Make assertions
@@ -195,7 +176,11 @@ class TestManager:
             registry_queue = multiprocess.Queue()
             registry_queue.put((config_registry, given_registry, when_registry, then_registry))
 
-            test_runner = self.create_test_runner(scenario, self._assertion_queue, registry_queue)
+            test_runner = TestRunner(GameInstanceService(CommunicationServiceSocket(host="127.0.0.1")),
+                                     self._timesteps, self._iterations, self._mode, scenario.feature.name,
+                                     scenario.name,
+                                     self._assertion_queue, scenario.steps, registry_queue)
+
             self._scenario_datas[scenario].test_runner = test_runner
 
             methods = test_runner.config()
@@ -208,7 +193,9 @@ class TestManager:
             })
 
         # Make call to api to start the game instances
-        ports_pids: Dict[scenario, Tuple[int, int]] = self._comm_service.start_scenarios(scenarios_methods, feature.scenarios, self._fps_limit, self._render)
+        ports_pids: Dict[scenario, Tuple[int, int]] = self._comm_service.start_scenarios(scenarios_methods,
+                                                                                         feature.scenarios,
+                                                                                         self._fps_limit, self._render)
 
         for scenario in ports_pids:
             self._scenario_datas[scenario].port = ports_pids[scenario][0]
