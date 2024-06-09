@@ -1,8 +1,6 @@
 from abc import abstractmethod
 from typing import Optional
 
-from xumes.test_runner.test_runner import TestRunner
-
 
 class ITrainer:
 
@@ -25,7 +23,7 @@ class ITrainer:
     def play(self, timesteps: Optional[int] = None):
         """
         Use the algorithm not in training mode.
-        :param test_runner: The test runner to use.
+        :param test_automation: The test runner to use.
         :param timesteps: Number maximum of step (action to perform).
         """
         raise NotImplementedError

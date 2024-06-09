@@ -3,7 +3,7 @@ from typing import Any, Dict
 
 class ICommunicationService:
     """
-      Communication between the test_runner and the game.
+      Communication between the test_automation and the game.
       Methods:
           observe: Send the game state to the training server.
           action: Wait for the training server to send an action.

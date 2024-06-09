@@ -1,7 +1,7 @@
 from typing import Tuple
 
-from xumes.behavior.game_element_state import GameElementState
-from xumes.behavior.i_game_element_state_converter import IGameElementStateConverter
+from xumes.entity.game_element_state import GameElementState
+from xumes.entity.i_game_element_state_converter import IGameElementStateConverter
 
 
 class JsonGameElementStateConverter(IGameElementStateConverter):

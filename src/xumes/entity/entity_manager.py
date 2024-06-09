@@ -1,14 +1,14 @@
 from abc import abstractmethod
 from typing import Dict, final
 
-from xumes.behavior.i_state_entity import IStateEntity
-from xumes.behavior.game_element_state import GameElementState
-from xumes.behavior.i_game_element_state_converter import IGameElementStateConverter
+from xumes.entity.i_state_entity import IStateEntity
+from xumes.entity.game_element_state import GameElementState
+from xumes.entity.i_game_element_state_converter import IGameElementStateConverter
 
 
-class EntityManager(IStateEntity):
+class EntityRegistry(IStateEntity):
     """
-       The `EntityManager` class is responsible for managing game entities and updating the game state.
+       The `EntityRegistry` class is responsible for managing game entities and updating the game state.
 
        Attributes:
            _game_element_state_converter: An object implementing the `IGameElementStateConverter` interface for converting game elements to states.
@@ -17,7 +17,7 @@ class EntityManager(IStateEntity):
 
        Methods:
            update(state): Updates the game state when received.
-           game_state: Property representing the current game state.
+           entity: Property representing the current game state.
            get_all(): Retrieves all game observable entities.
            get(name): Retrieves an entity by its name.
            _update(game_element_state): Updates an existing game entity with the provided `game_element_state`.
@@ -31,7 +31,7 @@ class EntityManager(IStateEntity):
                  ):
         self._game_element_state_converter = game_element_state_converter
         self._entities: Dict[str, IStateEntity] = {
-            "test_runner": self
+            "test_automation": self
         }
         self._game_state: str = ""
 
@@ -317,7 +317,7 @@ class EntitySetAdapter(set, Entity):
         return hash(tuple(self))
 
 
-class AutoEntityManager(EntityManager):
+class AutoEntityManager(EntityRegistry):
     def build_entity(self, game_element_state: GameElementState) -> IStateEntity:
         if game_element_state.type == "unknown":
             if isinstance(game_element_state.state, int):

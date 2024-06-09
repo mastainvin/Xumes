@@ -1,9 +1,10 @@
+import logging
 from abc import ABC, abstractmethod
 from typing import TypeVar, List, Optional
 
 from xumes.core.model_helper import trainer_name, model_path
 from xumes.core.modes import TEST_MODE, TRAIN_MODE
-from xumes.behavior.behavior import Behavior
+from xumes.test_automation.behavior import Behavior
 from xumes.modules.reinforcement_learning.i_trainer import ITrainer
 from xumes.modules.reinforcement_learning.stable_baselines_trainer import StableBaselinesTrainer
 
@@ -74,15 +75,16 @@ class Agent(Behavior, ABC):
             if self._mode == TRAIN_MODE:
                 self._trainer.train(_path + "/" + trainer_name(feature, scenario), self._eval_freq, self._logs_path,
                                     self._logs_name, self._previous_model_path)
-                self._trainer.free()
             elif self._mode == TEST_MODE:
                 self._trainer.load(_path + "/" + trainer_name(feature, scenario) + "/best_model")
                 self._trainer.play()
+        except KeyboardInterrupt or SystemExit:
+            logging.info("Training interrupted by user.")
         except Exception as e:
-            print(f"Error occurs while {self._mode}: ", e)
+            logging.error(f"Error occurs while {self._mode}: ", e)
         finally:
             self._trainer.free()
-            self.game_service().finished()
+            self.test_runner().finished()
 
     def predict(self, observation):
         """

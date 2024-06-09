@@ -1,6 +1,6 @@
 import os
 
-from xumes.test_runner.feature_strategy import FeatureStrategy, Feature, Scenario
+from xumes.test_automation.feature_strategy import FeatureStrategy, Feature, Scenario
 
 
 class BasicFeatureStrategy(FeatureStrategy):

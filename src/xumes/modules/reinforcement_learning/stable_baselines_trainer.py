@@ -113,6 +113,8 @@ class StableBaselinesTrainer(AgentTrainer, ABC):
 
         def step():
             nonlocal obs
+            nonlocal running
+
             action, _states = self.model.predict(obs, deterministic=True)
             try:
                 obs, reward, terminated, done, info = self.env.step(action)
@@ -121,7 +123,10 @@ class StableBaselinesTrainer(AgentTrainer, ABC):
             except RunningEndsError:
                 logging.info(f"Received stop signal. Closing environment.")
                 self.env.close()
-                nonlocal running
+                running = False
+            except Exception as e:
+                logging.error(f"Error in step: {e}")
+                self.env.close()
                 running = False
 
         if not timesteps:
@@ -131,8 +136,9 @@ class StableBaselinesTrainer(AgentTrainer, ABC):
             for _ in range(timesteps):
                 step()
 
+
     def finished(self):
-        self.agent.game_service().finished()
+        self.agent.test_runner().finished()
 
     def predict(self, obs: OBST):
         """

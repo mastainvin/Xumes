@@ -1,9 +1,7 @@
-import json
 import logging
 from typing import Dict, List
 
 import requests
-import time
 
 
 class CommunicationServiceRest:
@@ -32,7 +30,6 @@ class CommunicationServiceRest:
         http_response = requests.post(f"http://{self.host}:{self.port}/start_scenarios/", json=scenarios_methods)
         if http_response.status_code == 200:
             ports_response = http_response.json()
-            print(ports_response)
             for scenario_method in scenarios_methods:
                 scenario_name = scenario_method["name"]
                 port_pid = ports_response[scenario_name]

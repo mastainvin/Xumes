@@ -3,9 +3,9 @@ import time
 import multiprocess
 from typing import List, Dict
 
-from xumes.test_runner.assertion import IAssertionStrategy
-from xumes.test_runner.assertion_factory import AssertionFactory
-from xumes.test_runner.assertion_result import AssertionResult
+from xumes.assertions.assertion import IAssertionStrategy
+from xumes.assertions.assertion_factory import AssertionFactory
+from xumes.assertions.assertion_result import AssertionResult
 
 
 class AssertionReport:
