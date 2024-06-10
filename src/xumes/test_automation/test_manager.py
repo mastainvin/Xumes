@@ -105,11 +105,26 @@ class TestManager:
 
             # For all scenarios in each feature, we run the test
             for feature in self._features:
+                logging.info(f"{bcolors.OKBLUE + bcolors.BOLD}Feature: {feature.name}{bcolors.ENDC}")
+
+                # Run the feature (exec all scenarios)
                 self._run_feature(feature, active_processes)
 
-            # Wait for all tests to be finished
-            while active_processes.value > 0:
-                pass
+                # Wait for all tests to be finished
+                while active_processes.value > 0:
+                    time.sleep(1)
+
+                # Stop all scenarios
+                feature_scenarios_data = []
+                for scenario in feature.scenarios:
+                    feature_scenarios_data.append(self._scenario_datas[scenario])
+                    self._scenario_datas.pop(scenario)
+
+                self._comm_service.stop_scenarios([scenario_data.pid for scenario_data in feature_scenarios_data])
+
+                for process in feature.processes:
+                    process.join()
+                    process.terminate()
 
             test_time_end = time.time()
             self._delta_time = round(test_time_end - test_time_start, 3)
@@ -152,7 +167,9 @@ class TestManager:
                     table_data.append([f"  {scenario.name}", f"{scenario.steps}.py", wrapped_tags])
 
             # Define table headers
-            headers = [bcolors.UNDERLINE + bcolors.BOLD + "Feature/Scenario" + bcolors.ENDC, bcolors.UNDERLINE + bcolors.BOLD + "Steps file" + bcolors.ENDC, bcolors.UNDERLINE + bcolors.BOLD + "Tags" + bcolors.ENDC]
+            headers = [bcolors.UNDERLINE + bcolors.BOLD + "Feature/Scenario" + bcolors.ENDC,
+                       bcolors.UNDERLINE + bcolors.BOLD + "Steps file" + bcolors.ENDC,
+                       bcolors.UNDERLINE + bcolors.BOLD + "Tags" + bcolors.ENDC]
 
             # Print the table
             print(tabulate(table_data, headers=headers, tablefmt="grid"))
