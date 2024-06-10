@@ -22,7 +22,8 @@ dependencies = [
   "gherkin-official>=24.1.0",
   "multiprocess>=0.70.14",
   "furo",
-  "click>=8.1.7"
+  "click>=8.1.7",
+  "tabulate>=0.9.0"
 ]
 
 [build-system]

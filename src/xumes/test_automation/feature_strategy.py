@@ -10,10 +10,14 @@ from xumes.test_automation.registries import given, when, then
 
 class Scenario:
 
-    def __init__(self, name: str = None, steps: str = None, feature=None):
+    def __init__(self, name: str = None, steps: str = None, feature=None, tags=None):
         self.name = name
         self.steps: str = steps
         self.feature: Feature = feature
+
+        if tags is None:
+            tags = []
+        self.tags = tags
 
 
 class Feature:

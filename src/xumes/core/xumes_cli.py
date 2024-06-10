@@ -15,6 +15,7 @@ from xumes.test_automation.implementations.features_impl.gherkin_feature_strateg
 from xumes.test_automation.implementations.rest_impl.communication_service_rest import CommunicationServiceRest
 from xumes.modules.reinforcement_learning.rl_test_manager import RLTestManager
 from xumes.modules.reinforcement_learning.vec_rl_test_manager import VecRLTestManager
+from xumes.test_automation.test_manager import DummyTestManager
 
 
 @click.group()
@@ -203,3 +204,19 @@ def play(debug, features_path, steps_path, iterations, info, log,
     )
 
     test_manager.test_all(features_path)
+
+
+@cli.command()
+@click.option("--features_path", default=None, type=click.Path(), help="Path of the ./features folder.")
+@click.option("--steps_path", default=None, type=click.Path(), help="Path of the ./steps folder.")
+@click.option("--features", "-f", default=None, help="List of features to test.")
+@click.option("--scenarios", "-s", default=None, help="List of scenarios to test.")
+@click.option("--tags", default=None, help="Tags of the features to test.")
+def list(features, scenarios, tags, features_path="./", steps_path="./"):
+    test_manager = DummyTestManager(feature_strategy=GherkinFeatureStrategy(steps_path=steps_path, features_names=features, scenarios_names=scenarios, tags=tags),
+                                    comm_service=CommunicationServiceRest(host="127.0.0.1", port=8080))
+
+    test_manager.list_features(features_path)
+
+
+

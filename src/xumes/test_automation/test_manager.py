@@ -1,9 +1,12 @@
 import logging
+import textwrap
 import time
 from abc import abstractmethod
 
 import multiprocess
 from typing import List, Dict, Tuple
+
+from tabulate import tabulate
 
 from xumes.core.colors import bcolors
 from xumes.core.modes import TEST_MODE, RENDER_MODE
@@ -131,6 +134,31 @@ class TestManager:
                     process.join()
                     process.terminate()
 
+    def list_features(self, path):
+        try:
+            # Retrieve features and scenarios
+            self._feature_strategy.retrieve_feature(path)
+            self._features = self._feature_strategy.features
+            width = 80
+
+            # Create a list of rows for the table
+            table_data = []
+            for feature in self._features:
+                header = f"{bcolors.OKBLUE + bcolors.BOLD}Feature: {feature.name}{bcolors.ENDC}"
+                table_data.append([header, "", ""])
+                for scenario in feature.scenarios:
+                    tags = ', '.join(scenario.tags)
+                    wrapped_tags = textwrap.fill(tags, width=50, subsequent_indent=' ' * 8)
+                    table_data.append([f"  {scenario.name}", f"{scenario.steps}.py", wrapped_tags])
+
+            # Define table headers
+            headers = [bcolors.UNDERLINE + bcolors.BOLD + "Feature/Scenario" + bcolors.ENDC, bcolors.UNDERLINE + bcolors.BOLD + "Steps file" + bcolors.ENDC, bcolors.UNDERLINE + bcolors.BOLD + "Tags" + bcolors.ENDC]
+
+            # Print the table
+            print(tabulate(table_data, headers=headers, tablefmt="grid"))
+        except Exception as e:
+            logging.error(f"{bcolors.FAIL}Error occurs while listing features: {e}{bcolors.ENDC}")
+
     def _assert(self):
         # Make assertions
 
@@ -207,3 +235,8 @@ class TestManager:
     @abstractmethod
     def _run_scenarios(self, feature, scenario_datas, active_processes):
         raise NotImplementedError
+
+
+class DummyTestManager(TestManager):
+    def _run_scenarios(self, feature, scenario_datas, active_processes):
+        pass
