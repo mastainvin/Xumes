@@ -182,3 +182,85 @@ Options
 .. option:: --headless [Optional]
 
    Run the game in headless mode.
+
+
+
+List
+----
+
+This command lists all the features of the test.
+
+Synopsis
+~~~~~~~~
+
+.. code-block:: bash
+
+    xumes list [OPTIONS]
+
+Options
+~~~~~~~
+
+.. option:: --features_path <folder> [Optional]
+
+   The path to the folder where the features are located.
+
+.. option:: --steps_path <folder> [Optional]
+
+   The path to the folder where the steps are located.
+
+.. option:: --features <name>, -f <name> [Optional]
+
+   List of features you want to list, separated by commas. All if not specified.
+
+.. option:: --scenarios <name>, -s <name> [Optional]
+
+   List of scenarios you want to list, separated by commas. All if not specified.
+
+.. option:: --tags <name> [Optional]
+
+   List of tags you want to list, separated by commas. All if not specified.
+
+Description
+~~~~~~~~~~~
+
+The ``list`` command is used to list all the features of the test. It takes several optional parameters including ``features``, ``scenarios``, and ``tags``. The ``features``, ``scenarios``, and ``tags`` parameters are used to specify which features and scenarios to list and to tag the features. The ``features_path`` and ``steps_path`` parameters are used to specify the paths to the features and steps folders.
+
+Examples
+~~~~~~~~
+
+.. code-block:: bash
+
+    xumes list --features_path ./features --steps_path ./steps --features feature1,feature2 --scenarios scenario1,scenario2 --tags tag1,tag2
+
+This command will list all the features specified in the ``features`` and ``scenarios`` options that are tagged with the tags specified in the ``tags`` option. The features and scenarios are located in the folders specified by the ``features_path`` and ``steps_path`` options.
+
+
+.. code-block:: bash
+
+    +------------------------------------------------------+--------------+-------------+
+    | Feature/Scenario                                     | Steps file   | Tags        |
+    +======================================================+==============+=============+
+    | Feature: PipeSize2                                   |              |             |
+    +------------------------------------------------------+--------------+-------------+
+    | Testing the pipe size easy [0] - (i=0, j=0, k=2)     | PipeSize.py  | easy, smoke |
+    +------------------------------------------------------+--------------+-------------+
+    | Testing the pipe size easy [1] - (i=0.5, j=0.5, k=2) | PipeSize.py  | easy, smoke |
+    +------------------------------------------------------+--------------+-------------+
+    | Testing the pipe size easy [2] - (i=1, j=1, k=2)     | PipeSize.py  | easy, smoke |
+    +------------------------------------------------------+--------------+-------------+
+    | Testing the pipe size hard [0] - (i=0, j=1, k=2)     | PipeSize.py  | hard        |
+    +------------------------------------------------------+--------------+-------------+
+    | Testing the pipe size hard [1] - (i=1, j=0, k=2)     | PipeSize.py  | hard        |
+    +------------------------------------------------------+--------------+-------------+
+    | Feature: PipeSize                                    |              |             |
+    +------------------------------------------------------+--------------+-------------+
+    | Testing the pipe size easy [0] - (i=0, j=0, k=2)     | PipeSize.py  | easy, smoke |
+    +------------------------------------------------------+--------------+-------------+
+    | Testing the pipe size easy [1] - (i=0.5, j=0.5, k=2) | PipeSize.py  | easy, smoke |
+    +------------------------------------------------------+--------------+-------------+
+    | Testing the pipe size easy [2] - (i=1, j=1, k=2)     | PipeSize.py  | easy, smoke |
+    +------------------------------------------------------+--------------+-------------+
+    | Testing the pipe size hard [0] - (i=0, j=1, k=2)     | PipeSize.py  | hard        |
+    +------------------------------------------------------+--------------+-------------+
+    | Testing the pipe size hard [1] - (i=1, j=0, k=2)     | PipeSize.py  | hard        |
+    +------------------------------------------------------+--------------+-------------+

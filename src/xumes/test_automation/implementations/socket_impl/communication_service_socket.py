@@ -16,6 +16,7 @@ class CommunicationServiceSocket(ICommunicationService):
         self.is_running = False
 
     def push_dict(self, dictionary) -> None:
+
         if self.is_running:
             self.socket.sendall(json.dumps(dictionary).encode())
 
@@ -42,7 +43,7 @@ class CommunicationServiceSocket(ICommunicationService):
             try:
                 self.socket.connect((self.host, port))
                 break
-            except:
+            except Exception as e:
                 sleep(0.001)
         self.is_running = True
 

@@ -111,14 +111,18 @@ class GherkinFeatureStrategy(FeatureStrategy):
         """
         # If the scenario has tags, we check if the scenario has one of the selected tags
         has_tag = False
+        scenario_tags = []
+        if 'tags' in scenario:
+            for tag in scenario.get('tags', []):
+                scenario_tags.append(tag['name'][1:])
+
         if self._selected_tags is None:
             has_tag = True
         else:
-            if 'tags' in scenario:
-                for tag in scenario['tags']:
-                    if tag['name'][1:] in self._selected_tags:  # We remove the @ from the tag
-                        has_tag = True
-                        break
+            for tag in scenario_tags:
+                if tag in self._selected_tags:  # We remove the @ from the tag
+                    has_tag = True
+                    break
             else:
                 has_tag = False
 
@@ -136,7 +140,7 @@ class GherkinFeatureStrategy(FeatureStrategy):
                 self.then.all[steps_file][i].add_params(scenario['name'], then_params[i])
 
             # Create a Scenario object
-            scenario_obj = Scenario(scenario['name'], steps_file, feature_obj)
+            scenario_obj = Scenario(scenario['name'], steps_file, feature_obj, scenario_tags)
             feature_obj.scenarios.append(scenario_obj)
 
     def _convert_steps_files_to_gherkin_steps(self):

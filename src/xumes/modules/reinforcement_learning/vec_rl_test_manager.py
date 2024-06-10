@@ -1,4 +1,5 @@
 import logging
+import traceback
 
 import multiprocess
 
@@ -54,6 +55,7 @@ class VecRLTestManager(TestManager):
                 logging.warning("Training interrupted by user.")
             except Exception as e:
                 logging.error(f"Error occurs while {self._mode}: {e}")
+                logging.error(traceback.format_exc())
             finally:
                 vec_trainers.free()
 

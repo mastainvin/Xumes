@@ -1,9 +1,12 @@
 import logging
+import textwrap
 import time
 from abc import abstractmethod
 
 import multiprocess
 from typing import List, Dict, Tuple
+
+from tabulate import tabulate
 
 from xumes.core.colors import bcolors
 from xumes.core.modes import TEST_MODE, RENDER_MODE
@@ -102,11 +105,26 @@ class TestManager:
 
             # For all scenarios in each feature, we run the test
             for feature in self._features:
+                logging.info(f"{bcolors.OKBLUE + bcolors.BOLD}Feature: {feature.name}{bcolors.ENDC}")
+
+                # Run the feature (exec all scenarios)
                 self._run_feature(feature, active_processes)
 
-            # Wait for all tests to be finished
-            while active_processes.value > 0:
-                pass
+                # Wait for all tests to be finished
+                while active_processes.value > 0:
+                    time.sleep(1)
+
+                # Stop all scenarios
+                feature_scenarios_data = []
+                for scenario in feature.scenarios:
+                    feature_scenarios_data.append(self._scenario_datas[scenario])
+                    self._scenario_datas.pop(scenario)
+
+                self._comm_service.stop_scenarios([scenario_data.pid for scenario_data in feature_scenarios_data])
+
+                for process in feature.processes:
+                    process.join()
+                    process.terminate()
 
             test_time_end = time.time()
             self._delta_time = round(test_time_end - test_time_start, 3)
@@ -130,6 +148,33 @@ class TestManager:
                 for process in feature.processes:
                     process.join()
                     process.terminate()
+
+    def list_features(self, path):
+        try:
+            # Retrieve features and scenarios
+            self._feature_strategy.retrieve_feature(path)
+            self._features = self._feature_strategy.features
+            width = 80
+
+            # Create a list of rows for the table
+            table_data = []
+            for feature in self._features:
+                header = f"{bcolors.OKBLUE + bcolors.BOLD}Feature: {feature.name}{bcolors.ENDC}"
+                table_data.append([header, "", ""])
+                for scenario in feature.scenarios:
+                    tags = ', '.join(scenario.tags)
+                    wrapped_tags = textwrap.fill(tags, width=50, subsequent_indent=' ' * 8)
+                    table_data.append([f"  {scenario.name}", f"{scenario.steps}.py", wrapped_tags])
+
+            # Define table headers
+            headers = [bcolors.UNDERLINE + bcolors.BOLD + "Feature/Scenario" + bcolors.ENDC,
+                       bcolors.UNDERLINE + bcolors.BOLD + "Steps file" + bcolors.ENDC,
+                       bcolors.UNDERLINE + bcolors.BOLD + "Tags" + bcolors.ENDC]
+
+            # Print the table
+            print(tabulate(table_data, headers=headers, tablefmt="grid"))
+        except Exception as e:
+            logging.error(f"{bcolors.FAIL}Error occurs while listing features: {e}{bcolors.ENDC}")
 
     def _assert(self):
         # Make assertions
@@ -207,3 +252,8 @@ class TestManager:
     @abstractmethod
     def _run_scenarios(self, feature, scenario_datas, active_processes):
         raise NotImplementedError
+
+
+class DummyTestManager(TestManager):
+    def _run_scenarios(self, feature, scenario_datas, active_processes):
+        pass
