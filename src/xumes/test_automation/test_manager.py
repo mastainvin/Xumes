@@ -78,7 +78,7 @@ class TestManager:
         self._iterations = iterations
         self._feature_strategy: FeatureStrategy = feature_strategy
         self._assertion_queue = multiprocess.Queue()
-        self._do_logs = do_logs
+        self.do_logs = do_logs
         self._logging_level = logging_level
         self._delta_time = 0
         self._fps_limit = fps_limit

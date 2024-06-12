@@ -42,15 +42,20 @@ class VecRLTestManager(TestManager):
             # Add behavior to the list in order to free the resources after the training if error occurs
             behaviors.append(behavior)
 
-        def run(_path, nb_processes, vec_trainers, behaviors):
+        def run(_path, nb_processes, vec_trainers, behaviors, do_log=None):
             if not _path:
                 _path = "./models/" + feature.name
+
+            logging_path = None
+            if do_log:
+                logging_path = _path + "/logs"
+
             try:
                 if self._mode == TEST_MODE:
                     vec_trainers.load(_path + "/best_model")
                     vec_trainers.play()
                 else:
-                    vec_trainers.train(save_path=_path, **trainers_info)
+                    vec_trainers.train(save_path=_path, logs_path=logging_path, logs_name=feature.name, **trainers_info)
             except SystemExit or KeyboardInterrupt:
                 logging.warning("Training interrupted by user.")
             except Exception as e:
@@ -66,7 +71,7 @@ class VecRLTestManager(TestManager):
 
                 exit(0)
 
-        process = multiprocess.Process(target=run, args=(model_path, active_processes, vec_sb_trainers, behaviors))
+        process = multiprocess.Process(target=run, args=(model_path, active_processes, vec_sb_trainers, behaviors, self.do_logs))
         process.start()
         feature.processes.append(process)
         active_processes.value += 1

@@ -55,11 +55,7 @@ class VecStableBaselinesTrainer(ITrainer):
                 tb_log_name=logs_name
             )
         else:
-            self.model = algorithm(algorithm_type, self._vec_env, verbose=1, tensorboard_log=logs_path).learn(
-                total_timesteps,
-                callback=eval_callback,
-                tb_log_name=logs_name
-            )
+            self.model = algorithm(algorithm_type, self._vec_env, verbose=1, tensorboard_log=logs_path).learn(total_timesteps, callback=eval_callback, tb_log_name=logs_name)
 
     def save(self, path: str):
         self.model.save(path)

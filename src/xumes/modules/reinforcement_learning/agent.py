@@ -31,14 +31,12 @@ class Agent(Behavior, ABC):
         self._save_path = save_path
         self._eval_freq = eval_freq
         self._logs_path = logs_path
-        self._logs_name = logs_name
+        self._logging = False
         self._previous_model_path = previous_model_path
 
     def get_trainer_info(self):
         return {
             "eval_freq": self._eval_freq,
-            "logs_path": self._logs_path,
-            "logs_name": self._logs_name,
             "previous_model_path": self._previous_model_path
         }
 
@@ -53,6 +51,15 @@ class Agent(Behavior, ABC):
         Returns the agent's model save path.
         """
         return self._save_path
+
+    def set_do_logging(self, do_logging: bool):
+        """
+        Sets the logging mode.
+
+        Args:
+            do_logging: True to enable logging, otherwise False.
+        """
+        self._logging = do_logging
 
     def execute(self, feature, scenario):
         """
@@ -71,20 +78,27 @@ class Agent(Behavior, ABC):
         else:
             _path = _path + "/" + feature.name + "/" + scenario.name
 
+        logging_path = None
+        if self._logging:
+            logging_path = _path + "/logs"
+
         try:
             if self._mode == TRAIN_MODE:
-                self._trainer.train(_path + "/" + trainer_name(feature, scenario), self._eval_freq, self._logs_path,
-                                    self._logs_name, self._previous_model_path)
+                self._trainer.train(_path, self._eval_freq, logs_path=logging_path, logs_name=scenario.name,
+                                    previous_model_path=self._previous_model_path)
             elif self._mode == TEST_MODE:
-                self._trainer.load(_path + "/" + trainer_name(feature, scenario) + "/best_model")
+                self._trainer.load(_path + "/best_model")
                 self._trainer.play()
-        except KeyboardInterrupt or SystemExit:
+        except KeyboardInterrupt or SystemExit as e:
             logging.info("Training interrupted by user.")
+            raise e
         except Exception as e:
             logging.error(f"Error occurs while {self._mode}: ", e)
+            raise e
         finally:
             self._trainer.free()
             self.test_runner().finished()
+
 
     def predict(self, observation):
         """

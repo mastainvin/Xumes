@@ -8,7 +8,6 @@ import click
 import shlex
 import re
 
-
 from xumes.core.modes import TRAIN_MODE, TEST_MODE
 from xumes.modules.human.human_playing_test_manager import HumanPlayingTestManager
 from xumes.test_automation.implementations.features_impl.gherkin_feature_strategy import GherkinFeatureStrategy
@@ -144,7 +143,6 @@ def train(debug, steps_path, info, tensorboard, model, features_path, vectorize,
         headless = True
         fps = h
 
-
     render = not headless
 
     test_manager = test_manager_class(
@@ -156,6 +154,7 @@ def train(debug, steps_path, info, tensorboard, model, features_path, vectorize,
         logging_level=logging_level,
         render=render,
         fps_limit=fps,
+        do_logs=tensorboard,
         comm_service=CommunicationServiceRest(host="127.0.0.1", port=8080)
     )
 
@@ -213,10 +212,9 @@ def play(debug, features_path, steps_path, iterations, info, log,
 @click.option("--scenarios", "-s", default=None, help="List of scenarios to test.")
 @click.option("--tags", default=None, help="Tags of the features to test.")
 def list(features, scenarios, tags, features_path="./", steps_path="./"):
-    test_manager = DummyTestManager(feature_strategy=GherkinFeatureStrategy(steps_path=steps_path, features_names=features, scenarios_names=scenarios, tags=tags),
-                                    comm_service=CommunicationServiceRest(host="127.0.0.1", port=8080))
+    test_manager = DummyTestManager(
+        feature_strategy=GherkinFeatureStrategy(steps_path=steps_path, features_names=features,
+                                                scenarios_names=scenarios, tags=tags),
+        comm_service=CommunicationServiceRest(host="127.0.0.1", port=8080))
 
     test_manager.list_features(features_path)
-
-
-
