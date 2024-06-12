@@ -183,7 +183,9 @@ Options
 
    Run the game in headless mode.
 
+.. option:: --tensorboard, -tb [Optional]
 
+   Save logs to the ``logs`` folder to be used with TensorBoard.
 
 List
 ----

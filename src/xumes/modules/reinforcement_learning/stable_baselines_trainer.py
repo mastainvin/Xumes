@@ -136,7 +136,6 @@ class StableBaselinesTrainer(AgentTrainer, ABC):
             for _ in range(timesteps):
                 step()
 
-
     def finished(self):
         self.agent.test_runner().finished()
 
