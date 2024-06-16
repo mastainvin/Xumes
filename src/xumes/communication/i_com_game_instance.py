@@ -1,7 +1,7 @@
 from typing import Any, Dict
 
 
-class ICommunicationService:
+class IComGameInstance:
     """
       Communication between the test_automation and the game.
       Methods:
