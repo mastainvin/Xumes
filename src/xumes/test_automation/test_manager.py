@@ -12,11 +12,11 @@ from xumes.core.colors import bcolors
 from xumes.core.modes import TEST_MODE, RENDER_MODE
 from xumes.assertions.assertion_bucket import AssertionReport
 from xumes.test_automation.feature_strategy import FeatureStrategy, Scenario
+from xumes.communication.i_com_game_engine import IComGameEngine
 from xumes.test_automation.registries import config_registry, given_registry, \
     when_registry, then_registry
 
-from xumes.test_automation.implementations.socket_impl.communication_service_socket import \
-    CommunicationServiceSocket
+from xumes.communication.implementations.socket_impl.com_game_instance_socket import ComGameInstanceSocket
 
 from xumes.test_automation.game_instance_service import GameInstanceService
 from xumes.test_automation.test_runner import TestRunner
@@ -67,11 +67,11 @@ class TestManager:
             Runs a test in render mode with the given steps.
     """
 
-    def __init__(self, comm_service,
+    def __init__(self, comm_service: IComGameEngine,
                  feature_strategy: FeatureStrategy,
                  mode: str = TEST_MODE, timesteps=None, iterations=None, do_logs: bool = False,
                  logging_level=logging.NOTSET, fps_limit=-1, render=False):
-        self._comm_service = comm_service
+        self._comm_service: IComGameEngine = comm_service
         self._scenario_datas: Dict[Scenario, ScenarioData] = {}
         self._mode = mode
         self._timesteps = timesteps
@@ -221,7 +221,7 @@ class TestManager:
             registry_queue = multiprocess.Queue()
             registry_queue.put((config_registry, given_registry, when_registry, then_registry))
 
-            test_runner = TestRunner(GameInstanceService(CommunicationServiceSocket(host="127.0.0.1")),
+            test_runner = TestRunner(GameInstanceService(ComGameInstanceSocket(host="127.0.0.1")),
                                      self._timesteps, self._iterations, self._mode, scenario.feature.name,
                                      scenario.name,
                                      self._assertion_queue, scenario.steps, registry_queue)

@@ -1,17 +1,15 @@
-import csv
 import logging
 import platform
 from multiprocessing import set_start_method
 from typing import List
 
 import click
-import shlex
 import re
 
 from xumes.core.modes import TRAIN_MODE, TEST_MODE
 from xumes.modules.human.human_playing_test_manager import HumanPlayingTestManager
 from xumes.test_automation.implementations.features_impl.gherkin_feature_strategy import GherkinFeatureStrategy
-from xumes.test_automation.implementations.rest_impl.communication_service_rest import CommunicationServiceRest
+from xumes.communication.implementations.rest_impl.com_game_engine_rest import ComGameEngineRest
 from xumes.modules.reinforcement_learning.rl_test_manager import RLTestManager
 from xumes.modules.reinforcement_learning.vec_rl_test_manager import VecRLTestManager
 from xumes.test_automation.test_manager import DummyTestManager
@@ -103,7 +101,7 @@ def test(debug, features_path, steps_path, iterations, info, log, alpha,
         iterations=iterations,
         render=render,
         fps_limit=fps,
-        comm_service=CommunicationServiceRest(host="127.0.0.1", port=8080)
+        comm_service=ComGameEngineRest(host="127.0.0.1", port=8080)
     )
 
     test_manager.test_all(features_path)
@@ -155,7 +153,7 @@ def train(debug, steps_path, info, tensorboard, model, features_path, vectorize,
         render=render,
         fps_limit=fps,
         do_logs=tensorboard,
-        comm_service=CommunicationServiceRest(host="127.0.0.1", port=8080)
+        comm_service=ComGameEngineRest(host="127.0.0.1", port=8080)
     )
 
     test_manager.test_all(features_path)
@@ -199,7 +197,7 @@ def play(debug, features_path, steps_path, iterations, info, log,
         logging_level=logging_level,
         iterations=iterations,
         render=True,
-        comm_service=CommunicationServiceRest(host="127.0.0.1", port=8080)
+        comm_service=ComGameEngineRest(host="127.0.0.1", port=8080)
     )
 
     test_manager.test_all(features_path)
@@ -215,6 +213,6 @@ def list(features, scenarios, tags, features_path="./", steps_path="./"):
     test_manager = DummyTestManager(
         feature_strategy=GherkinFeatureStrategy(steps_path=steps_path, features_names=features,
                                                 scenarios_names=scenarios, tags=tags),
-        comm_service=CommunicationServiceRest(host="127.0.0.1", port=8080))
+        comm_service=ComGameEngineRest(host="127.0.0.1", port=8080))
 
     test_manager.list_features(features_path)
