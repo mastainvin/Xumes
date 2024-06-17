@@ -9,7 +9,7 @@ sys.path.insert(0, os.path.abspath('.'))
 project = 'Xumes'
 copyright = '2024, Vincent Mastain'
 author = 'Vincent Mastain'
-release = '0.1.0'
+release = "0.1.1"
 
 # -- General configuration
 extensions = [
