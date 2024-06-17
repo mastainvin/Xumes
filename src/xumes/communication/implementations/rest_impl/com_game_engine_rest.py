@@ -2,9 +2,10 @@ import logging
 from typing import Dict, List
 
 import requests
+from xumes.communication.i_com_game_engine import IComGameEngine
 
 
-class CommunicationServiceRest:
+class ComGameEngineRest(IComGameEngine):
 
     def __init__(self, host, port):
         self.host = host

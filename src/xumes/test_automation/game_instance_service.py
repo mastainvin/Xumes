@@ -1,6 +1,6 @@
 from typing import List
 
-from xumes.test_automation.i_communication_service import ICommunicationService
+from xumes.communication.i_com_game_instance import IComGameInstance
 
 
 class Behavior:
@@ -13,7 +13,7 @@ class GameInstanceService:
     the execution of the game itself, and external events that can modify the game state.
 
     Attributes:
-        communication_service (ICommunicationService): An object responsible for communication with other the training service.
+        communication_service (IComGameInstance): An object responsible for communication with other the training service.
 
     Methods:
         run_communication_service(): Starts the communication service thread.
@@ -26,7 +26,7 @@ class GameInstanceService:
     """
 
     def __init__(self,
-                 communication_service: ICommunicationService,
+                 communication_service: IComGameInstance,
                  ):
         self.communication_service = communication_service
         self.is_finished = False
