@@ -5,6 +5,7 @@ from typing import List, Dict, Any
 
 from xumes.core.errors.running_ends_error import RunningEndsError
 from xumes.test_automation.behavior import Behavior
+from xumes.test_automation.input import Input
 
 
 class Script(Behavior):
@@ -30,6 +31,6 @@ class Script(Behavior):
             exit(0)
 
     @abstractmethod
-    def step(self) -> List[Dict[str, Any]]:
+    def step(self) -> List[Input]:
         raise NotImplementedError
 
