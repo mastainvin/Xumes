@@ -65,7 +65,7 @@ class VecRLTestManager(TestManager):
                 vec_trainers.free()
 
                 for agent in behaviors:
-                    agent.test_runner().finished()
+                    agent.test_runner.finished()
 
                 nb_processes.value -= 1
 

@@ -8,6 +8,7 @@ class Behavior:
     def __init__(self):
         self._test_runner: TestRunner = None
         self._mode = None
+        self._logging = False
 
     def set_mode(self, mode: str):
         self._mode = mode
@@ -15,8 +16,22 @@ class Behavior:
     def set_test_runner(self, test_runner):
         self._test_runner = test_runner
 
+    @property
+    def context(self):
+        return self._test_runner.get_context()
+
+    @property
     def test_runner(self):
         return self._test_runner
+
+    def set_do_logging(self, do_logging: bool):
+        """
+        Sets the logging mode.
+
+        Args:
+            do_logging: True to enable logging, otherwise False.
+        """
+        self._logging = do_logging
 
     @abstractmethod
     def execute(self, feature, scenario):
@@ -24,12 +39,6 @@ class Behavior:
         Execute the behavior algorithm.
         """
         raise NotImplementedError
-
-    def __getattr__(self, item):
-        """
-        Retrieves an entity from the game service.
-        """
-        return self._test_runner.get_entity(item)
 
     @abstractmethod
     def terminated(self) -> bool:

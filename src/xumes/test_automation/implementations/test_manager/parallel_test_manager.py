@@ -1,10 +1,10 @@
 import multiprocess
+from xumes.test_automation.behavior import Behavior
 
 from xumes.test_automation.test_manager import TestManager
-from xumes.modules.reinforcement_learning.agent import Agent
 
 
-class RLTestManager(TestManager):
+class ParallelTestManager(TestManager):
 
     def _run_scenarios(self, feature, scenario_datas, active_processes):
         for scenario in scenario_datas:
@@ -17,7 +17,7 @@ class RLTestManager(TestManager):
                     if len(when_result) > 1:
                         raise Exception("Only one when step is allowed")
 
-                    behavior: Agent = when_result[next(iter(when_result))]
+                    behavior: Behavior = when_result[next(iter(when_result))]
                     behavior.set_mode(self._mode)
                     behavior.set_test_runner(t_runner)
                     behavior.set_do_logging(logging)

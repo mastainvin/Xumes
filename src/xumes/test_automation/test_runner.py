@@ -47,6 +47,9 @@ class TestRunner:
 
         self._context = TestContext(self._entity_manager, self.driver, self._assertion_bucket)
 
+    def get_context(self):
+        return self._context
+
     def run(self, port):
         self._game_instance_service.run(port)
 

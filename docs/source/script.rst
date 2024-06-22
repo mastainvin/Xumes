@@ -1,0 +1,60 @@
+Script Class
+============
+
+The `Script` class allows the user to create his own script has behavior. The script return actions that will be executed in the game.
+
+.. note::
+
+    The script can contains `Agent` objects and use all kind of algorithms to make decisions (ML, Metaheuristics).
+
+
+The `Script` class extends the `Behavior`.
+
+Methods that need to be implemented:
+
+- `def step(self) -> List[Dict[str, Any]]:`
+- `def terminated(self): -> bool`
+
+Example of a script that use an two ML models and make a random decision 10% of the time:
+
+
+.. code-block:: python
+
+    class FlyScript(Script):
+
+        def __init__(self):
+            super().__init__()
+            self.model = Fly(model_path="./Tests/PipeSizeTest/models/fly")
+            self.model2 = Fly(model_path="./Tests/PipeSizeTest/models/fly")
+
+        def step(self) -> List[Dict[str, Any]]:
+
+            # One in ten times, the bird jumps randomly
+            if random.random() < 0.1:
+                if random.random() < 0.5:
+                    return [{"type": "ACTION_EVENT", "action_name": "jump"}]
+                return []
+            observation = self.observation()
+
+            # use 2 different models to predict the action
+            if self.context.score % 2 == 0:
+                action = self.model2.predict(observation)
+            else:
+                action = self.model.predict(observation)
+
+            # convert the action to the game action
+            if action == 1:
+                return [{"type": "ACTION_EVENT", "action_name": "jump"}]
+
+            return []
+
+        def observation(self):
+            # convert the game state to an observation
+            velocity = self.context.Game.Bird.velocity
+            return {"velocity": np.array(velocity, dtype=float),
+                    "X": np.array([self.context.X], dtype=float),
+                    "Y": np.array([self.context.Y], dtype=float),
+                    "Y1": np.array([self.context.Y1], dtype=float)}
+
+        def terminated(self):
+            return self.context.dead != 0 or self.context.score >= 2 or self.context.Game.Bird.position[1] < 0

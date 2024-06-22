@@ -10,7 +10,7 @@ from xumes.core.modes import TRAIN_MODE, TEST_MODE
 from xumes.modules.human.human_playing_test_manager import HumanPlayingTestManager
 from xumes.test_automation.implementations.features_impl.gherkin_feature_strategy import GherkinFeatureStrategy
 from xumes.communication.implementations.rest_impl.com_game_engine_rest import ComGameEngineRest
-from xumes.modules.reinforcement_learning.rl_test_manager import RLTestManager
+from xumes.test_automation.implementations.test_manager.parallel_test_manager import ParallelTestManager
 from xumes.modules.reinforcement_learning.vec_rl_test_manager import VecRLTestManager
 from xumes.test_automation.test_manager import DummyTestManager
 
@@ -83,7 +83,7 @@ def test(debug, features_path, steps_path, iterations, info, log, alpha,
     if vectorize:
         test_manager_class = VecRLTestManager
     else:
-        test_manager_class = RLTestManager
+        test_manager_class = ParallelTestManager
 
     if h > 0:
         headless = True
@@ -135,7 +135,7 @@ def train(debug, steps_path, info, tensorboard, model, features_path, vectorize,
     if vectorize:
         test_manager_class = VecRLTestManager
     else:
-        test_manager_class = RLTestManager
+        test_manager_class = ParallelTestManager
 
     if h > 0:
         headless = True

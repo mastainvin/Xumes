@@ -144,4 +144,4 @@ class StableBaselinesTrainer(AgentTrainer, ABC):
         Predicts the action to take given the observation.
         Method used only when using the model in non-training model, inside a scripted bot.
         """
-        return self.model.predict(obs)
+        return self.model.predict(obs)[0]
