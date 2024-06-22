@@ -27,12 +27,12 @@ Example of a script that use an two ML models and make a random decision 10% of 
             self.model = Fly(model_path="./Tests/PipeSizeTest/models/fly")
             self.model2 = Fly(model_path="./Tests/PipeSizeTest/models/fly")
 
-        def step(self) -> List[Dict[str, Any]]:
+        def step(self) -> List[Input]:
 
             # One in ten times, the bird jumps randomly
             if random.random() < 0.1:
                 if random.random() < 0.5:
-                    return [{"type": "ACTION_EVENT", "action_name": "jump"}]
+                    return [GodotAction("jump")]
                 return []
             observation = self.observation()
 
@@ -44,7 +44,7 @@ Example of a script that use an two ML models and make a random decision 10% of 
 
             # convert the action to the game action
             if action == 1:
-                return [{"type": "ACTION_EVENT", "action_name": "jump"}]
+                return [GodotAction("jump")]
 
             return []
 
