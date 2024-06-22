@@ -7,6 +7,7 @@ from xumes.core.modes import TEST_MODE, TRAIN_MODE
 from xumes.test_automation.behavior import Behavior
 from xumes.modules.reinforcement_learning.i_trainer import ITrainer
 from xumes.modules.reinforcement_learning.stable_baselines_trainer import StableBaselinesTrainer
+from xumes.test_automation.input import Input
 
 OBST = TypeVar("OBST")
 
@@ -53,8 +54,6 @@ class Agent(Behavior, ABC):
         Returns the agent's model save path.
         """
         return self._save_path
-
-
 
     def execute(self, feature, scenario):
         """
@@ -142,7 +141,7 @@ class Agent(Behavior, ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def actions(self, raws_actions) -> List[str]:
+    def actions(self, raws_actions) -> List[Input]:
         """
         Abstract method to obtain the list of possible actions for the agent.
 
@@ -150,6 +149,6 @@ class Agent(Behavior, ABC):
             raws_actions: The raw actions to process.
 
         Returns:
-            List[str]: The list of possible actions.
+            List[Input]: The list of actions.
         """
         raise NotImplementedError
