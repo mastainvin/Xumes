@@ -44,6 +44,9 @@ You should see the following output:
         - PipeSize/Testing the pipe size [3] - (i=1, j=0.5, k=2)
 
 
-.. note::
 
-    `Here <https://www.youtube.com/watch?v=awXkgS3Pc8s>`_ is the video of godot first build and test execution.
+`Here <https://www.youtube.com/watch?v=awXkgS3Pc8s>`_ is the video of godot first build and test execution:
+
+.. youtube::
+    awXkgS3Pc8s
+    width=100%

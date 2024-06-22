@@ -21,7 +21,8 @@ Welcome to Xumes Documentation!
 
    features
    steps
-   behavior
+   agent
+   script
 
 .. toctree::
    :maxdepth: 1

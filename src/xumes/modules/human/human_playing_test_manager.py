@@ -1,25 +1,19 @@
-from xumes.core.errors.running_ends_error import RunningEndsError
+from xumes import Script
 from xumes.test_automation.behavior import Behavior
 from xumes.test_automation.test_manager import TestManager
 
 
-def play(behavior):
-    try:
-        behavior.test_runner().reset()
-        while True:
-            behavior.test_runner().push_action_and_get_state([])
+class HumanTestingScript(Script):
 
-            if behavior.terminated():
-                try:
-                    behavior.test_runner().episode_finished()
-                    behavior.test_runner().reset()
-                except RunningEndsError:
-                    break
-    except Exception as e:
-        print("Error in manual playing: ", e)
-    finally:
-        behavior.test_runner().finished()
-        exit(0)
+    def __init__(self, behavior: Behavior):
+        super().__init__()
+        self._behavior = behavior
+
+    def step(self):
+        return []
+
+    def terminated(self) -> bool:
+        return self._behavior.terminated()
 
 
 class HumanPlayingTestManager(TestManager):
@@ -38,4 +32,8 @@ class HumanPlayingTestManager(TestManager):
             behavior.set_mode(self._mode)
             behavior.set_test_runner(test_runner)
 
-            play(behavior)
+            human_testing_script = HumanTestingScript(behavior)
+            human_testing_script.set_mode(self._mode)
+            human_testing_script.set_test_runner(test_runner)
+            human_testing_script.set_do_logging(self.do_logs)
+            human_testing_script.execute(scenario.feature, scenario)

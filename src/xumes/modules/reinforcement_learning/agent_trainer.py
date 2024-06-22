@@ -17,23 +17,23 @@ class AgentTrainer(ITrainer, ABC):
 
     @final
     def do_reset(self):
-        self.agent.test_runner().reset()
+        self.agent.test_runner.reset()
 
     @final
     def episode_finished(self):
-        return self.agent.test_runner().episode_finished()
+        return self.agent.test_runner.episode_finished()
 
     @final
     def get_terminated(self):
-        return (self.agent.terminated() or self.agent.test_runner().game_state == "reset"
-                or self.agent.test_runner().game_state == "random_reset")
+        return (self.agent.terminated() or self.agent.test_runner.game_state == "reset"
+                or self.agent.test_runner.game_state == "random_reset")
 
     @final
     def get_obs(self) -> OBST:
-        self.agent.test_runner().retrieve_state()
+        self.agent.test_runner.retrieve_state()
         return self.agent.observation()
 
     @final
     def push_actions_and_get_obs(self, actions) -> OBST:
-        self.agent.test_runner().push_action_and_get_state(self.agent.actions(actions))
+        self.agent.test_runner.push_action_and_get_state(self.agent.actions(actions))
         return self.agent.observation()

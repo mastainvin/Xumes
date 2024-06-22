@@ -31,8 +31,10 @@ class Agent(Behavior, ABC):
         self._save_path = save_path
         self._eval_freq = eval_freq
         self._logs_path = logs_path
-        self._logging = False
+
         self._previous_model_path = previous_model_path
+
+        self._loaded = False
 
     def get_trainer_info(self):
         return {
@@ -52,14 +54,7 @@ class Agent(Behavior, ABC):
         """
         return self._save_path
 
-    def set_do_logging(self, do_logging: bool):
-        """
-        Sets the logging mode.
 
-        Args:
-            do_logging: True to enable logging, otherwise False.
-        """
-        self._logging = do_logging
 
     def execute(self, feature, scenario):
         """
@@ -99,7 +94,6 @@ class Agent(Behavior, ABC):
             self._trainer.free()
             self.test_runner().finished()
 
-
     def predict(self, observation):
         """
         Predicts the next action based on the given observation.
@@ -110,6 +104,11 @@ class Agent(Behavior, ABC):
         Returns:
             The predicted action.
         """
+
+        if not self._loaded:
+            self._trainer.load(self._save_path + "/best_model")
+            self._loaded = True
+
         return self._trainer.predict(observation)
 
     @abstractmethod
