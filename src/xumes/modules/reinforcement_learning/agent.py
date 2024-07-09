@@ -27,7 +27,7 @@ class Agent(Behavior, ABC):
     def __init__(self, save_path: str = None, eval_freq: int = 1000, logs_path: Optional[str] = None,
                  logs_name: Optional[str] = None, previous_model_path: Optional[str] = None, **kwargs):
         super().__init__()
-        self._trainer: ITrainer = StableBaselinesTrainer(self, **kwargs)
+        self._trainer: StableBaselinesTrainer = StableBaselinesTrainer(self, **kwargs)
 
         self._save_path = save_path
         self._eval_freq = eval_freq
@@ -43,7 +43,7 @@ class Agent(Behavior, ABC):
             "previous_model_path": self._previous_model_path
         }
 
-    def get_trainer(self) -> ITrainer:
+    def get_trainer(self) -> StableBaselinesTrainer:
         """
         Returns the agent's behavior.
         """

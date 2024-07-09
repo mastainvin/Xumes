@@ -12,7 +12,7 @@ class Script(Behavior):
 
     def execute(self, feature, scenario):
         try:
-            self.test_runner.reset()
+            self.reset()
             game_state = self.test_runner.push_action_and_get_state([])
             while True:
                 game_state = self.test_runner.push_action_and_get_state(self.step())
@@ -20,7 +20,7 @@ class Script(Behavior):
                 if self.terminated():
                     try:
                         self.test_runner.episode_finished()
-                        self.test_runner.reset()
+                        self.reset()
                     except RunningEndsError:
                         break
         except Exception as e:
@@ -28,9 +28,10 @@ class Script(Behavior):
             logging.error(traceback.format_exc())
         finally:
             self.test_runner.finished()
-            exit(0)
 
     @abstractmethod
     def step(self) -> List[Input]:
         raise NotImplementedError
 
+    def reset(self):
+        self.test_runner.reset()

@@ -7,7 +7,9 @@ import click
 import re
 
 from xumes.core.modes import TRAIN_MODE, TEST_MODE
+from xumes.core.parameters_registry import ParametersRegistry
 from xumes.modules.human.human_playing_test_manager import HumanPlayingTestManager
+from xumes.modules.imitation_learning.collector_test_manager import CollectorTestManager
 from xumes.test_automation.implementations.features_impl.gherkin_feature_strategy import GherkinFeatureStrategy
 from xumes.communication.implementations.rest_impl.com_game_engine_rest import ComGameEngineRest
 from xumes.test_automation.implementations.test_manager.parallel_test_manager import ParallelTestManager
@@ -104,6 +106,19 @@ def test(debug, features_path, steps_path, iterations, info, log, alpha,
         comm_service=ComGameEngineRest(host="127.0.0.1", port=8080)
     )
 
+    params = ParametersRegistry()
+    params.register("alpha", alpha)
+    params.register("iterations", iterations)
+    params.register("features", features)
+    params.register("scenarios", scenarios)
+    params.register("tags", tags)
+    params.register("log", log)
+    params.register("headless", headless)
+    params.register("features_path", features_path)
+    params.register("steps_path", steps_path)
+    params.register("alpha", alpha)
+    params.register("fps", fps)
+
     test_manager.test_all(features_path)
 
 
@@ -156,6 +171,18 @@ def train(debug, steps_path, info, tensorboard, model, features_path, vectorize,
         comm_service=ComGameEngineRest(host="127.0.0.1", port=8080)
     )
 
+    params = ParametersRegistry()
+    params.register("tensorboard", tensorboard)
+    params.register("vectorize", vectorize)
+    params.register("features_path", features_path)
+    params.register("steps_path", steps_path)
+    params.register("model", model)
+    params.register("features", features)
+    params.register("scenarios", scenarios)
+    params.register("tags", tags)
+    params.register("fps", fps)
+    params.register("headless", headless)
+
     test_manager.test_all(features_path)
 
 
@@ -200,6 +227,15 @@ def play(debug, features_path, steps_path, iterations, info, log,
         comm_service=ComGameEngineRest(host="127.0.0.1", port=8080)
     )
 
+    params = ParametersRegistry()
+    params.register("iterations", iterations)
+    params.register("features", features)
+    params.register("scenarios", scenarios)
+    params.register("tags", tags)
+    params.register("log", log)
+    params.register("features_path", features_path)
+    params.register("steps_path", steps_path)
+
     test_manager.test_all(features_path)
 
 
@@ -216,3 +252,60 @@ def list(features, scenarios, tags, features_path="./", steps_path="./"):
         comm_service=ComGameEngineRest(host="127.0.0.1", port=8080))
 
     test_manager.list_features(features_path)
+
+
+@cli.command()
+@click.option("--iterations", "-i", default=None, help="Number of iterations to test the game.")
+@click.option("--features", "-f", default=None, help="List of features to test.")
+@click.option("--scenarios", "-s", default=None, help="List of scenarios to test.")
+@click.option("--tags", default=None, help="Tags of the features to test.")
+@click.option("--log", is_flag=True, help="Log the game.")
+@click.option("--debug", is_flag=True, help="Debug debug level.")
+@click.option("--info", is_flag=True, help="Info debug level.")
+@click.option("--features_path", default=None, type=click.Path(), help="Path of the ./features folder.")
+@click.option("--steps_path", default=None, type=click.Path(), help="Path of the ./steps folder.")
+@click.option("--clean", is_flag=True, help="Clean the data.")
+def collect(debug, features_path, steps_path, iterations, info, log,
+         features,
+         scenarios,
+         tags,
+         clean):
+    if iterations is not None:
+        iterations = int(iterations)
+    else:
+        raise Exception("Number of iterations must be set")
+
+    # change start method to fork to avoid errors with multiprocessing
+    # Windows does not support the fork start method
+    if platform.system() != "Windows":
+        set_start_method('fork')
+
+    logging_level = get_debug_level(debug, info)
+    logging.basicConfig(format='%(levelname)s:%(message)s', level=logging_level)
+
+    mode = TRAIN_MODE
+
+    test_manager = CollectorTestManager(
+        feature_strategy=GherkinFeatureStrategy(steps_path=steps_path,
+                                                features_names=features,
+                                                scenarios_names=scenarios,
+                                                tags=tags),
+        mode=TEST_MODE,
+        logging_level=logging_level,
+        iterations=iterations,
+        render=True,
+        comm_service=ComGameEngineRest(host="127.0.0.1", port=8080)
+    )
+
+    params = ParametersRegistry()
+    params.register("iterations", iterations)
+    params.register("features", features)
+    params.register("scenarios", scenarios)
+    params.register("tags", tags)
+    params.register("log", log)
+    params.register("features_path", features_path)
+    params.register("steps_path", steps_path)
+    params.register("clean", clean)
+
+    test_manager.test_all(features_path)
+

@@ -17,7 +17,7 @@ class VecStableBaselinesTrainer(ITrainer):
         self._trainers: List[StableBaselinesTrainer] = []
         self._envs = []
         self._first_trainer = None
-        self.model = None
+        self.policy = None
 
     def add_trainer(self, trainer: StableBaselinesTrainer):
         self._trainers.append(trainer)
@@ -37,7 +37,7 @@ class VecStableBaselinesTrainer(ITrainer):
         if self._vec_env is None:
             self._vec_env = DummyVecEnv(self._envs)
 
-        algorithm = self._first_trainer.algorithm
+        policy_class = self._first_trainer.policy_class
         algorithm_type = self._first_trainer.algorithm_type
         total_timesteps = self._first_trainer.total_timesteps
 
@@ -48,22 +48,22 @@ class VecStableBaselinesTrainer(ITrainer):
                                          deterministic=True, render=False)
 
         if previous_model_path:
-            self.model = algorithm(algorithm_type, self._vec_env, verbose=1, tensorboard_log=logs_path).load(
+            self.policy = policy_class(algorithm_type, self._vec_env, verbose=1, tensorboard_log=logs_path).load(
                 previous_model_path, env=self._vec_env).learn(
                 total_timesteps,
                 callback=eval_callback,
                 tb_log_name=logs_name
             )
         else:
-            self.model = algorithm(algorithm_type, self._vec_env, verbose=1, tensorboard_log=logs_path).learn(total_timesteps, callback=eval_callback, tb_log_name=logs_name)
+            self.policy = policy_class(algorithm_type, self._vec_env, verbose=1, tensorboard_log=logs_path).learn(total_timesteps, callback=eval_callback, tb_log_name=logs_name)
 
     def save(self, path: str):
-        self.model.save(path)
+        self.policy.save(path)
 
     def free(self):
         if self._vec_env is not None:
             self._vec_env.close()
-            self.model = None
+            self.policy = None
 
     def load(self, path: str):
         if self._first_trainer is None:
@@ -75,7 +75,7 @@ class VecStableBaselinesTrainer(ITrainer):
         algorithm = self._first_trainer.algorithm
         algorithm_type = self._first_trainer.algorithm_type
 
-        self.model = algorithm(algorithm_type, self._vec_env, verbose=1).load(path, env=self._vec_env)
+        self.policy = algorithm(algorithm_type, self._vec_env, verbose=1).load(path, env=self._vec_env)
 
     def play(self, timesteps: int = None):
 
@@ -100,7 +100,7 @@ class VecStableBaselinesTrainer(ITrainer):
 
         def step():
             nonlocal obs
-            actions, _ = self.model.predict(obs)
+            actions, _ = self.policy.predict(obs)
             for i in range(len(next(iter(obs.values())))):
                 if active_envs[i]:
                     try:

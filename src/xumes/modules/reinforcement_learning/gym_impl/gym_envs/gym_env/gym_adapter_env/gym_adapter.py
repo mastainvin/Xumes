@@ -20,6 +20,7 @@ class GymAdapter(gym.Env):
         self.observation_space = observation_space
         self.action_space = action_space
         self._first_reset = True
+        self.num_envs = 1
 
     def reset(
             self,

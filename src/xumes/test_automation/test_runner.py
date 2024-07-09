@@ -34,7 +34,7 @@ class TestRunner:
         self._mode = mode
         self._number_of_steps = 0
         self._number_max_of_steps = number_max_of_steps
-        self._number_of_tests = 0
+        self._number_of_tests = 1
         self._number_max_of_tests = number_max_of_tests
         self._steps = steps
         self._entity_manager = AutoEntityManager(JsonGameElementStateConverter())
@@ -72,15 +72,14 @@ class TestRunner:
     def episode_finished(self) -> bool:
         # when an episode is finished, we collect the assertions
         if self._mode == TEST_MODE:
+            try:
+                self.then()
+                self._assertion_bucket.reset_iterator()
+            except KeyError:
+                pass
             if self._number_of_tests >= self._number_max_of_tests:
                 self._do_assert()
                 raise RunningEndsError
-            else:
-                try:
-                    self.then()
-                    self._assertion_bucket.reset_iterator()
-                except KeyError:
-                    pass
             self._number_of_tests += 1
 
         return True

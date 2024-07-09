@@ -1,6 +1,6 @@
 import logging
 from abc import ABC
-from typing import final, TypeVar, Optional
+from typing import final, TypeVar, Optional, Type
 
 import gymnasium as gym
 import stable_baselines3
@@ -9,6 +9,7 @@ from stable_baselines3.common.monitor import Monitor
 
 # noinspection PyUnresolvedReferences
 import xumes
+from stable_baselines3.common.policies import ActorCriticPolicy
 from xumes.core.errors.running_ends_error import RunningEndsError
 from xumes.modules.reinforcement_learning.agent_trainer import AgentTrainer
 
@@ -24,7 +25,7 @@ class StableBaselinesTrainer(AgentTrainer, ABC):
                  max_episode_length: int = 1000,
                  total_timesteps: int = 1000000,
                  algorithm_type: str = "MultiInputPolicy",
-                 algorithm=stable_baselines3.PPO,
+                 policy: Type[ActorCriticPolicy] = stable_baselines3.PPO,
                  ):
         super().__init__(agent)
         if observation_space is not None and action_space is not None:
@@ -35,17 +36,19 @@ class StableBaselinesTrainer(AgentTrainer, ABC):
                 observation_space=observation_space,
                 action_space=action_space,
             ), filename=None, allow_early_resets=True)
-        self.algorithm = algorithm
+        self.policy_class = policy
         self.algorithm_type = algorithm_type
         self.total_timesteps = total_timesteps
 
-        self.model = None
+        # self.model = None
 
         self.observation_space = observation_space
         self.action_space = action_space
         self.max_episode_length = max_episode_length
 
         self.made = False
+
+        self.policy = None
 
     @final
     def make(self):
@@ -72,35 +75,47 @@ class StableBaselinesTrainer(AgentTrainer, ABC):
                                          log_path=save_path, eval_freq=eval_freq,
                                          deterministic=True, render=False)
 
+        self.make_algo(logs_path)
+
         if previous_model_path:
-            self.model = self.algorithm(self.algorithm_type, self.env, verbose=1, tensorboard_log=logs_path).load(
-                previous_model_path, env=self.env).learn(
-                self.total_timesteps,
-                callback=eval_callback,
-                tb_log_name=logs_name,
-            )
-        else:
-            self.model = self.algorithm(self.algorithm_type, self.env, verbose=1, tensorboard_log=logs_path).learn(
-                self.total_timesteps,
-                callback=eval_callback,
-                tb_log_name=logs_name,
-            )
+            self.policy = self.policy.load(previous_model_path)
+
+        self.policy = self.policy.learn(
+            self.total_timesteps,
+            callback=eval_callback,
+            tb_log_name=logs_name,
+        )
 
         self.finished()
 
     def save(self, path: str):
+        self.policy.policy.save(path)
         self.model.save(path)
 
     def free(self):
         if self.env is not None:
             self.env.close()
-        self.model = None
+        self.policy = None
 
     def load(self, path: str):
         if not self.made:
             self.make()
 
-        self.model = self.algorithm(self.algorithm_type, self.env, verbose=1).load(path, env=self.env)
+        self.make_algo()
+
+        self.policy = self.policy.load(path, env=self.env)
+
+    def make_algo(self, logs_path: Optional[str] = None):
+        if not self.made:
+            self.make()
+
+        self.policy = self.policy_class(self.algorithm_type, self.env, verbose=1, tensorboard_log=logs_path)
+
+    def get_env(self):
+        return self.env
+
+    def get_policy(self):
+        return self.policy
 
     def play(self, timesteps: Optional[int] = None):
 
@@ -115,7 +130,7 @@ class StableBaselinesTrainer(AgentTrainer, ABC):
             nonlocal obs
             nonlocal running
 
-            action, _states = self.model.predict(obs, deterministic=True)
+            action, _states = self.policy.predict(obs, deterministic=True)
             try:
                 obs, reward, terminated, done, info = self.env.step(action)
                 if done or terminated:
@@ -137,11 +152,11 @@ class StableBaselinesTrainer(AgentTrainer, ABC):
                 step()
 
     def finished(self):
-        self.agent.test_runner().finished()
+        self.policy.test_runner().finished()
 
     def predict(self, obs: OBST):
         """
         Predicts the action to take given the observation.
         Method used only when using the model in non-training model, inside a scripted bot.
         """
-        return self.model.predict(obs)[0]
+        return self.policy.predict(obs)[0]
