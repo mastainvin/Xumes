@@ -2,7 +2,7 @@ import logging
 from abc import ABC
 from typing import final, TypeVar, Optional, Type
 
-import gymnasium as gym
+import gymnasium
 import stable_baselines3
 from stable_baselines3.common.callbacks import EvalCallback
 from stable_baselines3.common.monitor import Monitor
@@ -25,18 +25,18 @@ class StableBaselinesTrainer(AgentTrainer, ABC):
                  max_episode_length: int = 1000,
                  total_timesteps: int = 1000000,
                  algorithm_type: str = "MultiInputPolicy",
-                 policy: Type[ActorCriticPolicy] = stable_baselines3.PPO,
+                 algorithm: Type[ActorCriticPolicy] = stable_baselines3.PPO,
                  ):
         super().__init__(agent)
         if observation_space is not None and action_space is not None:
-            self.env = Monitor(gym.make(
+            self.env = Monitor(gymnasium.make(
                 id="xumes-v0",
                 max_episode_steps=max_episode_length,
                 training_service=self,
                 observation_space=observation_space,
                 action_space=action_space,
             ), filename=None, allow_early_resets=True)
-        self.policy_class = policy
+        self.policy_class = algorithm
         self.algorithm_type = algorithm_type
         self.total_timesteps = total_timesteps
 
@@ -54,7 +54,7 @@ class StableBaselinesTrainer(AgentTrainer, ABC):
     def make(self):
         if self.observation_space is None or self.action_space is None:
             raise Exception("Observation space and action space must be set before calling make")
-        self.env = Monitor(gym.make(
+        self.env = Monitor(gymnasium.make(
             id="xumes-v0",
             max_episode_steps=self.max_episode_length,
             training_service=self,
@@ -89,8 +89,7 @@ class StableBaselinesTrainer(AgentTrainer, ABC):
         self.finished()
 
     def save(self, path: str):
-        self.policy.policy.save(path)
-        self.model.save(path)
+        self.policy.save(path)
 
     def free(self):
         if self.env is not None:
@@ -117,7 +116,7 @@ class StableBaselinesTrainer(AgentTrainer, ABC):
     def get_policy(self):
         return self.policy
 
-    def play(self, timesteps: Optional[int] = None):
+    def play(self, time_steps: Optional[int] = None):
 
         if not self.made:
             self.make()
@@ -144,11 +143,11 @@ class StableBaselinesTrainer(AgentTrainer, ABC):
                 self.env.close()
                 running = False
 
-        if not timesteps:
+        if not time_steps:
             while running:
                 step()
         else:
-            for _ in range(timesteps):
+            for _ in range(time_steps):
                 step()
 
     def finished(self):

@@ -2,10 +2,9 @@ import logging
 from abc import ABC, abstractmethod
 from typing import TypeVar, List, Optional
 
-from xumes.core.model_helper import trainer_name, model_path
+from xumes.core.model_helper import model_path
 from xumes.core.modes import TEST_MODE, TRAIN_MODE
 from xumes.test_automation.behavior import Behavior
-from xumes.modules.reinforcement_learning.i_trainer import ITrainer
 from xumes.modules.reinforcement_learning.stable_baselines_trainer import StableBaselinesTrainer
 from xumes.test_automation.input import Input
 
@@ -91,7 +90,7 @@ class Agent(Behavior, ABC):
             raise e
         finally:
             self._trainer.free()
-            self.test_runner().finished()
+            self.test_runner.finished()
 
     def predict(self, observation):
         """

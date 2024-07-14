@@ -73,8 +73,8 @@ Attributes
 
 and `stable_baselines3` attributes:
 
-- `observation_space` (gym.spaces.Space): The observation space.
-- `action_space` (gym.spaces.Space): The action space.
+- `observation_space` (gymnasium.spaces.Space): The observation space.
+- `action_space` (gymnasium.spaces.Space): The action space.
 - `max_episode_length` (int): The maximum length of an episode.
 - `total_timesteps` (int): The total number of timesteps.
 - `algorithm_type` str: The algorithm type.

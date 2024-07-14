@@ -10,6 +10,8 @@ from xumes.core.modes import TRAIN_MODE, TEST_MODE
 from xumes.core.parameters_registry import ParametersRegistry
 from xumes.modules.human.human_playing_test_manager import HumanPlayingTestManager
 from xumes.modules.imitation_learning.collector_test_manager import CollectorTestManager
+from xumes.modules.imitation_learning.vec_imitator_test_manager import VecImitatorTestManager
+from xumes.test_automation.episode_control import UserControlledEpisodeControlFactory
 from xumes.test_automation.implementations.features_impl.gherkin_feature_strategy import GherkinFeatureStrategy
 from xumes.communication.implementations.rest_impl.com_game_engine_rest import ComGameEngineRest
 from xumes.test_automation.implementations.test_manager.parallel_test_manager import ParallelTestManager
@@ -36,6 +38,7 @@ def split_names(names: str) -> List[str]:
     Two cases:
         - names='a,b,c' -> ["a", "b", "c"]
         - names='"a, a","b, b","c, c"' -> ["a, a", "b, b", "c, c"]
+        - names='"a"' -> ["a"]
     Args:
         names (str): A string of names separated by commas. If a name contains a comma, it should be enclosed in quotes.
 
@@ -71,7 +74,6 @@ def test(debug, features_path, steps_path, iterations, info, log, alpha,
         iterations = int(iterations)
     else:
         raise Exception("Number of iterations must be set")
-
     # change start method to fork to avoid errors with multiprocessing
     # Windows does not support the fork start method
     if platform.system() != "Windows":
@@ -92,6 +94,12 @@ def test(debug, features_path, steps_path, iterations, info, log, alpha,
         fps = h
 
     render = not headless
+
+    if features is not None:
+        features = split_names(features)
+
+    if scenarios is not None:
+        scenarios = split_names(scenarios)
 
     test_manager = test_manager_class(
         feature_strategy=GherkinFeatureStrategy(steps_path=steps_path,
@@ -137,8 +145,9 @@ def test(debug, features_path, steps_path, iterations, info, log, alpha,
 @click.option("--fps", default=-1, help="Limit of FPS.")
 @click.option("--headless", is_flag=False, help="Run the game in headless mode.")
 @click.option("-h", default=-1, help="Headless and fix FPS.")
+@click.option("--imitate", is_flag=True, help="Train the model with imitation learning.")
 def train(debug, steps_path, info, tensorboard, model, features_path, vectorize, features, scenarios, tags, fps,
-          headless, h):
+          headless, h, imitate):
     # change start method to fork to avoid errors with multiprocessing
     # Windows does not support the fork start method
     if platform.system() != "Windows":
@@ -147,16 +156,25 @@ def train(debug, steps_path, info, tensorboard, model, features_path, vectorize,
     logging_level = get_debug_level(debug, info)
     logging.basicConfig(format='%(levelname)s:%(message)s', level=logging_level)
 
-    if vectorize:
-        test_manager_class = VecRLTestManager
+    if imitate:
+        test_manager_class = VecImitatorTestManager
     else:
-        test_manager_class = ParallelTestManager
+        if vectorize:
+            test_manager_class = VecRLTestManager
+        else:
+            test_manager_class = ParallelTestManager
 
     if h > 0:
         headless = True
         fps = h
 
     render = not headless
+
+    if features is not None:
+        features = split_names(features)
+
+    if scenarios is not None:
+        scenarios = split_names(scenarios)
 
     test_manager = test_manager_class(
         feature_strategy=GherkinFeatureStrategy(steps_path=steps_path,
@@ -215,6 +233,12 @@ def play(debug, features_path, steps_path, iterations, info, log,
 
     mode = TRAIN_MODE
 
+    if features is not None:
+        features = split_names(features)
+
+    if scenarios is not None:
+        scenarios = split_names(scenarios)
+
     test_manager = HumanPlayingTestManager(
         feature_strategy=GherkinFeatureStrategy(steps_path=steps_path,
                                                 features_names=features,
@@ -246,6 +270,11 @@ def play(debug, features_path, steps_path, iterations, info, log,
 @click.option("--scenarios", "-s", default=None, help="List of scenarios to test.")
 @click.option("--tags", default=None, help="Tags of the features to test.")
 def list(features, scenarios, tags, features_path="./", steps_path="./"):
+    if features is not None:
+        features = split_names(features)
+
+    if scenarios is not None:
+        scenarios = split_names(scenarios)
     test_manager = DummyTestManager(
         feature_strategy=GherkinFeatureStrategy(steps_path=steps_path, features_names=features,
                                                 scenarios_names=scenarios, tags=tags),
@@ -266,10 +295,10 @@ def list(features, scenarios, tags, features_path="./", steps_path="./"):
 @click.option("--steps_path", default=None, type=click.Path(), help="Path of the ./steps folder.")
 @click.option("--clean", is_flag=True, help="Clean the data.")
 def collect(debug, features_path, steps_path, iterations, info, log,
-         features,
-         scenarios,
-         tags,
-         clean):
+            features,
+            scenarios,
+            tags,
+            clean):
     if iterations is not None:
         iterations = int(iterations)
     else:
@@ -285,6 +314,12 @@ def collect(debug, features_path, steps_path, iterations, info, log,
 
     mode = TRAIN_MODE
 
+    if features is not None:
+        features = split_names(features)
+
+    if scenarios is not None:
+        scenarios = split_names(scenarios)
+
     test_manager = CollectorTestManager(
         feature_strategy=GherkinFeatureStrategy(steps_path=steps_path,
                                                 features_names=features,
@@ -294,7 +329,8 @@ def collect(debug, features_path, steps_path, iterations, info, log,
         logging_level=logging_level,
         iterations=iterations,
         render=True,
-        comm_service=ComGameEngineRest(host="127.0.0.1", port=8080)
+        comm_service=ComGameEngineRest(host="127.0.0.1", port=8080),
+        episode_control_factory=UserControlledEpisodeControlFactory(),
     )
 
     params = ParametersRegistry()
@@ -308,4 +344,3 @@ def collect(debug, features_path, steps_path, iterations, info, log,
     params.register("clean", clean)
 
     test_manager.test_all(features_path)
-

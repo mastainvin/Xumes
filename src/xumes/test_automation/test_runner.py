@@ -9,6 +9,7 @@ from xumes.entity.entity_manager import AutoEntityManager
 from xumes.entity.implementations.json_impl.json_game_element_state_converter import \
     JsonGameElementStateConverter
 from xumes.test_automation.driver import Driver
+from xumes.test_automation.episode_control import EpisodeControl, DefaultEpisodeControl
 from xumes.test_automation.game_instance_service import GameInstanceService
 from xumes.test_automation.test_context import TestContext
 
@@ -24,7 +25,8 @@ class TestRunner:
     def __init__(self, game_instance_service: GameInstanceService, number_max_of_steps: int = None,
                  number_max_of_tests: int = None,
                  mode: str = TEST_MODE, feature_name: str = None,
-                 scenario_name: str = None, test_queue=None, steps=None, registry_queue=None):
+                 scenario_name: str = None, test_queue=None, steps=None, registry_queue=None,
+                 episode_control: EpisodeControl = None):
         """
         The constructor for the GameService class.
         """
@@ -46,6 +48,11 @@ class TestRunner:
         self._config_registry, self._given_registry, self._when_registry, self._then_registry = registry_queue.get()
 
         self._context = TestContext(self._entity_manager, self.driver, self._assertion_bucket)
+
+        if episode_control is None:
+            self._episode_control = DefaultEpisodeControl(self._number_max_of_steps, self._number_max_of_tests)
+        else:
+            self._episode_control = episode_control
 
     def get_context(self):
         return self._context
@@ -77,12 +84,15 @@ class TestRunner:
                 self._assertion_bucket.reset_iterator()
             except KeyError:
                 pass
-            if self._number_of_tests >= self._number_max_of_tests:
+            self._episode_control.increment_test()
+            if not self._episode_control.should_continue():
                 self._do_assert()
                 raise RunningEndsError
-            self._number_of_tests += 1
+        return False
 
-        return True
+    @property
+    def episode_control(self):
+        return self._episode_control
 
     def _do_assert(self) -> None:
         self._assertion_bucket.assertion_mode()
@@ -129,7 +139,6 @@ class TestRunner:
         """
         Retrieves the game state by calling the get_state method of the TestRunner instance.
         """
-        # self._test_runner.run_loop()
         states = self._game_instance_service.get_state()
         logging.debug(f"Received states: {states}")
         for state in states.items():

@@ -3,9 +3,10 @@ import pickle
 
 import pygame
 
-from xumes import Script, Imitator
+from xumes import Script, Imitator, Agent, Imitable
 from xumes.core.parameters_registry import ParametersRegistry
 from xumes.test_automation.behavior import Behavior
+from xumes.test_automation.episode_control import UserControlledEpisodeControl
 from xumes.test_automation.test_manager import TestManager
 
 
@@ -27,6 +28,8 @@ class CollectorScript(Script):
         self._pause = False
 
         self._observation = None
+
+        self._keep_episode = True
 
     def reset(self):
         """
@@ -56,6 +59,7 @@ class CollectorScript(Script):
         new_observation = self.get_observation()
         reward = self.get_reward()
         terminated = self._imitator.terminated()
+
         self._episode_data.append((self._observation, action, reward, new_observation, terminated))
 
         self._observation = new_observation
@@ -73,6 +77,17 @@ class CollectorScript(Script):
                 self.draw_pause()
                 if keys[pygame.K_RETURN]:
                     break
+
+    def wait_episode_end(self) -> bool:
+        while True:
+            for event in pygame.event.get():
+                pass
+            keys = pygame.key.get_pressed()
+            self.draw_episode_end()
+            if keys[pygame.K_RETURN]:
+                return True
+            if keys[pygame.K_BACKSPACE]:
+                return False
 
     def draw(self):
         self._screen.fill((0, 0, 0))  # Fill the screen with black
@@ -105,8 +120,13 @@ class CollectorScript(Script):
         terminated = self._imitator.terminated()
 
         if terminated:
-            self._collector.append(self._episode_data)
-            self._number_of_episode += 1
+
+            if self.wait_episode_end():
+                self._number_of_episode += 1
+                self._collector.append(self._episode_data)
+            else:
+                assert isinstance(self._test_runner.episode_control, UserControlledEpisodeControl)
+                self.test_runner.episode_control.decrement_test()
 
             self._episode_data = []
 
@@ -141,6 +161,14 @@ class CollectorScript(Script):
     def draw_echap_to_unpause(self):
         text = self._font.render("Press Enter to unpause", True, (255, 255, 255))
         self._screen.blit(text, (20, 20))
+
+    def draw_episode_end(self):
+        # Enter if the user wants to keep the episode
+        # or delete if the user wants to discard the episode
+        self._screen.fill((0, 0, 0))  # Fill the screen with black
+        text = self._font.render("Press Enter to keep the episode or Delete to discard it", True, (255, 255, 255))
+        self._screen.blit(text, (20, 20))  # Display the text
+        pygame.display.flip()
 
 
 def init_pygame():
@@ -188,15 +216,19 @@ class CollectorTestManager(TestManager):
 
             behavior: Behavior = when_result[next(iter(when_result))]
 
-            if not isinstance(behavior, Imitator):
-                raise Exception("Only Imitator is allowed")
+            if not isinstance(behavior, (Agent, Imitable)):
+                raise Exception("Only Imitable Agent is allowed")
 
-            imitator = behavior
+            agent: Agent = behavior
+            agent.set_test_runner(test_runner)
+            agent.set_mode(self._mode)
 
+            imitable: Imitable = behavior
+            imitator = imitable.imitator()
+
+            imitator.set_agent(agent)
             imitator.set_mode(self._mode)
             imitator.set_test_runner(test_runner)
-
-            imitator.make()
 
             if not path:
                 path = imitator.path + "/collected_data.pkl"
