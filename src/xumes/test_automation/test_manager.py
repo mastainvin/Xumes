@@ -1,6 +1,7 @@
 import logging
 import textwrap
 import time
+import traceback
 from abc import abstractmethod
 
 import multiprocess
@@ -11,6 +12,7 @@ from tabulate import tabulate
 from xumes.core.colors import bcolors
 from xumes.core.modes import TEST_MODE, RENDER_MODE
 from xumes.assertions.assertion_bucket import AssertionReport
+from xumes.test_automation.episode_control import DefaultEpisodeControlFactory
 from xumes.test_automation.feature_strategy import FeatureStrategy, Scenario
 from xumes.communication.i_com_game_engine import IComGameEngine
 from xumes.test_automation.registries import config_registry, given_registry, \
@@ -70,7 +72,9 @@ class TestManager:
     def __init__(self, comm_service: IComGameEngine,
                  feature_strategy: FeatureStrategy,
                  mode: str = TEST_MODE, timesteps=None, iterations=None, do_logs: bool = False,
-                 logging_level=logging.NOTSET, fps_limit=-1, render=False):
+                 logging_level=logging.NOTSET, fps_limit=-1, render=False,
+                 episode_control_factory=DefaultEpisodeControlFactory()
+                 ):
         self._comm_service: IComGameEngine = comm_service
         self._scenario_datas: Dict[Scenario, ScenarioData] = {}
         self._mode = mode
@@ -84,6 +88,7 @@ class TestManager:
         self._fps_limit = fps_limit
         self._render = render
         self._features = []
+        self._episode_control_factory = episode_control_factory
 
     def add_test_runner_data(self, scenario: Scenario, ip: str, port: int):
         # Add a game service data to the list of game services data
@@ -139,6 +144,7 @@ class TestManager:
             logging.info(f"{bcolors.FAIL}Xumes interrupted by user.{bcolors.ENDC}")
         except Exception as e:
             logging.error(f"{bcolors.FAIL}Error occurs while testing: {e}{bcolors.ENDC}")
+            logging.error(traceback.format_exc())
         finally:
             # Close all game processes
             self._comm_service.stop_scenarios([scenario_data.pid for scenario_data in self._scenario_datas.values()])
@@ -224,7 +230,9 @@ class TestManager:
             test_runner = TestRunner(GameInstanceService(ComGameInstanceSocket(host="127.0.0.1")),
                                      self._timesteps, self._iterations, self._mode, scenario.feature.name,
                                      scenario.name,
-                                     self._assertion_queue, scenario.steps, registry_queue)
+                                     self._assertion_queue, scenario.steps, registry_queue,
+                                     self._episode_control_factory.create(self._timesteps, self._iterations),
+                                     )
 
             self._scenario_datas[scenario].test_runner = test_runner
 

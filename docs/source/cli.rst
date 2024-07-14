@@ -187,6 +187,80 @@ Options
 
    Save logs to the ``logs`` folder to be used with TensorBoard.
 
+.. option:: --imitate
+
+   Imitate the expert.
+
+Collect
+-------
+
+This command collects the data from the game.
+
+Synopsis
+~~~~~~~~
+
+.. code-block:: bash
+
+    xumes collect [OPTIONS]
+
+Options
+~~~~~~~
+
+.. option:: --clean [Optional]
+
+   Clean the data before collecting. If not specified, the data will be appended.
+
+.. option:: --iterations <num>, -i <num>
+
+   [when collecting] The number of iterations to perform (Number of games played).
+
+.. option:: --features <name>, -f <name> [Optional]
+
+   List of features you want to collect, separated by commas. All if not specified.
+
+.. option:: --scenarios <name>, -s <name> [Optional]
+
+   List of scenarios you want to collect, separated by commas. All if not specified.
+
+.. option:: --tags <name> [Optional]
+
+   List of tags you want to collect, separated by commas. All if not specified.
+
+.. option:: --log
+
+   Enable logging of the results.
+
+.. option:: --debug [Optional]
+
+   Enable debug messages display.
+
+.. option:: --info [Optional]
+
+   Enable info messages display.
+
+.. option:: --features_path <folder> [Optional]
+
+   The path to the folder where the features are located.
+
+.. option:: --steps_path <folder> [Optional]
+
+   The path to the folder where the steps are located.
+
+.. option:: --fps <value> [Optional]
+
+   Limit of FPS.
+
+.. option:: --headless [Optional]
+
+   Run the game in headless mode.
+
+.. option:: --h <value> [Optional]
+
+   Limit of FPS and headless mode.
+
+
+
+
 List
 ----
 

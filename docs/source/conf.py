@@ -9,7 +9,8 @@ sys.path.insert(0, os.path.abspath('.'))
 project = 'Xumes'
 copyright = '2024, Vincent Mastain'
 author = 'Vincent Mastain'
-release = "0.1.2"
+description = 'Xumes is a test automation framework for Games in Game Engines using reinforcement learning.'
+release = "0.2.0"
 
 # -- General configuration
 extensions = [

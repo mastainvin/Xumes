@@ -2,14 +2,14 @@ from __future__ import annotations
 
 from typing import SupportsFloat, Any, Tuple, Dict
 
-import gymnasium as gym
+import gymnasium
 from gymnasium import Space
 from gymnasium.core import RenderFrame, ActType, ObsType
 
 from xumes.modules.reinforcement_learning.agent_trainer import AgentTrainer
 
 
-class GymAdapter(gym.Env):
+class GymAdapter(gymnasium.Env):
 
     def __init__(self,
                  training_service: AgentTrainer,
@@ -20,6 +20,7 @@ class GymAdapter(gym.Env):
         self.observation_space = observation_space
         self.action_space = action_space
         self._first_reset = True
+        self.num_envs = 1
 
     def reset(
             self,

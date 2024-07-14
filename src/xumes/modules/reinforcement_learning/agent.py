@@ -2,10 +2,9 @@ import logging
 from abc import ABC, abstractmethod
 from typing import TypeVar, List, Optional
 
-from xumes.core.model_helper import trainer_name, model_path
+from xumes.core.model_helper import model_path
 from xumes.core.modes import TEST_MODE, TRAIN_MODE
 from xumes.test_automation.behavior import Behavior
-from xumes.modules.reinforcement_learning.i_trainer import ITrainer
 from xumes.modules.reinforcement_learning.stable_baselines_trainer import StableBaselinesTrainer
 from xumes.test_automation.input import Input
 
@@ -27,7 +26,7 @@ class Agent(Behavior, ABC):
     def __init__(self, save_path: str = None, eval_freq: int = 1000, logs_path: Optional[str] = None,
                  logs_name: Optional[str] = None, previous_model_path: Optional[str] = None, **kwargs):
         super().__init__()
-        self._trainer: ITrainer = StableBaselinesTrainer(self, **kwargs)
+        self._trainer: StableBaselinesTrainer = StableBaselinesTrainer(self, **kwargs)
 
         self._save_path = save_path
         self._eval_freq = eval_freq
@@ -43,7 +42,7 @@ class Agent(Behavior, ABC):
             "previous_model_path": self._previous_model_path
         }
 
-    def get_trainer(self) -> ITrainer:
+    def get_trainer(self) -> StableBaselinesTrainer:
         """
         Returns the agent's behavior.
         """
@@ -91,7 +90,7 @@ class Agent(Behavior, ABC):
             raise e
         finally:
             self._trainer.free()
-            self.test_runner().finished()
+            self.test_runner.finished()
 
     def predict(self, observation):
         """
