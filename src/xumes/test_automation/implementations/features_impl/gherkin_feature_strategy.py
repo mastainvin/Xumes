@@ -270,6 +270,10 @@ class GherkinFeatureStrategy(FeatureStrategy):
                     param_value = float(param_value)
                 elif param_type == 's':
                     param_value = str(param_value)
+                elif param_type == 'b':
+                    param_value = param_value.lower() == 'true'
+                elif param_type in ['array', 'list']:
+                    param_value = param_value.strip('[]').split(',')
                 else:
                     return False
 
