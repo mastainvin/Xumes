@@ -36,11 +36,23 @@ class FeatureStrategy(ABC):
     all features.
     """
 
-    def __init__(self, alpha: float = 0.001, steps_path: str = "./"):
+    def __init__(self, alpha: float = 0.001, steps_path: str = None, features_path: str = None):
         self.features: List[Feature] = []
         self._steps_files: List[str] = []
 
         self._alpha = alpha
+
+        if not features_path:
+            features_path = "./"
+
+        self._features_path = features_path
+
+        if not steps_path:
+            steps_path = os.path.join(self._features_path, "steps")
+
+        if not os.path.exists(steps_path):
+            raise FileNotFoundError(f"Path {steps_path} does not exists.")
+
         self._load_tests(steps_path)
 
         self.given = given
@@ -66,7 +78,7 @@ class FeatureStrategy(ABC):
                 self._steps_files.append(file[:-3])
 
     @abstractmethod
-    def retrieve_feature(self, path: str):
+    def retrieve_features(self):
         """
         Get all features.
         """
@@ -74,5 +86,5 @@ class FeatureStrategy(ABC):
 
 
 class DummyFeatureStrategy(FeatureStrategy):
-    def retrieve_feature(self, path: str):
+    def retrieve_features(self):
         pass

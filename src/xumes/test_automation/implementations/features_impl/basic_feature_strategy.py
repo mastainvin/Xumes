@@ -5,7 +5,7 @@ from xumes.test_automation.feature_strategy import FeatureStrategy, Feature, Sce
 
 class BasicFeatureStrategy(FeatureStrategy):
 
-    def retrieve_feature(self):
+    def retrieve_features(self):
         """
         Get features and scenarios from a feature file ".feature" in the test directory.
         The feature file must be in the following format:

@@ -102,7 +102,7 @@ class TestManager:
             test_time_start = time.time()
 
             # Retrieve features and scenarios
-            self._feature_strategy.retrieve_feature(path)
+            self._feature_strategy.retrieve_features()
             self._features = self._feature_strategy.features
 
             # Check if all tests are finished
@@ -158,7 +158,7 @@ class TestManager:
     def list_features(self, path):
         try:
             # Retrieve features and scenarios
-            self._feature_strategy.retrieve_feature(path)
+            self._feature_strategy.retrieve_features()
             self._features = self._feature_strategy.features
             width = 80
 

@@ -50,6 +50,7 @@ def split_names(names: str) -> List[str]:
 
 
 @cli.command()
+@click.argument("features_path", type=click.Path(), required=False)
 @click.option("--vectorize", "-v", is_flag=True, help="Vectorize the training.")
 @click.option("--iterations", "-i", default=None, help="Number of iterations to test the game.")
 @click.option("--features", "-f", default=None, help="List of features to test.")
@@ -58,7 +59,6 @@ def split_names(names: str) -> List[str]:
 @click.option("--log", is_flag=True, help="Log the game.")
 @click.option("--debug", is_flag=True, help="Debug debug level.")
 @click.option("--info", is_flag=True, help="Info debug level.")
-@click.option("--features_path", default=None, type=click.Path(), help="Path of the ./features folder.")
 @click.option("--steps_path", default=None, type=click.Path(), help="Path of the ./steps folder.")
 @click.option("--alpha", "-a", default=0.001, help="Alpha of the training.")
 @click.option("--fps", default=-1, help="Limit of FPS.")
@@ -103,6 +103,7 @@ def test(debug, features_path, steps_path, iterations, info, log, alpha,
 
     test_manager = test_manager_class(
         feature_strategy=GherkinFeatureStrategy(steps_path=steps_path,
+                                                features_path=features_path,
                                                 features_names=features,
                                                 scenarios_names=scenarios,
                                                 tags=tags),
@@ -131,11 +132,11 @@ def test(debug, features_path, steps_path, iterations, info, log, alpha,
 
 
 @cli.command()
+@click.argument("features_path", type=click.Path(), required=False)
 @click.option("--tensorboard", "-tb", is_flag=True, help="Save logs to _logs folder to be use with the tensorboard.")
 @click.option("--vectorize", "-v", is_flag=True, help="Vectorize the training.")
 @click.option("--debug", is_flag=True, help="Debug debug level.")
 @click.option("--info", is_flag=True, help="Info debug level.")
-@click.option("--features_path", default=None, type=click.Path(), help="Path of the ./features folder.")
 @click.option("--steps_path", default=None, type=click.Path(), help="Path of the ./steps folder.")
 @click.option("--model", default=None, type=click.Path(),
               help="Path of the model to load if you want to use a base model for your training.")
@@ -178,6 +179,7 @@ def train(debug, steps_path, info, tensorboard, model, features_path, vectorize,
 
     test_manager = test_manager_class(
         feature_strategy=GherkinFeatureStrategy(steps_path=steps_path,
+                                                features_path=features_path,
                                                 features_names=features,
                                                 scenarios_names=scenarios,
                                                 tags=tags),
@@ -205,6 +207,7 @@ def train(debug, steps_path, info, tensorboard, model, features_path, vectorize,
 
 
 @cli.command()
+@click.argument("features_path", type=click.Path(), required=False)
 @click.option("--iterations", "-i", default=None, help="Number of iterations to test the game.")
 @click.option("--features", "-f", default=None, help="List of features to test.")
 @click.option("--scenarios", "-s", default=None, help="List of scenarios to test.")
@@ -212,7 +215,6 @@ def train(debug, steps_path, info, tensorboard, model, features_path, vectorize,
 @click.option("--log", is_flag=True, help="Log the game.")
 @click.option("--debug", is_flag=True, help="Debug debug level.")
 @click.option("--info", is_flag=True, help="Info debug level.")
-@click.option("--features_path", default=None, type=click.Path(), help="Path of the ./features folder.")
 @click.option("--steps_path", default=None, type=click.Path(), help="Path of the ./steps folder.")
 def play(debug, features_path, steps_path, iterations, info, log,
          features,
@@ -241,6 +243,7 @@ def play(debug, features_path, steps_path, iterations, info, log,
 
     test_manager = HumanPlayingTestManager(
         feature_strategy=GherkinFeatureStrategy(steps_path=steps_path,
+                                                features_path=features_path,
                                                 features_names=features,
                                                 scenarios_names=scenarios,
                                                 tags=tags),
@@ -264,7 +267,7 @@ def play(debug, features_path, steps_path, iterations, info, log,
 
 
 @cli.command()
-@click.option("--features_path", default=None, type=click.Path(), help="Path of the ./features folder.")
+@click.argument("features_path", type=click.Path(), required=False)
 @click.option("--steps_path", default=None, type=click.Path(), help="Path of the ./steps folder.")
 @click.option("--features", "-f", default=None, help="List of features to test.")
 @click.option("--scenarios", "-s", default=None, help="List of scenarios to test.")
@@ -277,6 +280,7 @@ def list(features, scenarios, tags, features_path="./", steps_path="./"):
         scenarios = split_names(scenarios)
     test_manager = DummyTestManager(
         feature_strategy=GherkinFeatureStrategy(steps_path=steps_path, features_names=features,
+                                                features_path=features_path,
                                                 scenarios_names=scenarios, tags=tags),
         comm_service=ComGameEngineRest(host="127.0.0.1", port=8080))
 
@@ -284,6 +288,7 @@ def list(features, scenarios, tags, features_path="./", steps_path="./"):
 
 
 @cli.command()
+@click.argument("features_path", type=click.Path(), required=False)
 @click.option("--iterations", "-i", default=None, help="Number of iterations to test the game.")
 @click.option("--features", "-f", default=None, help="List of features to test.")
 @click.option("--scenarios", "-s", default=None, help="List of scenarios to test.")
@@ -291,7 +296,6 @@ def list(features, scenarios, tags, features_path="./", steps_path="./"):
 @click.option("--log", is_flag=True, help="Log the game.")
 @click.option("--debug", is_flag=True, help="Debug debug level.")
 @click.option("--info", is_flag=True, help="Info debug level.")
-@click.option("--features_path", default=None, type=click.Path(), help="Path of the ./features folder.")
 @click.option("--steps_path", default=None, type=click.Path(), help="Path of the ./steps folder.")
 @click.option("--clean", is_flag=True, help="Clean the data.")
 def collect(debug, features_path, steps_path, iterations, info, log,
@@ -322,6 +326,7 @@ def collect(debug, features_path, steps_path, iterations, info, log,
 
     test_manager = CollectorTestManager(
         feature_strategy=GherkinFeatureStrategy(steps_path=steps_path,
+                                                features_path=features_path,
                                                 features_names=features,
                                                 scenarios_names=scenarios,
                                                 tags=tags),

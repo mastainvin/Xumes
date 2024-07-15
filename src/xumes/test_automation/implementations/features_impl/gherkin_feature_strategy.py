@@ -16,14 +16,14 @@ class GherkinFeatureStrategy(FeatureStrategy):
     It also implements a way to filter the features and scenarios that we want to run.
     """
     def __init__(self, alpha: float = 0.001, features_names: List[str] = None, scenarios_names: List[str] = None,
-                 tags: List[str] = None, steps_path: str = "./"):
-        super().__init__(alpha, steps_path)
+                 tags: List[str] = None, steps_path: str = None, features_path: str = "./"):
+        super().__init__(alpha, steps_path, features_path)
         self._selected_features: List[str] = features_names
         self._selected_scenarios: List[str] = scenarios_names
         self._selected_tags: List[str] = tags
         self._steps = []
 
-    def retrieve_feature(self, path: str):
+    def retrieve_features(self):
         """
         Get features and scenarios from every feature file ".feature" in the "./features" directory.
         """
@@ -32,7 +32,7 @@ class GherkinFeatureStrategy(FeatureStrategy):
         self._convert_steps_files_to_gherkin_steps()
 
         # Get all feature files
-        feature_files = os.listdir(path)
+        feature_files = os.listdir(self._features_path)
         feature_files = [file for file in feature_files if file.endswith(".feature")]
 
         # If there are no feature files, raise an exception
@@ -46,7 +46,7 @@ class GherkinFeatureStrategy(FeatureStrategy):
         for feature_file in feature_files:
             if self._selected_features is None or feature_file[:-8] in self._selected_features:
                 # We open the feature file and parse it
-                feature_path = os.path.join(path, feature_file)
+                feature_path = os.path.join(self._features_path, feature_file)
 
                 with open(feature_path, 'r') as file:
                     feature = parser.parse(TokenScanner(file.read()))['feature']
