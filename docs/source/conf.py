@@ -10,7 +10,7 @@ project = 'Xumes'
 copyright = '2024, Vincent Mastain'
 author = 'Vincent Mastain'
 description = 'Xumes is a test automation framework for Games in Game Engines using reinforcement learning.'
-release = "0.2.0"
+release = "0.2.1"
 
 # -- General configuration
 extensions = [
