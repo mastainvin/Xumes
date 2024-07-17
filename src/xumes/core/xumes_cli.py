@@ -51,7 +51,7 @@ def split_names(names: str) -> List[str]:
 
 @cli.command()
 @click.argument("features_path", type=click.Path(), required=False)
-@click.option("--vectorize", "-v", is_flag=True, help="Vectorize the training.")
+@click.option("--not_vectorize", "-nv", is_flag=True, help="Vectorize the training.")
 @click.option("--iterations", "-i", default=None, help="Number of iterations to test the game.")
 @click.option("--features", "-f", default=None, help="List of features to test.")
 @click.option("--scenarios", "-s", default=None, help="List of scenarios to test.")
@@ -68,7 +68,7 @@ def test(debug, features_path, steps_path, iterations, info, log, alpha,
          features,
          scenarios,
          tags,
-         vectorize,
+         not_vectorize,
          fps, headless, h):
     if iterations is not None:
         iterations = int(iterations)
@@ -84,10 +84,13 @@ def test(debug, features_path, steps_path, iterations, info, log, alpha,
 
     mode = TRAIN_MODE
 
-    if vectorize:
-        test_manager_class = VecRLTestManager
+    if not_vectorize is not None:
+        if not not_vectorize:
+            test_manager_class = VecRLTestManager
+        else:
+            test_manager_class = ParallelTestManager
     else:
-        test_manager_class = ParallelTestManager
+        test_manager_class = VecRLTestManager
 
     if h > 0:
         headless = True
@@ -127,6 +130,7 @@ def test(debug, features_path, steps_path, iterations, info, log, alpha,
     params.register("steps_path", steps_path)
     params.register("alpha", alpha)
     params.register("fps", fps)
+    params.register("not_vectorize", not_vectorize)
 
     test_manager.test_all(features_path)
 
@@ -134,7 +138,7 @@ def test(debug, features_path, steps_path, iterations, info, log, alpha,
 @cli.command()
 @click.argument("features_path", type=click.Path(), required=False)
 @click.option("--tensorboard", "-tb", is_flag=True, help="Save logs to _logs folder to be use with the tensorboard.")
-@click.option("--vectorize", "-v", is_flag=True, help="Vectorize the training.")
+@click.option("--not_vectorize", "-nv", is_flag=True, help="Vectorize the training.")
 @click.option("--debug", is_flag=True, help="Debug debug level.")
 @click.option("--info", is_flag=True, help="Info debug level.")
 @click.option("--steps_path", default=None, type=click.Path(), help="Path of the ./steps folder.")
@@ -147,7 +151,7 @@ def test(debug, features_path, steps_path, iterations, info, log, alpha,
 @click.option("--headless", is_flag=False, help="Run the game in headless mode.")
 @click.option("-h", default=-1, help="Headless and fix FPS.")
 @click.option("--imitate", is_flag=True, help="Train the model with imitation learning.")
-def train(debug, steps_path, info, tensorboard, model, features_path, vectorize, features, scenarios, tags, fps,
+def train(debug, steps_path, info, tensorboard, model, features_path, not_vectorize, features, scenarios, tags, fps,
           headless, h, imitate):
     # change start method to fork to avoid errors with multiprocessing
     # Windows does not support the fork start method
@@ -160,10 +164,13 @@ def train(debug, steps_path, info, tensorboard, model, features_path, vectorize,
     if imitate:
         test_manager_class = VecImitatorTestManager
     else:
-        if vectorize:
-            test_manager_class = VecRLTestManager
+        if not_vectorize is not None:
+            if not not_vectorize:
+                test_manager_class = VecRLTestManager
+            else:
+                test_manager_class = ParallelTestManager
         else:
-            test_manager_class = ParallelTestManager
+            test_manager_class = VecRLTestManager
 
     if h > 0:
         headless = True
@@ -193,7 +200,7 @@ def train(debug, steps_path, info, tensorboard, model, features_path, vectorize,
 
     params = ParametersRegistry()
     params.register("tensorboard", tensorboard)
-    params.register("vectorize", vectorize)
+    params.register("not_vectorize", not_vectorize)
     params.register("features_path", features_path)
     params.register("steps_path", steps_path)
     params.register("model", model)

@@ -65,9 +65,9 @@ To launch the test mode, run the following command:
 Options
 ~~~~~~~
 
-.. option:: --vectorize, -v
+.. option:: --not_vectorize, -nv
 
-   Vectorize the testing.
+    Do not vectorize the training. (Vectorize by default)
 
 .. option:: --iterations <num>, -i <num>
 
@@ -139,9 +139,9 @@ Options
 
    Save logs to the ``_logs`` folder to be used with TensorBoard.
 
-.. option:: --vectorize, -v
+.. option:: --not_vectorize, -nv
 
-   Vectorize the training.
+    Do not vectorize the training. (Vectorize by default)
 
 .. option:: --debug [Optional]
 
