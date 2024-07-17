@@ -50,7 +50,7 @@ You can use the following command to start collecting data:
 
 .. code:: bash
 
-   python -m xumes collect --features_path=<features_path> --steps_path=<steps_path> -i <number_of_examples_per_scenario>
+   python -m xumes collect <features_path> -i <number_of_examples_per_scenario>
 
 Then a window will open and you can start playing the game.
 
@@ -69,6 +69,6 @@ After the data collection, you can train the model using the 'train' command wit
 
 .. code:: bash
 
-   python -m xumes train --features_path=<features_path> --steps_path=<steps_path> --imitate -v -h 10
+   python -m xumes train <features_path> --imitate -v -h 10
 
 After the training, you can use the trained model to train the agent.

@@ -17,7 +17,7 @@ Run the tests with the following command:
 
 .. code-block:: bash
 
-    python -m xumes test --features_path=./Tests/PipeSizeTest/features --steps_path=./Tests/PipeSizeTest/features/steps -h 10 -i 100 -v
+    python -m xumes test ./Tests/PipeSizeTest/features -h 10 -i 100 -v
 
 .. warning::
 

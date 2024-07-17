@@ -29,7 +29,7 @@ Options
 
 .. option:: --tags <name> [Optional]
 
-   List of tags you want to play, separated by commas. All if not specified.
+   Tags to filter the scenarios. See the `Tags Expression` section for more information.
 
 .. option:: --log
 
@@ -83,7 +83,7 @@ Options
 
 .. option:: --tags <name> [Optional]
 
-   List of tags you want to test, separated by commas. All if not specified.
+   Tags to filter the scenarios. See the `Tags Expression` section for more information.
 
 .. option:: --alpha <value>, -a <value>
 
@@ -173,7 +173,7 @@ Options
 
 .. option:: --tags <name> [Optional]
 
-   List of tags you want to train, separated by commas. All if not specified.
+   Tags to filter the scenarios. See the `Tags Expression` section for more information.
 
 .. option:: --fps <value> [Optional]
 
@@ -224,7 +224,7 @@ Options
 
 .. option:: --tags <name> [Optional]
 
-   List of tags you want to collect, separated by commas. All if not specified.
+   Tags to filter the scenarios. See the `Tags Expression` section for more information.
 
 .. option:: --log
 
@@ -294,7 +294,7 @@ Options
 
 .. option:: --tags <name> [Optional]
 
-   List of tags you want to list, separated by commas. All if not specified.
+   Tags to filter the scenarios. See the `Tags Expression` section for more information.
 
 Description
 ~~~~~~~~~~~
@@ -306,7 +306,7 @@ Examples
 
 .. code-block:: bash
 
-    xumes list --features_path ./features --steps_path ./steps --features feature1,feature2 --scenarios scenario1,scenario2 --tags tag1,tag2
+    xumes list --features_path ./features --steps_path ./steps --features feature1,feature2 --scenarios scenario1,scenario2 --tags 'tag1 and tag2'
 
 This command will list all the features specified in the ``features`` and ``scenarios`` options that are tagged with the tags specified in the ``tags`` option. The features and scenarios are located in the folders specified by the ``features_path`` and ``steps_path`` options.
 
@@ -340,3 +340,32 @@ This command will list all the features specified in the ``features`` and ``scen
     +------------------------------------------------------+--------------+-------------+
     | Testing the pipe size hard [1] - (i=1, j=0, k=2)     | PipeSize.py  | hard        |
     +------------------------------------------------------+--------------+-------------+
+
+
+Tags Expression
+----------------
+
+This feature allows you to filter scenarios based on tags expressions. The `--tags` parameter supports boolean logic expressions with `and`, `or`, and `not` operators, as well as wildcard matching.
+
+Syntax
+~~~~~~
+
+- `tag1 and tag2`: Select scenarios that have both `tag1` and `tag2`.
+- `tag1 or tag2`: Select scenarios that have either `tag1` or `tag2`.
+- `not tag1`: Select scenarios that do not have `tag1`.
+- `tag1 and (tag2 or tag3)`: Select scenarios that have `tag1` and either `tag2` or `tag3`.
+- `not (tag1 or tag2)`: Select scenarios that do not have `tag1` or `tag2`.
+
+Wildcards
+~~~~~~~~~
+
+- `tag.*`: Select scenarios with tags that start with `tag`.
+- `.*tag`: Select scenarios with tags that end with `tag`.
+- `*tag*`: Select scenarios with tags that contain `tag`.
+
+Examples
+~~~~~~~~
+
+.. code-block:: bash
+
+    xumes list --tags "easy and not smoke"

@@ -16,11 +16,11 @@ class GherkinFeatureStrategy(FeatureStrategy):
     It also implements a way to filter the features and scenarios that we want to run.
     """
     def __init__(self, alpha: float = 0.001, features_names: List[str] = None, scenarios_names: List[str] = None,
-                 tags: List[str] = None, steps_path: str = None, features_path: str = "./"):
+                 tags: str = None, steps_path: str = None, features_path: str = "./"):
         super().__init__(alpha, steps_path, features_path)
         self._selected_features: List[str] = features_names
         self._selected_scenarios: List[str] = scenarios_names
-        self._selected_tags: List[str] = tags
+        self._selected_tags: str = tags
         self._steps = []
 
     def retrieve_features(self):
@@ -109,22 +109,7 @@ class GherkinFeatureStrategy(FeatureStrategy):
         """
         Process a single scenario and add it to the feature object.
         """
-        # If the scenario has tags, we check if the scenario has one of the selected tags
-        has_tag = False
-        scenario_tags = []
-        if 'tags' in scenario:
-            for tag in scenario.get('tags', []):
-                scenario_tags.append(tag['name'][1:])
-
-        if self._selected_tags is None:
-            has_tag = True
-        else:
-            for tag in scenario_tags:
-                if tag in self._selected_tags:  # We remove the @ from the tag
-                    has_tag = True
-                    break
-            else:
-                has_tag = False
+        has_tag, scenario_tags = self.has_tags(scenario)
 
         # Check if the scenario name matches the selected scenarios
         if (self._selected_scenarios is None or scenario['name'] in self._selected_scenarios) and has_tag:
@@ -142,6 +127,46 @@ class GherkinFeatureStrategy(FeatureStrategy):
             # Create a Scenario object
             scenario_obj = Scenario(scenario['name'], steps_file, feature_obj, scenario_tags)
             feature_obj.scenarios.append(scenario_obj)
+
+    def has_tags(self, scenario):
+        scenario_tags = [tag['name'][1:] for tag in scenario.get('tags', [])]  # Remove '@' from tags
+
+        if not self._selected_tags:
+            return True, scenario_tags
+
+        expression = self._selected_tags
+
+        # Handle wildcard expressions
+        if expression.startswith('.*'):
+            suffix = expression[2:]
+            has_tag = any(tag.endswith(suffix) for tag in scenario_tags)
+            return has_tag, scenario_tags
+
+        if expression.startswith('*') and expression.endswith('*'):
+            contains = expression[1:-1]
+            has_tag = any(contains in tag for tag in scenario_tags)
+            return has_tag, scenario_tags
+
+        if expression.endswith('.*'):
+            prefix = expression[:-2]
+            has_tag = any(tag.startswith(prefix) for tag in scenario_tags)
+            return has_tag, scenario_tags
+
+        # Replace logical operators
+        expression = expression.replace("and", "&&").replace("or", "||").replace("not ", "!")
+
+        # Replace simple tag names with presence check in scenario_tags
+        expression = re.sub(r'(\b\w+\b)', r'"\1" in scenario_tags', expression)
+
+        # Replace logical operators back to Python syntax
+        expression = expression.replace("&&", "and").replace("||", "or").replace("!", "not ")
+
+        try:
+            has_tag = eval(expression)
+        except Exception as e:
+            has_tag = False
+
+        return has_tag, scenario_tags
 
     def _convert_steps_files_to_gherkin_steps(self):
         """
