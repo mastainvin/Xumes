@@ -17,13 +17,13 @@ Run the tests with the following command:
 
 .. code-block:: bash
 
-    python -m xumes test ./Tests/PipeSizeTest/features -h 10 -i 100 -v
+    python -m xumes test ./Tests/PipeSizeTest/features -h 10 -i 100
 
 .. warning::
 
     Always use `python -m xumes` to run the tests. This ensures the use `Xumes` as a module and be able to import other modules in the project.
 
-This command will run the tests found in the `features` directory in headless mode (without rendering the game), with a frame rate limit of 10 FPS and 100 iterations. The `-v` flag enables vectorized mode.
+This command will run the tests found in the `features` directory in headless mode (without rendering the game), with a frame rate limit of 10 FPS and 100 iterations.
 
 You should see the following output:
 

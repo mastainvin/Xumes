@@ -3,7 +3,6 @@ import os
 import sys
 sys.path.insert(0, os.path.abspath('.'))
 
-
 # -- Project information
 
 project = 'Xumes'
@@ -11,6 +10,8 @@ copyright = '2024, Vincent Mastain'
 author = 'Vincent Mastain'
 description = 'Xumes is a test automation framework for Games in Game Engines using reinforcement learning.'
 release = "0.2.1"
+html_title = f'<strong>Xumes {release}</strong>  <small>🤖 ✔️</small>'
+html_short_title = description
 
 # -- General configuration
 extensions = [
@@ -40,10 +41,15 @@ html_theme = 'furo'
 # -- Options for EPUB output
 epub_show_urls = 'footnote'
 
-# Ajouter le logo
-html_logo = "_static/logo.png"
-
+# html_logo = "_static/logo.png"
+# Options spécifiques à Furo pour les logos
 html_static_path = ['_static']
+
+html_theme_options = {
+    "light_logo": "logo_lightmode.png",
+    "dark_logo": "logo_darkmode.png",
+}
+
 
 
 from docutils import nodes
