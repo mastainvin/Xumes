@@ -1,4 +1,7 @@
+import numpy as np
+
 from xumes import Script
+from xumes.core.parameters_registry import ParametersRegistry
 from xumes.test_automation.behavior import Behavior
 from xumes.test_automation.test_manager import TestManager
 
@@ -9,10 +12,21 @@ class HumanTestingScript(Script):
         super().__init__()
         self._behavior = behavior
 
+        self._episode_length = (ParametersRegistry()).get("episode_length")
+        if self._episode_length is None:
+            self._episode_length = None
+        else:
+            self._episode_length = int(self._episode_length)
+        self._step_count = 0
+
     def step(self):
+        self._step_count += 1
         return []
 
     def terminated(self) -> bool:
+        if self._episode_length is not None and self._step_count >= self._episode_length:
+            self._step_count = 0
+            return True
         return self._behavior.terminated()
 
 

@@ -10,7 +10,7 @@ To launch the play mode, run the following command:
 
 .. code-block:: bash
 
-    xumes play [options]
+    xumes play <features_path> [options]
 
 Options
 ~~~~~~~
@@ -18,6 +18,10 @@ Options
 .. option:: --iterations <num>, -i <num>
 
    [when playing] The number of iterations to perform (Number of games played).
+
+.. option:: --episode_length <num>, -el <num>
+
+   [when playing] The maximum number of steps per episode.
 
 .. option:: --features <name>, -f <name> [Optional]
 
@@ -43,13 +47,10 @@ Options
 
    Enable info messages display.
 
-.. option:: --features_path <folder> [Optional]
-
-   The path to the folder where the features are located.
-
 .. option:: --steps_path <folder> [Optional]
 
    The path to the folder where the steps are located.
+
 
 Test Mode
 ---------
@@ -60,7 +61,7 @@ To launch the test mode, run the following command:
 
 .. code-block:: bash
 
-    xumes test [options]
+    xumes test <features_path> [options]
 
 Options
 ~~~~~~~
@@ -101,10 +102,6 @@ Options
 
    Enable info messages display.
 
-.. option:: --features_path <folder> [Optional]
-
-   The path to the folder where the features are located.
-
 .. option:: --steps_path <folder> [Optional]
 
    The path to the folder where the steps are located.
@@ -130,7 +127,7 @@ To launch the train mode, run the following command:
 
 .. code-block:: bash
 
-    xumes train [options]
+    xumes train <features_path> [options]
 
 Options
 ~~~~~~~
@@ -150,10 +147,6 @@ Options
 .. option:: --info [Optional]
 
    Enable info messages display.
-
-.. option:: --features_path <folder> [Optional]
-
-   The path to the folder where the features are located.
 
 .. option:: --steps_path <folder> [Optional]
 
@@ -201,7 +194,7 @@ Synopsis
 
 .. code-block:: bash
 
-    xumes collect [OPTIONS]
+    xumes collect <features_path> [OPTIONS]
 
 Options
 ~~~~~~~
@@ -238,10 +231,6 @@ Options
 
    Enable info messages display.
 
-.. option:: --features_path <folder> [Optional]
-
-   The path to the folder where the features are located.
-
 .. option:: --steps_path <folder> [Optional]
 
    The path to the folder where the steps are located.
@@ -271,14 +260,10 @@ Synopsis
 
 .. code-block:: bash
 
-    xumes list [OPTIONS]
+    xumes list <features_path> [OPTIONS]
 
 Options
 ~~~~~~~
-
-.. option:: --features_path <folder> [Optional]
-
-   The path to the folder where the features are located.
 
 .. option:: --steps_path <folder> [Optional]
 
@@ -306,7 +291,7 @@ Examples
 
 .. code-block:: bash
 
-    xumes list --features_path ./features --steps_path ./steps --features feature1,feature2 --scenarios scenario1,scenario2 --tags 'tag1 and tag2'
+    xumes list ./features --features feature1,feature2 --scenarios scenario1,scenario2 --tags 'tag1 and tag2'
 
 This command will list all the features specified in the ``features`` and ``scenarios`` options that are tagged with the tags specified in the ``tags`` option. The features and scenarios are located in the folders specified by the ``features_path`` and ``steps_path`` options.
 

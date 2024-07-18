@@ -216,6 +216,7 @@ def train(debug, steps_path, info, tensorboard, model, features_path, not_vector
 @cli.command()
 @click.argument("features_path", type=click.Path(), required=False)
 @click.option("--iterations", "-i", default=None, help="Number of iterations to test the game.")
+@click.option("--episode_length", "-el", default=None, help="Number of steps per episode.")
 @click.option("--features", "-f", default=None, help="List of features to test.")
 @click.option("--scenarios", "-s", default=None, help="List of scenarios to test.")
 @click.option("--tags", default=None, help="Tags of the features to test.")
@@ -223,10 +224,12 @@ def train(debug, steps_path, info, tensorboard, model, features_path, not_vector
 @click.option("--debug", is_flag=True, help="Debug debug level.")
 @click.option("--info", is_flag=True, help="Info debug level.")
 @click.option("--steps_path", default=None, type=click.Path(), help="Path of the ./steps folder.")
+@click.option("--fps", default=-1, help="Limit of FPS.")
 def play(debug, features_path, steps_path, iterations, info, log,
          features,
          scenarios,
-         tags):
+         tags,
+         episode_length, fps):
     if iterations is not None:
         iterations = int(iterations)
     else:
@@ -258,6 +261,7 @@ def play(debug, features_path, steps_path, iterations, info, log,
         logging_level=logging_level,
         iterations=iterations,
         render=True,
+        fps_limit=fps,
         comm_service=ComGameEngineRest(host="127.0.0.1", port=8080)
     )
 
@@ -269,6 +273,7 @@ def play(debug, features_path, steps_path, iterations, info, log,
     params.register("log", log)
     params.register("features_path", features_path)
     params.register("steps_path", steps_path)
+    params.register("episode_length", episode_length)
 
     test_manager.test_all(features_path)
 
