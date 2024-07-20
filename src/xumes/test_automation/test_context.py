@@ -4,6 +4,14 @@ from xumes.test_automation.driver import Driver
 
 
 class TestContext:
+    """
+    Class responsible for providing the test context to the test scripts.
+    The test context provides limited access to the test automation framework.
+    Access:
+        - Entities: Access to the entities registered in the entity registry.
+        - Driver: Access to the driver. (call game methods, etc.)
+        - Assertions: Access to the assertion methods.
+    """
 
     def __init__(self, entity_registry: EntityRegistry, driver: Driver, assertion_bucket: AssertionBucket):
         self._entity_registry = entity_registry

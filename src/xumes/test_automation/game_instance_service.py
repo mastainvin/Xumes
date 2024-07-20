@@ -9,20 +9,11 @@ class Behavior:
 
 class GameInstanceService:
     """
-    The `TestRunner` class is a central component of Xumes. It manages communication between communication service,
-    the execution of the game itself, and external events that can modify the game state.
-
+    Class responsible for the communication between the game instance and the test automation.
+    Used by the test runner to interact with the game instance.
     Attributes:
-        communication_service (IComGameInstance): An object responsible for communication with other the training service.
-
-    Methods:
-        run_communication_service(): Starts the communication service thread.
-        run_test_runner(run_func): Starts the game loop if this is the main thread. `run_func` is the game loop function to execute.
-        run(): Executes the game by starting both the communication service and the game loop.
-        run_render(): Similar to `run()`, but runs the game loop with rendering.
-        stop(): Stops both threads currently running.
-        wait(): The first method executed in the game loop. It allows the game to wait for an event sent by the training service.
-        update_event(event): Method used to accept external modifications to the game, such as reset. `event` represents an external event that can modify the game state.
+        - communication_service (IComGameInstance): The communication service.
+        - is_finished (bool): A flag indicating if the game instance is finished.
     """
 
     def __init__(self,

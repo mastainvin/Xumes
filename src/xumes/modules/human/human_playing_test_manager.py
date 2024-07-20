@@ -31,6 +31,9 @@ class HumanTestingScript(Script):
 
 
 class HumanPlayingTestManager(TestManager):
+    """
+    Test manager for human playing doing the manual testing.
+    """
 
     def _run_scenarios(self, feature, scenario_datas, active_processes):
         reversed_scenario_datas = list(scenario_datas.keys())

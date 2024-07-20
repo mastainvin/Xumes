@@ -41,32 +41,6 @@ class TestManager:
 
     The TestManager class is responsible for loading and running tests in a game environment. It provides functionality
     for creating game services, running tests, and managing communication with the training manager.
-
-    Args:
-        communication_service (ICommunicationServiceTestManager): An implementation of the
-            ICommunicationServiceTestManager interface for communication with the training manager.
-        mode (str, optional): The mode of the test execution. Can be 'test', 'render', or 'train'.
-            Defaults to 'test'.
-        timesteps (int, optional): The maximum number of steps to run in a test. Defaults to None.
-        iterations (int, optional): The maximum number of iterations to run a test. Defaults to None.
-
-    Methods:
-        get_port(feature: str, scenario: str) -> int:
-            Retrieves the port number for a given feature and scenario.
-        add_test_runner_data(steps: str, ip: str, port: int) -> None:
-            Adds game service data to the list of game services data.
-        create_test_runner(steps: str, ip: str, port: int) -> GameService:
-            Creates a game service instance with the specified steps, IP, and port.
-        _build_test_runner(test_automation, ip, port) -> GameService:
-            Abstract method to build a game service instance. Must be implemented by subclasses.
-        test_all() -> None:
-            Runs all the tests in the game environment.
-        delete_test_runners() -> None:
-            Deletes all game service instances.
-        run_test(steps: str, active_processes) -> None:
-            Runs a test with the given steps.
-        run_test_render(steps: str, active_processes) -> None:
-            Runs a test in render mode with the given steps.
     """
 
     def __init__(self, comm_service: IComGameEngine,

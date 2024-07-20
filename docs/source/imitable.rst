@@ -69,6 +69,6 @@ After the data collection, you can train the model using the 'train' command wit
 
 .. code:: bash
 
-   python -m xumes train <features_path> --imitate -v -h 10
+   python -m xumes train <features_path> --imitate -h 10
 
 After the training, you can use the trained model to train the agent.

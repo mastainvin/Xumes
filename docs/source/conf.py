@@ -1,6 +1,7 @@
 # conf.py
 import os
 import sys
+
 sys.path.insert(0, os.path.abspath('.'))
 
 # -- Project information
@@ -50,8 +51,6 @@ html_theme_options = {
     "dark_logo": "logo_darkmode.png",
 }
 
-
-
 from docutils import nodes
 from docutils.parsers.rst import directives
 
@@ -59,6 +58,7 @@ IFRAME_CODE = """<iframe width="%(width)s" height="%(height)s"
 src="https://www.youtube.com/embed/%(yid)s" frameborder="0"
 allowfullscreen>%(extra)s</iframe>
 """
+
 
 def youtube(name, args, options, content, lineno,
             contentOffset, blockText, state, stateMachine):
@@ -83,6 +83,7 @@ def youtube(name, args, options, content, lineno,
         params = ["%s='%s'" % (key, extra_args[key]) for key in extra_args]
         string_vars['extra'] = " ".join(params)
     return [nodes.raw('', IFRAME_CODE % (string_vars), format='html')]
+
 
 youtube.content = True
 directives.register_directive('youtube', youtube)

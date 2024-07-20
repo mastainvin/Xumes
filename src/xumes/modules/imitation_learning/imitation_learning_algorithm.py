@@ -5,6 +5,7 @@ class ImitationLearningAlgorithm:
     """
     Base class for imitation learning algorithms.
     Made to be used in the Imitator class.
+    Implements algorithm from the imitation library.
     """
 
     def __init__(self, n_epochs=20):
