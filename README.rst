@@ -1,48 +1,91 @@
 Xumes
 =====
 
-Xumes is a game testing tool designed to be used on top of games without the need to modify the game sources. It provides a framework for observing and interacting with game elements, training models, and conducting tests.
+Xumes is a game testing tool designed to be used on top of games without the need to modify the game sources. It provides a framework for observing and interacting with game elements, training models, and conducting tests. For the moment, only the Godot framework has an implemented module for interacting with Xumes. So for the moment, the documentation will be focused on the implementation with Godot.
 
-Please check the `documentation <https://xumes.readthedocs.io/en/latest/>`__ for more information.
+Please check the `documentation <https://xumes.readthedocs.io/en/latest/>`_ for more information.
 
-Framework usage
----------------
-
-The Xumes framework consists of two main components: the "Game side" and the "Training side". These components are implemented as separate Python modules within the framework: ``game_module`` and ``training_module``.
-You will need to implement these modules to use the framework. The following diagram illustrates the architecture of the framework:
-
-.. image:: schema.png
-   :alt: framework schema
-
-Game side
+Framework
 ---------
 
-The steps files and features files are responsible for implementing the tests that will be executed by the framework. They are written in Gherkin, a language that allows you to write tests in a human-readable format. The framework will execute these tests by interacting with the game through the game side component.
+The framework is based on the BDD methodology, that means that two types of files are needed to conduct tests. Those files are the `feature` files and the `steps` files.
 
-Training side
--------------
+The following diagram illustrates the architecture of the framework:
 
-The training side of the Xumes framework is responsible for predicting actions based on game states. It leverages the ``stablebaselines`` library, which provides a wide range of reinforcement learning (RL) algorithms to facilitate the implementation of the training process.
+.. image:: ./docs/source/_static/architecture.png
+   :alt: framework schema
 
-Limitations
+Installation
+------------
+
+.. code-block:: bash
+
+    pip install xumes
+
+Using with Godot
+----------------
+
+To use Xumes with Godot, you need to compile Godot from sources. Follow the instructions in the `Godot documentation <https://docs.godotengine.org/en/stable/development/compiling/index.html>`_.
+
+Clone the following repository instead of the official one:
+
+.. code-block:: bash
+
+    git clone https://github.com/mastainvin/godot.git
+
+.. note::
+
+    Don't forget to checkout to the `xumes` branch before building `Godot`.
+
+To start the `Godot` editor, run the following command:
+
+.. code-block:: bash
+
+    ./bin/godot.x11.tools.64 --editor --path <path_to_godot_project>
+
+Quick start
 -----------
 
-- Randomness of the tests due to the stochastic behaviour of AI agents. We are doing t-test and let the user choose $\alpha$, by default $\alpha=0.001$. That means that there are cases of false positives and false negatives which is not good for testing.
-- Training time can be long, especially for big tests.
+Once `Xumes` and `Godot` are installed, you can test your installation with the Flappy Bird example. First, clone the repository:
 
-Those limitations make testing difficult and impose a good definition of the test cases.
+.. code-block:: bash
 
-Future work
------------
+    git clone https://github.com/mastainvin/Xumes-Examples.git
 
-- [ ] Improve the error handling for the BDD (steps not written yet for instance).
-- [ ] Change the Observable implementation.
-- [ ] Add seed to perform same tests every time.
-- [X] Add tags in feature files.
-- [ ] Improve code coverage with unit tests.
-- [ ] Create an architecture schema for the framework (not a usage schema).
-- [ ] Improve the documentation with descriptions of every class of the framework.
-- [ ] Improve the documentation with advices on how to make good tests and how to choose good alphas.
-- [ ] Convert the documentation to Sphinx.
-- [ ] Add a class to pass data from game to training (for the moment is Dict).
-- [ ] Add behavior observation (observe when a method is called).
+Then, navigate to the `FlappyBird` directory:
+
+.. code-block:: bash
+
+    cd Xumes-Examples/Godot/flappy_bird/
+
+Run the tests with the following command:
+
+.. code-block:: bash
+
+    python -m xumes test ./Tests/PipeSizeTest/features -h 10 -i 100
+
+.. warning::
+
+    Always use `python -m xumes` to run the tests. This ensures the use of `Xumes` as a module and the ability to import other modules in the project.
+
+This command will run the tests found in the `features` directory in headless mode (without rendering the game), with a frame rate limit of 10 FPS and 100 iterations.
+
+You should see the following output:
+
+.. code-block:: text
+
+                   TEST REPORT
+
+    9 tests passed on a total of 9 in 00:01:16.
+    Tests passed:
+        - PipeSize/Testing the pipe size [2] - (i=0.5, j=1, k=2)
+        - PipeSize/Testing the pipe size easy [1] - (i=0.5, j=0.5, k=2)
+        - PipeSize/Testing the pipe size easy [2] - (i=1, j=1, k=2)
+        - PipeSize/Testing the pipe size hard [1] - (i=1, j=0, k=2)
+        - PipeSize/Testing the pipe size [1] - (i=0.5, j=0, k=2)
+        - PipeSize/Testing the pipe size easy [0] - (i=0, j=0, k=2)
+        - PipeSize/Testing the pipe size hard [0] - (i=0, j=1, k=2)
+        - PipeSize/Testing the pipe size [0] - (i=0, j=0.5, k=2)
+        - PipeSize/Testing the pipe size [3] - (i=1, j=0.5, k=2)
+
+`Here <https://www.youtube.com/watch?v=awXkgS3Pc8s>`_ is the video of Godot first build and test execution.
