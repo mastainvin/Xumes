@@ -1,8 +1,18 @@
 # Xumes
 
-Xumes is a game testing tool designed to be used on top of games without the need to modify the game sources. It provides a framework for observing and interacting with game elements, training models, and conducting tests. For the moment, only the Godot framework has an implemented module for interacting with Xumes. So for the moment, the documentation will be focus on the implementation with godot.
-
-Please check the [documentation](https://xumes.readthedocs.io/en/latest/) for more information.
+<table style="width:100%">
+   <tr>
+      <td style="width:75%; vertical-align: top;">
+         <p>Xumes is a game testing tool designed to be used on top of games without the need to modify the game sources. It provides a framework for observing and interacting with game elements, training models, and conducting tests. For the moment, only the Godot framework has an implemented module for interacting with Xumes. So for the moment, the documentation will be focused on the implementation with Godot.</p>
+         <p>Please check the <a href="https://xumes.readthedocs.io/en/latest/">documentation</a> for more information.</p>
+      </td>
+       <td style="width:5%; vertical-align: top;">
+         </td>
+      <td style="width:20%; vertical-align: top;">
+         <img src="/docs/source/_static/fb.gif" alt="Test Animation">
+      </td>
+   </tr>
+</table>
 
 ## Framework
 
@@ -11,7 +21,6 @@ The framework is based on the BDD methodology, that's means that two type of fil
 The following diagram illustrates the architecture of the framework:
 
 ![framework schema](/docs/source/_static/architecture.png)
-
 
 ## Installation
 
