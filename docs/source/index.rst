@@ -11,7 +11,7 @@ Welcome to Xumes! 🤖 ✔️
          <td style="width:5%; vertical-align: top;">
          </td>
          <td style="width:20%; vertical-align: top;">
-            <img src="/_static/fb.gif" alt="Test Animation">
+            <img src="_static/fb.gif" alt="Test Animation">
          </td>
       </tr>
    </table>
