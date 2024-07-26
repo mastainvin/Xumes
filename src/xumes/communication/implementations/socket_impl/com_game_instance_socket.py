@@ -14,6 +14,7 @@ class ComGameInstanceSocket(IComGameInstance):
         self.socket = None
         self.addr = None
         self.is_running = False
+        self.size = 4096
 
     def push_dict(self, dictionary) -> None:
 
@@ -23,7 +24,7 @@ class ComGameInstanceSocket(IComGameInstance):
     def get_dict(self) -> Dict[str, Any]:
         data = {}
         if self.is_running:
-            data = self.socket.recv(1024)
+            data = self.socket.recv(self.size)
             data = data.decode()
             data = json.loads(data)
             data = parse_json_with_eval(data)
@@ -32,7 +33,7 @@ class ComGameInstanceSocket(IComGameInstance):
     def get_int(self) -> int:
         data = 0
         if self.is_running:
-            data = self.socket.recv(1024)
+            data = self.socket.recv(self.size)
             data = eval(data)
         return data
 

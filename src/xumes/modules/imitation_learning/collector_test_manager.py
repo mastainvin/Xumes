@@ -31,6 +31,12 @@ class CollectorScript(Script):
 
         self._keep_episode = True
 
+        self._episode_length = (ParametersRegistry()).get("episode_length")
+        if self._episode_length is None:
+            self._episode_length = None
+        else:
+            self._episode_length = int(self._episode_length)
+
     def reset(self):
         """
             Reset the environment
@@ -64,9 +70,7 @@ class CollectorScript(Script):
 
         self._observation = new_observation
 
-        if action:
-            return self._imitator.agent.actions(action)
-        return []
+        return self._imitator.agent.actions(action)
 
     def wait_pause(self, keys):
         if keys[pygame.K_ESCAPE]:

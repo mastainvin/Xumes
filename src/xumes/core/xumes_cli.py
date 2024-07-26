@@ -301,6 +301,7 @@ def list(features, scenarios, tags, features_path="./", steps_path="./"):
 
 @cli.command()
 @click.argument("features_path", type=click.Path(), required=False)
+@click.option("--episode_length", "-el", default=None, help="Number of steps per episode.")
 @click.option("--iterations", "-i", default=None, help="Number of iterations to test the game.")
 @click.option("--features", "-f", default=None, help="List of features to test.")
 @click.option("--scenarios", "-s", default=None, help="List of scenarios to test.")
@@ -314,7 +315,7 @@ def collect(debug, features_path, steps_path, iterations, info, log,
             features,
             scenarios,
             tags,
-            clean):
+            clean, episode_length):
     if iterations is not None:
         iterations = int(iterations)
     else:
@@ -359,5 +360,6 @@ def collect(debug, features_path, steps_path, iterations, info, log,
     params.register("features_path", features_path)
     params.register("steps_path", steps_path)
     params.register("clean", clean)
+    params.register("episode_length", episode_length)
 
     test_manager.test_all(features_path)

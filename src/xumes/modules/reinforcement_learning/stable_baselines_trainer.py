@@ -26,6 +26,7 @@ class StableBaselinesTrainer(AgentTrainer, ABC):
                  total_timesteps: int = 1000000,
                  algorithm_type: str = "MultiInputPolicy",
                  algorithm: Type[ActorCriticPolicy] = stable_baselines3.PPO,
+                 policy_kwargs: Optional[dict] = None,
                  ):
         super().__init__(agent)
         if observation_space is not None and action_space is not None:
@@ -49,6 +50,8 @@ class StableBaselinesTrainer(AgentTrainer, ABC):
         self.made = False
 
         self.policy = None
+
+        self.policy_kwargs = policy_kwargs
 
     @final
     def make(self):
@@ -108,7 +111,7 @@ class StableBaselinesTrainer(AgentTrainer, ABC):
         if not self.made:
             self.make()
 
-        self.policy = self.policy_class(self.algorithm_type, self.env, verbose=1, tensorboard_log=logs_path)
+        self.policy = self.policy_class(self.algorithm_type, self.env, verbose=1, tensorboard_log=logs_path, policy_kwargs=self.policy_kwargs)
 
     def get_env(self):
         return self.env

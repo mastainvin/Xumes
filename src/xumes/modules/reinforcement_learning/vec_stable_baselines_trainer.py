@@ -88,8 +88,9 @@ class VecStableBaselinesTrainer(ITrainer):
 
         policy_class = self._first_trainer.policy_class
         algorithm_type = self._first_trainer.algorithm_type
+        policy_kwargs = self._first_trainer.policy_kwargs if self._first_trainer.policy_kwargs else {}
 
-        self.policy = policy_class(algorithm_type, self._vec_env, verbose=1, tensorboard_log=logs_path)
+        self.policy = policy_class(algorithm_type, self._vec_env, verbose=1, tensorboard_log=logs_path, policy_kwargs=policy_kwargs)
 
     def play(self, timesteps: int = None):
 
