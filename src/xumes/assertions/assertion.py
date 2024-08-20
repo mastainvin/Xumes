@@ -75,7 +75,8 @@ class Assertion(IAssertionStrategy):
         if len(data) == 0:
             raise ValueError("Data is empty")
         if not isinstance(data[0], self._type):
-            raise TypeError("Data type is not equal to assertion type")
+            if not (isinstance(data[0], int) and self._type == bool):
+                raise TypeError("Data type is not equal to assertion type")
 
         return False
 
