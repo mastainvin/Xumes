@@ -1,4 +1,5 @@
 import logging
+import time
 from typing import TypeVar, final
 
 from xumes.assertions.assertion_bucket import AssertionBucket
@@ -41,7 +42,8 @@ class TestRunner:
         self._steps = steps
         self._entity_manager = AutoEntityManager(JsonGameElementStateConverter())
 
-        self._assertion_bucket = AssertionBucket(test_name=f"{self._feature}/{self._scenario}",
+        self._assertion_bucket = AssertionBucket(test_name=f"{self._scenario}",
+                                                 class_name=self._feature,
                                                  queue=test_queue)
         self.driver = Driver()
 
@@ -53,6 +55,8 @@ class TestRunner:
             self._episode_control = DefaultEpisodeControl(self._number_max_of_steps, self._number_max_of_tests)
         else:
             self._episode_control = episode_control
+
+        self._test_start_time = 0.0
 
     def get_context(self):
         return self._context
@@ -97,7 +101,9 @@ class TestRunner:
     def _do_assert(self) -> None:
         self._assertion_bucket.assertion_mode()
         self.then()
-        self._assertion_bucket.send_results()
+        test_time_end = time.time()
+        test_time = round(test_time_end - self._test_start_time, 3)
+        self._assertion_bucket.send_results(test_time)
         self._assertion_bucket.clear()
         self._assertion_bucket.collect_mode()
 
@@ -106,6 +112,8 @@ class TestRunner:
         """
         Resets the game state by calling the given and reset methods of the TestRunner instance.
         """
+        if self._test_start_time == 0.0:
+            self._test_start_time = time.time()
         self.given()
         self._game_instance_service.reset()
 

@@ -8,6 +8,7 @@ import multiprocess
 from typing import List, Dict, Tuple
 
 from tabulate import tabulate
+import xml.etree.ElementTree as et
 
 from xumes.core.colors import bcolors
 from xumes.core.modes import TEST_MODE, RENDER_MODE
@@ -179,17 +180,78 @@ class TestManager:
         # log results
         nb_test = len(results)
         converted_time = time.strftime("%H:%M:%S", time.gmtime(self._delta_time))
-        header = f"{bcolors.BOLD}{bcolors.UNDERLINE}{'':15}TEST REPORT{'':15}{bcolors.ENDC}\n"
-        details = f"{successes} tests passed on a total of {nb_test} in {converted_time}.\n"
-        details += f"Tests passed:\n{tests_passed_names}\n" if successes > 0 else ""
-        details += error_logs
 
-        if successes < nb_test:
-            print(f"{bcolors.FAIL}{header}{bcolors.ENDC}")
-            print(f"{bcolors.FAIL}{details}{bcolors.ENDC}")
-        else:
-            print(f"{bcolors.OKGREEN}{header}{bcolors.ENDC}")
-            print(f"{bcolors.OKGREEN}{details}{bcolors.ENDC}")
+        # Create XML structure
+        testsuite = et.Element('testsuite', {
+            'name': 'TestSuite',
+            'tests': str(nb_test),
+            'failures': str(nb_test - successes),
+            'errors': '0',
+            'skipped': '0',
+            'timestamp': time.strftime("%Y-%m-%dT%H:%M:%S", time.gmtime()),
+            'time': str(self._delta_time)
+        })
+
+        for result in results:
+            testcase = et.SubElement(testsuite, 'testcase', {
+                'classname': result.class_name,
+                'name': result.test_name,
+                'time': result.time
+            })
+            if not result.passed:
+                failure = et.SubElement(testcase, 'failure', {
+                    'message': result.error_logs,
+                    'type': 'AssertionError'
+                })
+                failure.text = result.error_logs
+
+        # Write XML to file
+        xml_file = "test-results.xml"
+        tree = et.ElementTree(testsuite)
+        tree.write(xml_file, encoding='utf-8', xml_declaration=True)
+
+        # Print the formatted report to the console
+        self._print_formatted_report(xml_file)
+
+    def _print_formatted_report(self, xml_file):
+        tree = et.parse(xml_file)
+        root = tree.getroot()
+
+        header = f"{bcolors.BOLD}{bcolors.UNDERLINE}TEST REPORT{bcolors.ENDC}\n"
+        summary = (
+            f"Total Tests: {bcolors.BOLD}{root.attrib['tests']}{bcolors.ENDC}\n"
+            f"Failures: {bcolors.BOLD}{bcolors.FAIL}{root.attrib['failures']}{bcolors.ENDC}\n"
+            f"Errors: {bcolors.BOLD}{bcolors.FAIL}{root.attrib['errors']}{bcolors.ENDC}\n"
+            f"Skipped: {bcolors.BOLD}{root.attrib['skipped']}{bcolors.ENDC}\n"
+            f"Time: {bcolors.BOLD}{root.attrib['time']}{bcolors.ENDC}\n"
+        )
+
+        border = f"{bcolors.GREY}{'=' * 50}{bcolors.ENDC}"
+        print(f"{bcolors.HEADER}{header}{bcolors.ENDC}")
+        print(f"{border}")
+        print(f"{bcolors.OKBLUE}{summary}{bcolors.ENDC}")
+        print(f"{border}\n")
+
+        for testcase in root.findall('testcase'):
+            classname = testcase.attrib['classname']
+            name = testcase.attrib['name']
+            time = testcase.attrib['time']
+            failure = testcase.find('failure')
+            status = "PASSED"
+            message = ""
+            if failure is not None:
+                status = "FAILED"
+                message = failure.attrib['message']
+
+            status_icon = "✅" if status == "PASSED" else "❌"
+            status_color = bcolors.OKGREEN if status == "PASSED" else bcolors.FAIL
+            print(f"{status_color}{status_icon} Test Case: {name}{bcolors.ENDC}")
+            print(f"  Class: {classname}")
+            print(f"  Time: {time}")
+            print(f"  Status: {status_color}{status}{bcolors.ENDC}")
+            if message:
+                print(f"  Message: {message}")
+            print(f"{bcolors.GREY}{'-' * 50}{bcolors.ENDC}")
 
     def _run_feature(self, feature, active_processes):
 
