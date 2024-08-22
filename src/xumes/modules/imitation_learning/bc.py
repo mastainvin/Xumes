@@ -1,6 +1,5 @@
 import gymnasium
 from imitation.algorithms import bc
-from torchsummary import summary
 
 from xumes.modules.imitation_learning.imitation_learning_algorithm import ImitationLearningAlgorithm
 
@@ -19,8 +18,5 @@ class BC(ImitationLearningAlgorithm):
             demonstrations=demonstrations,
             device=device,
         )
-
-        print("Policy summary:")
-        print(trainer.policy)
 
         trainer.train(n_epochs=self._n_epochs)

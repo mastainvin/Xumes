@@ -10,16 +10,18 @@ from xumes.assertions.assertion_result import AssertionResult
 
 class AssertionReport:
 
-    def __init__(self, passed: bool, error_logs: str, test_name: str):
+    def __init__(self, passed: bool, error_logs: str, test_name: str, class_name: str, time: str):
         self.passed = passed
         self.error_logs = error_logs
         self.test_name = test_name
+        self.class_name = class_name
+        self.time = time
 
     def __getstate__(self):
-        return self.passed, self.error_logs, self.test_name
+        return self.passed, self.error_logs, self.test_name, self.class_name, self.time
 
     def __setstate__(self, state):
-        self.passed, self.error_logs, self.test_name = state
+        self.passed, self.error_logs, self.test_name, self.class_name, self.time = state
 
 
 class AssertionBucketState:
@@ -60,12 +62,13 @@ class AssertionBucket:
     ASSERT_MODE = "assert"
     COLLECT_MODE = "collect"
 
-    def __init__(self, test_name, queue: multiprocess.Queue, assertion_factory=AssertionFactory()):
+    def __init__(self, test_name, class_name, queue: multiprocess.Queue, assertion_factory=AssertionFactory()):
         super().__init__()
         self._data = []
         self._results: List[AssertionResult] = []
         self._iterator = 0
         self._test_name = test_name
+        self._class_name = class_name
         self._collect_state = CollectState(self)
         self._assert_state = AssertState(self)
         self._state = self._collect_state
@@ -157,7 +160,7 @@ class AssertionBucket:
         ))
         self._iterator += 1
 
-    def send_results(self):
+    def send_results(self, test_time: float):
         error_logs = ""
         for assertion_result in self._results:
             if not assertion_result.passed:
@@ -167,7 +170,9 @@ class AssertionBucket:
 
         assertion_report = AssertionReport(passed=self._passed,
                                            error_logs=error_logs,
-                                           test_name=self._test_name
+                                           test_name=self._test_name,
+                                           class_name=self._class_name,
+                                           time=str(test_time)
                                            )
 
         self._queue.put(assertion_report)
