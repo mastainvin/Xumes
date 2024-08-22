@@ -1,4 +1,5 @@
 import logging
+import os
 import pickle
 
 import pygame
@@ -257,6 +258,8 @@ class CollectorTestManager(TestManager):
                     existing_data = pickle.load(f)
             except (EOFError, FileNotFoundError):
                 logging.error("No existing data found")
+
+        os.makedirs(os.path.dirname(path), exist_ok=True)
 
         # Add new episode data
         existing_data.extend(collector)
