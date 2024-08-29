@@ -1,3 +1,4 @@
+import ast
 import os
 import re
 from typing import Dict, List
@@ -298,7 +299,7 @@ class GherkinFeatureStrategy(FeatureStrategy):
                 elif param_type == 'b':
                     param_value = param_value.lower() == 'true'
                 elif param_type in ['array', 'list']:
-                    param_value = param_value.strip('[]').split(',')
+                    param_value= ast.literal_eval(param_value)
                 else:
                     return False
 
