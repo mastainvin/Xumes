@@ -16,10 +16,11 @@ RUN cd /home/jenkins/godot-fork && \
     git checkout xumes && \
     scons platform=linuxbsd use_llvm=yes -j2
 
+RUN mkdir -p /home/jenkins/xumes
 
-RUN --mount=type=secret,id=github_token \
-    git clone https://$(cat /run/secrets/github_token)@github.com/mastainvin/Xumes.git /home/jenkins/xumes
+COPY ../../ /home/jenkins/xumes/
 
+RUN ls -la /home/jenkins/xumes
 
 RUN /home/jenkins/xumes_env/bin/pip install --no-cache-dir /home/jenkins/xumes
 
@@ -27,7 +28,7 @@ RUN chown -R jenkins:jenkins /home/jenkins/xumes_env && chmod -R 777 /home/jenki
 
 RUN jenkins-plugin-cli --plugins "workflow-job workflow-aggregator"
 
-COPY create-job.groovy /usr/share/jenkins/ref/init.groovy.d/
+COPY ./docker/jenkins/create-job.groovy /usr/share/jenkins/ref/init.groovy.d/
 
 ENV JENKINS_OPTS="--httpPort=80"
 
