@@ -19,7 +19,7 @@ jobs:
       run: echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
 
     - name: Build the Docker image
-      run: docker build . --file ./docker/jenkins/Dockerfile --tag mastainvin/xumes-jenkins:$(date +%s)
+      run: docker build . --file ./docker/jenkins/Dockerfile --tag mastainvin/xumes-jenkins
 
     - name: Push the Docker image
-      run: docker push mastainvin/xumes-jenkins:$(date +%s)
+      run: docker push mastainvin/xumes-jenkins
