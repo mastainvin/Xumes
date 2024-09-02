@@ -22,7 +22,7 @@ class EpisodeControl(ABC):
         self.current_step += 1
 
     @abstractmethod
-    def should_continue(self):
+    def should_continue(self, test_result: bool):
         """Abstract method to determine if the episode should continue."""
         raise NotImplementedError()
 
@@ -32,12 +32,15 @@ class DefaultEpisodeControl(EpisodeControl):
     Default implementation of EpisodeControl. The episode continues until the maximum number of steps or tests is reached.
     """
 
-    def should_continue(self):
+    def should_continue(self, test_result: bool):
         """
         Determines if the episode should continue. The episode continues until the maximum number of steps or tests is reached.
 
         :return: True if the episode should continue, False otherwise.
         """
+        if test_result:
+            return False
+
         if self.max_tests is not None and self.current_test >= self.max_tests:
             return False
         if self.max_steps is not None and self.current_step >= self.max_steps:
@@ -73,7 +76,7 @@ class UserControlledEpisodeControl(EpisodeControl):
         """Decrements the current step count by 1."""
         self.current_step -= 1
 
-    def should_continue(self):
+    def should_continue(self, test_result: bool):
         """
         Determines if the episode should continue. The episode continues until the user stops it or the maximum number of steps or tests is reached.
 

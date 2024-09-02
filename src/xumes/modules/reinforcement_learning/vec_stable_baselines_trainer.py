@@ -1,11 +1,14 @@
 import logging
+import os
 from typing import Optional, List
 
 from stable_baselines3.common.callbacks import EvalCallback
 # noinspection PyUnresolvedReferences
 from stable_baselines3.common.vec_env import SubprocVecEnv, DummyVecEnv, VecEnvWrapper
+from torch.utils.tensorboard import SummaryWriter
 
 from xumes.core.errors.running_ends_error import RunningEndsError
+from xumes.modules.reinforcement_learning.TestResultEvalCallback import CustomEvalCallback
 from xumes.modules.reinforcement_learning.i_trainer import ITrainer
 from xumes.modules.reinforcement_learning.stable_baselines_trainer import StableBaselinesTrainer
 
@@ -47,13 +50,36 @@ class VecStableBaselinesTrainer(ITrainer):
         algorithm_type = self._first_trainer.algorithm_type
         total_timesteps = self._first_trainer.total_timesteps
 
+        # Start training to initialize the automatic SummaryWriter
+        self.make_algo(logs_path=logs_path)
+        if previous_model_path:
+            self.policy = self.policy.load(previous_model_path, env=self._vec_env, tensorboard_log=logs_path)
+
+        # Get the automatically generated log directory
+        log_dir = self.policy.tensorboard_log
+
+        # Define a function to get the test result per environment
+        def test_result_func_per_env(env_idx):
+            return self._trainers[env_idx].test_result()
+
         eval_callback = None
         if save_path:
-            eval_callback = EvalCallback(self._vec_env, best_model_save_path=save_path,
-                                         log_path=save_path, eval_freq=eval_freq,
-                                         deterministic=True, render=False)
+            # Create a subdirectory for evaluation logs within the auto-generated log directory
+            eval_logs_path = os.path.join(log_dir, "eval")
+            os.makedirs(eval_logs_path, exist_ok=True)
+            eval_writer = SummaryWriter(log_dir=eval_logs_path)
 
-        self.make_algo(logs_path=logs_path)
+            eval_callback = CustomEvalCallback(
+                eval_env=self._vec_env,
+                test_result_func_per_env=test_result_func_per_env,
+                log_dir=eval_logs_path,
+                best_model_save_path=save_path,
+                eval_freq=eval_freq,
+                tensorboard_writer=eval_writer,  # Use a separate writer for evaluation
+                deterministic=True,
+                render=False
+            )
+
 
         if previous_model_path:
             self.policy = self.policy.load(previous_model_path, env=self._vec_env, tensorboard_log=logs_path)
@@ -90,7 +116,8 @@ class VecStableBaselinesTrainer(ITrainer):
         algorithm_type = self._first_trainer.algorithm_type
         policy_kwargs = self._first_trainer.policy_kwargs if self._first_trainer.policy_kwargs else {}
 
-        self.policy = policy_class(algorithm_type, self._vec_env, verbose=1, tensorboard_log=logs_path, policy_kwargs=policy_kwargs)
+        self.policy = policy_class(algorithm_type, self._vec_env, verbose=1, tensorboard_log=logs_path,
+                                   policy_kwargs=policy_kwargs)
 
     def play(self, timesteps: int = None):
 

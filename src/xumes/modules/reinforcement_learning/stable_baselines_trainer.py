@@ -162,3 +162,6 @@ class StableBaselinesTrainer(AgentTrainer, ABC):
         Method used only when using the model in non-training model, inside a scripted bot.
         """
         return self.policy.predict(obs)[0]
+
+    def test_result(self):
+        return self.agent.test_runner.test_passed()

@@ -85,27 +85,30 @@ class TestRunner:
         if self._mode == TEST_MODE:
             try:
                 self.then()
-                self._assertion_bucket.reset_iterator()
             except KeyError:
                 pass
+
+            test_result = self._assertion_bucket.to_next_episode()
+
             self._episode_control.increment_test()
-            if not self._episode_control.should_continue():
+            if not self._episode_control.should_continue(test_result):
                 self._do_assert()
                 raise RunningEndsError
         return False
+
+    def test_passed(self):
+        self.then()
+        return self._assertion_bucket.passed
 
     @property
     def episode_control(self):
         return self._episode_control
 
     def _do_assert(self) -> None:
-        self._assertion_bucket.assertion_mode()
-        self.then()
         test_time_end = time.time()
         test_time = round(test_time_end - self._test_start_time, 3)
         self._assertion_bucket.send_results(test_time)
         self._assertion_bucket.clear()
-        self._assertion_bucket.collect_mode()
 
     @final
     def reset(self):
