@@ -15,7 +15,10 @@ class ParametersRegistry:
         self._parameters[name] = value
 
     def get(self, name):
-        return self._parameters[name]
+        if name in self._parameters:
+            return self._parameters[name]
+        else:
+            return None
 
     def __getitem__(self, name):
         return self.get(name)

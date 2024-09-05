@@ -3,6 +3,8 @@ import time
 import multiprocess
 from typing import List, Dict
 
+from jsonpickle.compat import iterator
+
 from xumes.assertions.assertion import IAssertionStrategy
 from xumes.assertions.assertion_factory import AssertionFactory
 from xumes.assertions.assertion_result import AssertionResult
@@ -31,7 +33,7 @@ class AssertionBucket:
     """
     def __init__(self, test_name, class_name, queue: multiprocess.Queue, assertion_factory=AssertionFactory()):
         super().__init__()
-        self._results: List[AssertionResult] = []
+        self._results: List = []
         self._test_name = test_name
         self._class_name = class_name
         self._queue = queue
@@ -114,12 +116,29 @@ class AssertionBucket:
 
     def to_next_episode(self) -> bool:
         self.iterator = 0
-        return self.passed
+        return self.passed()
 
-    @property
     def passed(self):
         for assertion_result in self._results:
             if not assertion_result.passed:
                 return False
         return True
 
+
+class AssertionBucketTrain(AssertionBucket):
+
+    def _assert_and_store(self, data, expected, assertion_strategy: IAssertionStrategy, opposite=False):
+        r = assertion_strategy.test([data])
+        if opposite:
+            r = not r
+
+        if self.iterator < len(self._results):
+            self._results[self.iterator] = r
+        else:
+            self._results.append(r)
+
+        self.iterator  += 1
+
+
+    def passed(self):
+        return all(self._results)
