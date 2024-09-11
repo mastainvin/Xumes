@@ -2,9 +2,10 @@ import logging
 import time
 from typing import TypeVar, final
 
-from xumes.assertions.assertion_bucket import AssertionBucket
+from xumes.assertions.assertion_bucket import AssertionBucket, AssertionBucketTrain
 from xumes.core.errors.running_ends_error import RunningEndsError
-from xumes.core.modes import TEST_MODE
+from xumes.core.modes import TEST_MODE, TRAIN_MODE
+from xumes.core.parameters_registry import ParametersRegistry
 from xumes.core.registry import exec_registry_function
 from xumes.entity.entity_manager import AutoEntityManager
 from xumes.entity.implementations.json_impl.json_game_element_state_converter import \
@@ -42,9 +43,15 @@ class TestRunner:
         self._steps = steps
         self._entity_manager = AutoEntityManager(JsonGameElementStateConverter())
 
-        self._assertion_bucket = AssertionBucket(test_name=f"{self._scenario}",
-                                                 class_name=self._feature,
-                                                 queue=test_queue)
+        if self._mode == TEST_MODE:
+            self._assertion_bucket = AssertionBucket(test_name=f"{self._scenario}",
+                                                     class_name=self._feature,
+                                                     queue=test_queue)
+        else:
+            self._assertion_bucket = AssertionBucketTrain(test_name=f"{self._scenario}",
+                                                          class_name=self._feature,
+                                                          queue=test_queue)
+
         self.driver = Driver()
 
         self._config_registry, self._given_registry, self._when_registry, self._then_registry = registry_queue.get()
@@ -57,6 +64,14 @@ class TestRunner:
             self._episode_control = episode_control
 
         self._test_start_time = 0.0
+
+        self._test_result = False
+
+        params = ParametersRegistry()
+        self._do_tensorboard_logs = params.get("tensorboard")
+
+        self._successes = 0
+        self._nb_episode = 0
 
     def get_context(self):
         return self._context
@@ -85,27 +100,46 @@ class TestRunner:
         if self._mode == TEST_MODE:
             try:
                 self.then()
-                self._assertion_bucket.reset_iterator()
             except KeyError:
                 pass
+
+            self._test_result = self._assertion_bucket.to_next_episode()
+
             self._episode_control.increment_test()
-            if not self._episode_control.should_continue():
+            if not self._episode_control.should_continue(self._test_result):
                 self._do_assert()
                 raise RunningEndsError
+        elif self._mode == TRAIN_MODE and self._do_tensorboard_logs:
+                self.then()
+                self._test_result = self._assertion_bucket.to_next_episode()
+                if self._test_result:
+                    self._successes += 1
+                self._nb_episode += 1
+
         return False
+
+    def success_ratio(self):
+        rate = self._successes / self._nb_episode
+        if rate >= 0.1:
+            rate = 1
+        return rate
+
+    def reset_ratio(self):
+        self._successes = 0
+        self._nb_episode = 0
+
+    def test_passed(self):
+        return self._test_result
 
     @property
     def episode_control(self):
         return self._episode_control
 
     def _do_assert(self) -> None:
-        self._assertion_bucket.assertion_mode()
-        self.then()
         test_time_end = time.time()
         test_time = round(test_time_end - self._test_start_time, 3)
         self._assertion_bucket.send_results(test_time)
         self._assertion_bucket.clear()
-        self._assertion_bucket.collect_mode()
 
     @final
     def reset(self):

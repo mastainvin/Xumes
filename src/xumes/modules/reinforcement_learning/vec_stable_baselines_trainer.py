@@ -1,13 +1,29 @@
 import logging
+import os
 from typing import Optional, List
 
-from stable_baselines3.common.callbacks import EvalCallback
-# noinspection PyUnresolvedReferences
-from stable_baselines3.common.vec_env import SubprocVecEnv, DummyVecEnv, VecEnvWrapper
+from stable_baselines3.common.callbacks import EvalCallback, CallbackList
+from stable_baselines3.common.vec_env import DummyVecEnv, VecEnvWrapper
+from stable_baselines3.common.logger import configure
+from torch.utils.tensorboard import SummaryWriter
 
 from xumes.core.errors.running_ends_error import RunningEndsError
+from xumes.modules.reinforcement_learning.success_ratio_callback import SuccessRatioCallback
 from xumes.modules.reinforcement_learning.i_trainer import ITrainer
 from xumes.modules.reinforcement_learning.stable_baselines_trainer import StableBaselinesTrainer
+
+
+def find_path(path: str, name: str) -> str:
+    counter = 1
+    base_name = f"{name}_{counter}"
+    full_path = os.path.join(path, base_name)
+
+    while os.path.exists(full_path):
+        counter += 1
+        base_name = f"{name}_{counter}"
+        full_path = os.path.join(path, base_name)
+
+    return full_path
 
 
 class VecStableBaselinesTrainer(ITrainer):
@@ -31,12 +47,12 @@ class VecStableBaselinesTrainer(ITrainer):
         return self._vec_env
 
     def make(self):
-        # self._vec_env = SubprocVecEnv(self._envs, "fork")
         self._made = True
         self._vec_env = DummyVecEnv(self._envs)
 
     def train(self, save_path: str = None, eval_freq: int = 10000, logs_path: Optional[str] = None,
               logs_name: Optional[str] = None, previous_model_path: Optional[str] = None):
+
         if self._first_trainer is None:
             raise Exception("No training services added")
 
@@ -47,18 +63,57 @@ class VecStableBaselinesTrainer(ITrainer):
         algorithm_type = self._first_trainer.algorithm_type
         total_timesteps = self._first_trainer.total_timesteps
 
-        eval_callback = None
-        if save_path:
-            eval_callback = EvalCallback(self._vec_env, best_model_save_path=save_path,
-                                         log_path=save_path, eval_freq=eval_freq,
-                                         deterministic=True, render=False)
+        # Configure the logs path
+        if logs_path and logs_name:
+            logs_path = find_path(logs_path, logs_name)
 
+        # Initialize the algorithm with TensorBoard logging
         self.make_algo(logs_path=logs_path)
 
         if previous_model_path:
-            self.policy = self.policy.load(previous_model_path, env=self._vec_env, tensorboard_log=logs_path)
+            self.policy = self.policy.load(previous_model_path, env=self._vec_env)
 
-        self.policy = self.policy.learn(total_timesteps, callback=eval_callback, tb_log_name=logs_name)
+        # Set up the logger if logs_path is provided
+        if logs_path:
+            main_logger = configure(folder=logs_path, format_strings=["stdout", "tensorboard"])
+            self.policy.set_logger(main_logger)
+
+        # Define the evaluation callback
+        eval_callback = None
+        if save_path:
+            eval_callback = EvalCallback(
+                self._vec_env,
+                best_model_save_path=save_path,
+                log_path=logs_path,
+                eval_freq=eval_freq,
+                deterministic=True,
+                render=False
+            )
+
+        # Define the success ratio callback
+        success_rate_callback = None
+        if logs_path:
+            eval_logs_path = os.path.join(logs_path, "success_rate")
+            os.makedirs(eval_logs_path, exist_ok=True)
+
+            def success_ratio_and_reset(env_idx):
+                rate = self._trainers[env_idx].agent.test_runner.success_ratio()
+                self._trainers[env_idx].agent.test_runner.reset_ratio()
+                return rate
+
+            success_rate_callback = SuccessRatioCallback(
+                eval_env=self._vec_env,
+                test_result_func_per_env=success_ratio_and_reset,
+                log_dir=eval_logs_path,
+                eval_freq=eval_freq,
+                tensorboard_writer=SummaryWriter(log_dir=eval_logs_path)
+            )
+
+        # Combine callbacks
+        combined_callback = CallbackList([cb for cb in [eval_callback, success_rate_callback] if cb is not None])
+
+        # Start training
+        self.policy = self.policy.learn(total_timesteps, callback=combined_callback)
 
     def save(self, path: str):
         self.policy.save(path)
@@ -76,7 +131,6 @@ class VecStableBaselinesTrainer(ITrainer):
             self.make()
 
         self.make_algo()
-
         self.policy = self.policy.load(path, env=self._vec_env)
 
     def make_algo(self, logs_path: Optional[str] = None):
@@ -90,7 +144,9 @@ class VecStableBaselinesTrainer(ITrainer):
         algorithm_type = self._first_trainer.algorithm_type
         policy_kwargs = self._first_trainer.policy_kwargs if self._first_trainer.policy_kwargs else {}
 
-        self.policy = policy_class(algorithm_type, self._vec_env, verbose=1, tensorboard_log=logs_path, policy_kwargs=policy_kwargs)
+        self.policy = policy_class(algorithm_type, self._vec_env, verbose=1, tensorboard_log=logs_path,
+                                   policy_kwargs=policy_kwargs)
+
 
     def play(self, timesteps: int = None):
 
@@ -139,3 +195,4 @@ class VecStableBaselinesTrainer(ITrainer):
         else:
             for _ in range(timesteps):
                 step()
+

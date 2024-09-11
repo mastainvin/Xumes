@@ -11,68 +11,91 @@ def xmlConfig = """
   <properties>
     <hudson.model.ParametersDefinitionProperty>
       <parameterDefinitions>
+        <hudson.model.ChoiceParameterDefinition>
+          <name>Game</name>
+          <description>The game you want to test.</description>
+          <choices class="java.util.Arrays\$ArrayList">
+            <a class="string-array">
+              <string>flappy_bird</string>
+              <string>smb</string>
+              <string>smb_jump_change</string>
+            </a>
+          </choices>
+        </hudson.model.ChoiceParameterDefinition>
         <hudson.model.StringParameterDefinition>
-          <name>PROJECT_NAME</name>
-          <defaultValue>flappy_bird</defaultValue>
-          <description>Project name in xumes_examples</description>
-        </hudson.model.StringParameterDefinition>
-        <hudson.model.StringParameterDefinition>
-          <name>BRANCH_NAME</name>
-          <defaultValue>flappy-bird</defaultValue>
-          <description>Branch name to check out</description>
+          <name>Tries</name>
+          <description>Number of test iterations</description>
+          <defaultValue>20</defaultValue>
+          <trim>false</trim>
         </hudson.model.StringParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
   </properties>
   <definition class="org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition" plugin="workflow-cps@2.92">
-    <script>pipeline {
-    agent any
+    <script>
+    pipeline {
+        agent any
 
-    parameters {
-        string(name: 'PROJECT_NAME', defaultValue: 'flappy_bird', description: 'Project name in xumes_examples')
-        string(name: 'BRANCH_NAME', defaultValue: 'flappy-bird', description: 'Branch name to check out')
-    }
-
-    stages {
-        stage('Clone repository') {
-            steps {
-                checkout([
-                    \$class: 'GitSCM',
-                    branches: [[name: "\${params.BRANCH_NAME}"]],
-                    userRemoteConfigs: [[
-                        url: 'https://github.com/mastainvin/Xumes-Examples.git',
-                    ]],
-                    extensions: [[\$class: 'RelativeTargetDirectory', relativeTargetDir: "xumes_examples"]]
-                ])
-            }
+        parameters {
+            choice(name: "Game", choices: ['flappy_bird', 'smb', 'smb_jump_change'], description: 'The game you want to test.')
+            string(name: "Tries", defaultValue: '20')
         }
 
-        stage('Test') {
-            steps {
-                script {
-                    sh \"\"\"
-                        /home/jenkins/godot-fork/bin/godot.linuxbsd.editor.x86_64.llvm --editor --path /var/jenkins_home/workspace/xumes/xumes_examples/Godot/\${params.PROJECT_NAME} --headless &gt; godot_output.log 2&gt;&amp;1 &amp;
+        stages {
+            stage('Clone repository') {
+                steps {
+                    checkout([
+                        \$class: 'GitSCM',
+                        branches: [[name: "main"]],
+                        userRemoteConfigs: [[
+                            url: 'https://github.com/mastainvin/Xumes-Examples.git',
+                        ]],
+                        extensions: [[\$class: 'RelativeTargetDirectory', relativeTargetDir: "xumes_examples"]]
+                    ])
+                }
+            }
 
-                        wait_for_port() {
-                          while ! nc -z localhost 8080; do
-                            sleep 1
-                          done
+            stage('Test') {
+                steps {
+                    script {
+
+                        sh \"\"\"
+                              /home/jenkins/godot-fork/bin/godot.linuxbsd.editor.x86_64.llvm --editor --path /var/jenkins_home/workspace/xumes/xumes_examples/Godot/\${params.Game} --headless &gt; godot_output.log 2&gt;&amp;1 &amp;
+
+                            wait_for_port() {
+                              while ! nc -z localhost 8080; do
+                                sleep 1
+                              done
+                            }
+
+                            wait_for_port
+                        \"\"\"
+
+                        def features_path = ""
+                        if (params.Game == "flappy_bird") {
+                            features_path = "./Tests/PipeSizeTest/features/"
+                        } else if (params.Game == "smb" || params.Game == "smb_jump_change"){
+                            features_path = "./tests/features/"
                         }
 
-                        wait_for_port
+                        int tries = params.Tries as Integer
 
-                        cd /var/jenkins_home/workspace/xumes/xumes_examples/Godot/\${params.PROJECT_NAME}
-                        /home/jenkins/xumes_env/bin/python -m xumes test ./Tests/PipeSizeTest/features/ -i 20 --info -h 10
-                    \"\"\"
 
-                    junit "**/test-results.xml"
+                        sh \"\"\"
+                            cd /var/jenkins_home/workspace/xumes/xumes_examples/Godot/\${params.Game}
+
+                            /home/jenkins/xumes_env/bin/python -m xumes test \${features_path} -i \${tries} --info -h 10
+                        \"\"\"
+
+                        junit "**/test-results.xml"
+                    }
+
                 }
 
             }
-
         }
-    }
-}</script>
+}
+</script>
     <sandbox>true</sandbox>
   </definition>
   <triggers/>
