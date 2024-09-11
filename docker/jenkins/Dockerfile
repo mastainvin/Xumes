@@ -8,6 +8,7 @@ RUN apt-get update && \
     apt-get clean
 
 RUN python3 -m venv /home/jenkins/xumes_env
+
 RUN /home/jenkins/xumes_env/bin/pip install --upgrade pip setuptools
 
 RUN git clone https://github.com/mastainvin/godot.git /home/jenkins/godot-fork
@@ -19,8 +20,6 @@ RUN cd /home/jenkins/godot-fork && \
 RUN mkdir -p /home/jenkins/xumes
 
 COPY ../../ /home/jenkins/xumes/
-
-RUN ls -la /home/jenkins/xumes
 
 RUN /home/jenkins/xumes_env/bin/pip install --no-cache-dir /home/jenkins/xumes
 
