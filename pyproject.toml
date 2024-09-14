@@ -1,6 +1,6 @@
 [project]
 name = "xumes"
-version = "0.2.2"
+version = "0.2.3"
 authors = [
   { name = "Vincent Mastain", email = "vincentmastain@gmail.com" },
 ]
@@ -40,4 +40,4 @@ homepage = "https://github.com/mastainvin/Xumes"
 bug-tracker = "https://github.com/mastainvin/Xumes/issues"
 
 [project.scripts]
-xumes = "xumes.core.xumes_cli:cli"
+xumes = "xumes.__main__:main"
