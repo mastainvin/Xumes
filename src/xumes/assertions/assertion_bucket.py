@@ -109,7 +109,6 @@ class AssertionBucket:
                                            )
 
         self._queue.put(assertion_report)
-        time.sleep(0.5)
 
     def clear(self):
         self._results.clear()
