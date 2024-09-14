@@ -10,7 +10,7 @@ project = 'Xumes'
 copyright = '2024, Vincent Mastain'
 author = 'Vincent Mastain'
 description = 'Xumes is a test automation framework for Games in Game Engines using reinforcement learning.'
-release = "0.2.2"
+release = "0.2.3"
 html_title = f'<strong>Xumes {release}</strong>  <small>🤖 ✔️</small>'
 html_short_title = description
 
