@@ -25,7 +25,7 @@ class Driver:
             list: A list containing the stored function calls.
         """
         call_details_list = self._calls
-        self._calls = []
+        # self._calls = []
         return call_details_list
 
     def __getattr__(self, name: str):

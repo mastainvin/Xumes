@@ -185,7 +185,6 @@ class VecStableBaselinesTrainer(ITrainer):
                         if done or terminated:
                             _envs.envs[i].reset()
                     except RunningEndsError:
-                        logging.info(f"Received stop signal for environment {i}. Closing environment.")
                         active_envs[i] = False
                         _envs.envs[i].close()
 

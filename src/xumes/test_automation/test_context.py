@@ -2,6 +2,8 @@ from xumes.assertions.assertion_bucket import AssertionBucket
 from xumes.entity.entity_manager import EntityRegistry
 from xumes.test_automation.driver import Driver
 
+from xumes.test_automation.given_script import TestStep
+
 
 class TestContext:
     """
@@ -9,17 +11,23 @@ class TestContext:
     The test context provides limited access to the test automation framework.
     Access:
         - Entities: Access to the entities registered in the entity registry.
-        - Driver: Access to the driver. (call game methods, etc.)
+        - EngineDriver: Access to the driver that communicates with the game engine.
+        - InstanceDriver: Access to the driver. (call game methods, etc.)
         - Assertions: Access to the assertion methods.
     """
 
-    def __init__(self, entity_registry: EntityRegistry, driver: Driver, assertion_bucket: AssertionBucket):
+    def __init__(self, entity_registry: EntityRegistry, instance_driver: Driver, engine_driver: Driver,assertion_bucket: AssertionBucket, given_scrpt):
         self._entity_registry = entity_registry
-        self.driver = driver
+        self.instance_driver = instance_driver
+        self.engine_driver = engine_driver
         self._assertion_bucket = assertion_bucket
+        self._given_script = given_scrpt
 
     def __getattr__(self, item):
         return self._entity_registry.get(item)
+
+    def add_step(self, step: TestStep):
+        self._given_script.add_step(step)
 
     def assert_true(self, condition: bool) -> None:
         self._assertion_bucket.assert_true(data=condition)

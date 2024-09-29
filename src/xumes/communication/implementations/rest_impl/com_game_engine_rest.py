@@ -23,7 +23,7 @@ class ComGameEngineRest(IComGameEngine):
         http_response = self.session.post(f"http://{self.host}:{self.port}/start_scenario/", json=body)
         if http_response.status_code == 200:
             port = http_response.json()
-            logging.log(logging.INFO, f"Scenario {name} started on port {port}.")
+            logging.log(logging.INFO, f"Environment {name} started on port {port}.")
         return port
 
     def start_scenarios(self, scenarios_methods, scenarios, fps_limit: int, render: bool) -> Dict[str, int]:
@@ -36,7 +36,7 @@ class ComGameEngineRest(IComGameEngine):
                 port_pid = ports_response[scenario_name]
                 scenario = next(scenario for scenario in scenarios if scenario.name == scenario_name) # TODO change this to a dict
                 ports_pids[scenario] = port_pid
-                logging.log(logging.INFO, f"Scenario {scenario_name} started on port {port_pid[0]} with pid {port_pid[1]}.")
+                logging.log(logging.INFO, f"Environment {scenario_name} started on port {port_pid[0]} with pid {port_pid[1]}.")
 
         return ports_pids
 
@@ -48,4 +48,4 @@ class ComGameEngineRest(IComGameEngine):
     def stop_scenarios(self, pids: List[int]) -> None:
         http_response = requests.post(f"http://{self.host}:{self.port}/stop_scenarios/", json=pids)
         if http_response.status_code == 200:
-            logging.log(logging.INFO, "Scenarios stopped.")
+            logging.log(logging.INFO, "Environments stopped.")

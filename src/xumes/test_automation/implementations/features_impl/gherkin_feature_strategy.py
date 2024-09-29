@@ -108,25 +108,38 @@ class GherkinFeatureStrategy(FeatureStrategy):
 
     def _process_scenario(self, scenario: Dict, feature_obj: Feature, is_outline: bool = False):
         """
-        Process a single scenario and add it to the feature object.
+        Traite un scénario individuel et l'ajoute à l'objet Feature.
         """
         has_tag, scenario_tags = self.has_tags(scenario)
 
-        # Check if the scenario name matches the selected scenarios
+        # Vérifier si le scénario correspond aux scénarios sélectionnés
         if (self._selected_scenarios is None or scenario['name'] in self._selected_scenarios) and has_tag:
-            # Find the steps file for the scenario using pattern matching
-            steps_file, given_params, when_params, then_params = self._find_steps_file(scenario, feature_obj.name)
+            # Trouver les steps pour le scénario en utilisant le pattern matching
+            scenario_steps_info = self._find_steps_files(scenario, feature_obj.name)
 
-            # Fill parameters
-            for i in range(len(given_params)):
-                self.given.all[steps_file][i].add_params(scenario['name'], given_params[i])
-            for i in range(len(when_params)):
-                self.when.all[steps_file][i].add_params(scenario['name'], when_params[i])
-            for i in range(len(then_params)):
-                self.then.all[steps_file][i].add_params(scenario['name'], then_params[i])
+            steps_files = set()
 
-            # Create a Scenario object
-            scenario_obj = Scenario(scenario['name'], steps_file, feature_obj, scenario_tags)
+            # Remplir les paramètres pour chaque étape
+            for step_info in scenario_steps_info:
+                step_type = step_info['step_type']
+                registry = step_info['registry']
+                steps_file = step_info['steps_file']
+                idx = step_info['step_index']
+                parameters = step_info['parameters']
+                scenario_name = scenario['name']
+
+                # Ajouter les paramètres à l'étape correspondante
+                step_obj = registry.all[steps_file][idx]
+                if scenario_name not in step_obj.params:
+                    step_obj.params[scenario_name] = [parameters]
+                else:
+                    # Si l'étape est utilisée plusieurs fois dans le même scénario
+                    step_obj.params[scenario_name].append(parameters)
+
+                steps_files.add(steps_file)
+
+            # Créer un objet Scenario
+            scenario_obj = Scenario(scenario['name'], ",".join(steps_files), feature_obj, scenario_tags)
             feature_obj.scenarios.append(scenario_obj)
 
     def has_tags(self, scenario):
@@ -177,15 +190,15 @@ class GherkinFeatureStrategy(FeatureStrategy):
         self._steps.clear()
         for name in self.given.all:
             try:
-                given = self.given.all[name]
+                given = self.given.all[name] if name in self.given.all else []
             except IndexError:
                 raise Exception("Given steps not found.")
             try:
-                when = self.when.all[name]
+                when = self.when.all[name] if name in self.when.all else []
             except IndexError:
                 raise Exception("When steps not found.")
             try:
-                then = self.then.all[name]
+                then = self.then.all[name] if name in self.then.all else []
             except IndexError:
                 raise Exception("Then steps not found.")
 
@@ -200,52 +213,62 @@ class GherkinFeatureStrategy(FeatureStrategy):
                 "then_contents": then_contents
             })
 
-    def _find_steps_file(self, scenario: Dict, feature_name: str):
+    def _find_steps_files(self, scenario: Dict, feature_name: str):
         """
-        Find the steps file for the scenario using pattern matching.
+        Trouve les steps pour le scénario en utilisant le pattern matching.
         """
-        # Get scenario name
         previous_type = None
-        scenario_givens = []
-        scenario_whens = []
-        scenario_thens = []
+        scenario_steps_info = []
 
-        # Iterate over steps
-        # And convert the steps to a list of gherkin steps
-        # Check the gherkin-official package for more information
+        # Itérer sur chaque étape du scénario
         for step in scenario['steps']:
-            if step['keywordType'] == "Context" or (
-                    step['keywordType'] == "Conjunction" and previous_type == "Context"):
-                scenario_givens.append(step['text'])
+            step_text = step['text']
+            keyword_type = step['keywordType']
+
+            # Déterminer le type de l'étape
+            if keyword_type == "Context" or (keyword_type == "Conjunction" and previous_type == "Context"):
+                step_type = 'given'
                 previous_type = "Context"
-            elif step['keywordType'] == "Action" or (
-                    step['keywordType'] == "Conjunction" and previous_type == "Action"):
-                scenario_whens.append(step['text'])
+            elif keyword_type == "Action" or (keyword_type == "Conjunction" and previous_type == "Action"):
+                step_type = 'when'
                 previous_type = "Action"
-            elif step['keywordType'] == "Outcome" or (
-                    step['keywordType'] == "Conjunction" and previous_type == "Outcome"):
-                scenario_thens.append(step['text'])
+            elif keyword_type == "Outcome" or (keyword_type == "Conjunction" and previous_type == "Outcome"):
+                step_type = 'then'
                 previous_type = "Outcome"
             else:
-                raise Exception("Keyword type not found.")
+                raise Exception(f"Type de mot-clé non trouvé pour l'étape : {step_text}")
 
-        # Iterate over steps files
-        for steps_file in self._steps:
-            # Get steps file name
-            steps_file_name = steps_file['name']
-            steps_file_givens = steps_file['given_contents']
-            steps_file_whens = steps_file['when_contents']
-            steps_file_thens = steps_file['then_contents']
+            # Rechercher l'implémentation de l'étape dans les registres
+            found = False
+            step_registries = {
+                'given': self.given,
+                'when': self.when,
+                'then': self.then
+            }
+            registry = step_registries[step_type].all  # Accéder au registre approprié
+            for steps_file_name, steps_list in registry.items():
+                for idx, step_obj in enumerate(steps_list):
+                    # Effectuer le pattern matching
+                    parameters = self._pattern_matching(step_obj.content, step_text)
+                    if parameters != False:
+                        # Étape correspondante trouvée
+                        scenario_steps_info.append({
+                            'step_type': step_type,
+                            'registry': step_registries[step_type],
+                            'steps_file': steps_file_name,
+                            'step_index': idx,
+                            'parameters': parameters,
+                            'step_text': step_text
+                        })
+                        found = True
+                        break
+                if found:
+                    break
+            if not found:
+                raise Exception(
+                    f"Implémentation non trouvée pour l'étape : {step_text} dans le scénario : {feature_name}/{scenario['name']}")
 
-            # Check if the scenario contents corresponds to the steps file contents
-            given_parameters = self._steps_matching(steps_file_givens, scenario_givens)
-            when_parameters = self._steps_matching(steps_file_whens, scenario_whens)
-            then_parameters = self._steps_matching(steps_file_thens, scenario_thens)
-
-            if given_parameters != False and when_parameters != False and then_parameters != False:
-                return steps_file_name, given_parameters, when_parameters, then_parameters
-        # If no steps file was found, raise an exception
-        raise Exception(f"Steps file for scenario: {feature_name}/{scenario['name']} not found.")
+        return scenario_steps_info
 
     @staticmethod
     def _steps_matching(step_files_steps, scenario_steps):

@@ -13,9 +13,12 @@ from xumes.entity.implementations.json_impl.json_game_element_state_converter im
 from xumes.test_automation.driver import Driver
 from xumes.test_automation.episode_control import EpisodeControl, DefaultEpisodeControl
 from xumes.test_automation.game_instance_service import GameInstanceService
+from xumes.test_automation.given_script import GivenScript
 from xumes.test_automation.test_context import TestContext
 
 OBST = TypeVar("OBST")
+
+
 
 
 class TestRunner:
@@ -52,11 +55,14 @@ class TestRunner:
                                                           class_name=self._feature,
                                                           queue=test_queue)
 
-        self.driver = Driver()
+        self.instance_driver = Driver()
+        self.engine_driver = Driver()
 
-        self._config_registry, self._given_registry, self._when_registry, self._then_registry = registry_queue.get()
+        self._given_registry, self._when_registry, self._then_registry = registry_queue.get()
 
-        self._context = TestContext(self._entity_manager, self.driver, self._assertion_bucket)
+        self._given_script = GivenScript(self)
+
+        self._context = TestContext(self._entity_manager, self.instance_driver, self.engine_driver,self._assertion_bucket, self._given_script)
 
         if episode_control is None:
             self._episode_control = DefaultEpisodeControl(self._number_max_of_steps, self._number_max_of_tests)
@@ -73,27 +79,21 @@ class TestRunner:
         self._successes = 0
         self._nb_episode = 0
 
+
     def get_context(self):
         return self._context
 
     def run(self, port):
         self._game_instance_service.run(port)
 
-    def config(self):
-        self._config_registry[self._steps](self)
-        return self.driver()
-
     def given(self):
-        exec_registry_function(registry=self._given_registry[self._steps], game_context=self._context,
-                               scenario_name=self._scenario)
+        return exec_registry_function(registry=self._given_registry, game_context=self._context, scenario_name=self._scenario)
 
     def when(self):
-        return exec_registry_function(registry=self._when_registry[self._steps], game_context=self._context,
-                                      scenario_name=self._scenario)
+        return exec_registry_function(registry=self._when_registry, game_context=self._context, scenario_name=self._scenario)
 
     def then(self):
-        return exec_registry_function(registry=self._then_registry[self._steps], game_context=self._context,
-                                      scenario_name=self._scenario)
+        return exec_registry_function(registry=self._then_registry, game_context=self._context, scenario_name=self._scenario)
 
     def episode_finished(self) -> bool:
         # when an episode is finished, we collect the assertions
@@ -146,25 +146,38 @@ class TestRunner:
         """
         Resets the game state by calling the given and reset methods of the TestRunner instance.
         """
+        self._given_script.reset()
         if self._test_start_time == 0.0:
             self._test_start_time = time.time()
-        self.given()
+        # self.given()
         self._game_instance_service.reset()
 
+        # Push method
+        self.push_action_and_get_state([], self.instance_driver())
+
+        # Need 2 frame to initiate properly the case (TODO check if something else is possible)
+        self.push_action_and_get_state([])
+        self.push_action_and_get_state([])
+
+        # Given script
+        self._given_script.execute()
+
     @final
-    def push_action_and_get_state(self, actions):
+    def push_action_and_get_state(self, actions, methods=None):
         """
         Pushes actions to the TestRunner and retrieves the game state.
 
         Parameters:
             actions: The actions to be pushed to the TestRunner.
+            methods: Method to be executed by the game instance.
         """
         logging.debug(f"Pushing actions: {actions}")
-        methods = self.driver()
         states = self._game_instance_service.push_actions_and_get_state(actions, methods)
         logging.debug(f"Received states: {states}")
         for state in states.items():
             self._entity_manager.convert(state)
+
+
 
     @final
     def finished(self):
@@ -174,6 +187,7 @@ class TestRunner:
         Returns:
             bool: True if the game has finished, False otherwise.
         """
+        logging.info(f"Received stop signal for environment {self._scenario}. Closing environment.")
         return self._game_instance_service.finish()
 
     @final

@@ -28,11 +28,11 @@ class GymAdapter(gymnasium.Env):
             seed: int | None = None,
             options: dict[str, Any] | None = None,
     ) -> tuple[ObsType, dict[str, Any]]:
-        self._trainer.do_reset()
         if self._first_reset:
             self._first_reset = False
         else:
             self._trainer.episode_finished()
+        self._trainer.do_reset()
         return self._trainer.get_obs(), {}
 
     def step(self, action: ActType) -> Tuple[ObsType, SupportsFloat, bool, bool, Dict[str, Any]]:

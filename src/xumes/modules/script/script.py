@@ -1,21 +1,36 @@
 import logging
 import traceback
 from abc import abstractmethod
-from typing import List, Dict, Any
+from typing import List
 
 from xumes.core.errors.running_ends_error import RunningEndsError
 from xumes.test_automation.behavior import Behavior
+from xumes.test_automation.given_script import GivenScript
 from xumes.test_automation.input import Input
+
+from xumes.test_automation.given_script import TestStep
 
 
 class Script(Behavior):
+
+    def __init__(self):
+        super().__init__()
+        self.given_script = None
 
     def execute(self, feature, scenario):
         try:
             self.reset()
             game_state = self.test_runner.push_action_and_get_state([])
             while True:
-                game_state = self.test_runner.push_action_and_get_state(self.step())
+                actions = self.step()
+                if isinstance(actions, TestStep):
+                    if self.given_script is None:
+                        self.given_script = GivenScript(self.test_runner)
+                    self.given_script.clean()
+                    self.given_script.add_step(actions)
+                    self.given_script.execute()
+                else:
+                    game_state = self.test_runner.push_action_and_get_state(self.step())
 
                 if self.terminated():
                     try:
@@ -30,7 +45,12 @@ class Script(Behavior):
             self.test_runner.finished()
 
     @abstractmethod
-    def step(self) -> List[Input]:
+    def step(self) -> List[Input] | TestStep:
+        """
+        Method executed at each game frame.
+
+        :return: A list of `Input` objects or an instance of `TestStep`.
+        """
         raise NotImplementedError
 
     def reset(self):

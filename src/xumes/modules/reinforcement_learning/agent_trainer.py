@@ -3,6 +3,8 @@ from typing import final, TypeVar
 
 from xumes.modules.reinforcement_learning.i_trainer import ITrainer
 
+from xumes.test_automation.given_script import TestStep, GivenScript
+
 OBST = TypeVar("OBST")
 
 
@@ -10,6 +12,7 @@ class AgentTrainer(ITrainer, ABC):
 
     def __init__(self, agent):
         self.agent = agent
+        self.given_script = None
 
     @final
     def get_reward(self):
@@ -35,5 +38,15 @@ class AgentTrainer(ITrainer, ABC):
 
     @final
     def push_actions_and_get_obs(self, actions) -> OBST:
-        self.agent.test_runner.push_action_and_get_state(self.agent.actions(actions))
+        actions = self.agent.actions(actions)
+
+        if isinstance(actions, TestStep):
+            if self.given_script is None:
+                self.given_script = GivenScript(self.agent.test_runner)
+            self.given_script.clean()
+            self.given_script.add_step(actions)
+            self.given_script.execute()
+        else:
+            self.agent.test_runner.push_action_and_get_state(actions)
+
         return self.agent.observation()

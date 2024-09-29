@@ -95,7 +95,7 @@ class VecImitatorTestManager(TestManager):
             try:
                 # If the mode is TRAIN_MODE, execute the vec_imitator
                 if self._mode == TRAIN_MODE:
-                    vec_imitator.execute(feature, None)
+                    vec_imitator.execute()
                 else:
                     raise Exception("Can only run in TRAIN_MODE")
             except SystemExit or KeyboardInterrupt:

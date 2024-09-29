@@ -33,11 +33,12 @@ def xmlConfig = """
   </properties>
   <definition class="org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition" plugin="workflow-cps@2.92">
     <script>
+
     pipeline {
         agent any
 
         parameters {
-            choice(name: "Game", choices: ['flappy_bird', 'smb', 'smb_jump_change'], description: 'The game you want to test.')
+            choice(name: "Game", choices: ['flappy_bird', 'smb', 'smb_jump_change','tanks-of-freedom-ii'], description: 'The game you want to test.')
             string(name: "Tries", defaultValue: '20')
         }
 
@@ -60,7 +61,7 @@ def xmlConfig = """
                     script {
 
                         sh \"\"\"
-                              /home/jenkins/godot-fork/bin/godot.linuxbsd.editor.x86_64.llvm --editor --path /var/jenkins_home/workspace/xumes/xumes_examples/Godot/\${params.Game} --headless &gt; godot_output.log 2&gt;&amp;1 &amp;
+                              /home/jenkins/godot-source/bin/godot.linuxbsd.editor.x86_64.llvm --editor --path \${env.WORKSPACE}/xumes_examples/Godot/\${params.Game} --headless > godot_output.log 2&gt;&amp;1 &amp;
 
                             wait_for_port() {
                               while ! nc -z localhost 8080; do
@@ -72,22 +73,25 @@ def xmlConfig = """
                         \"\"\"
 
                         def features_path = ""
+                        def options = ""
                         if (params.Game == "flappy_bird") {
                             features_path = "./Tests/PipeSizeTest/features/"
                         } else if (params.Game == "smb" || params.Game == "smb_jump_change"){
                             features_path = "./tests/features/"
+                        } else if (params.Game == "tanks-of-freedom-ii") {
+                            features_path = "./tests/features/"
+                            options = "-nv"
+
                         }
 
                         int tries = params.Tries as Integer
 
-
                         sh \"\"\"
-                            cd /var/jenkins_home/workspace/xumes/xumes_examples/Godot/\${params.Game}
-
-                            /home/jenkins/xumes_env/bin/python -m xumes test \${features_path} -i \${tries} --info -h 10
+                            cd \${env.WORKSPACE}/xumes_examples/Godot/\${params.Game}
+                            /home/jenkins/xumes_env/bin/python -m xumes test \${features_path} -i \${tries} --info -h 10 \${options}
                         \"\"\"
-
                         junit "**/test-results.xml"
+
                     }
 
                 }
@@ -95,6 +99,7 @@ def xmlConfig = """
             }
         }
 }
+
 </script>
     <sandbox>true</sandbox>
   </definition>

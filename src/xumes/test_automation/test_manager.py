@@ -16,7 +16,7 @@ from xumes.assertions.assertion_bucket import AssertionReport
 from xumes.test_automation.episode_control import DefaultEpisodeControlFactory
 from xumes.test_automation.feature_strategy import FeatureStrategy, Scenario
 from xumes.communication.i_com_game_engine import IComGameEngine
-from xumes.test_automation.registries import config_registry, given_registry, \
+from xumes.test_automation.registries import given_registry, \
     when_registry, then_registry
 
 from xumes.communication.implementations.socket_impl.com_game_instance_socket import ComGameInstanceSocket
@@ -145,7 +145,7 @@ class TestManager:
                 for scenario in feature.scenarios:
                     tags = ', '.join(scenario.tags)
                     wrapped_tags = textwrap.fill(tags, width=50, subsequent_indent=' ' * 8)
-                    table_data.append([f"  {scenario.name}", f"{scenario.steps}.py", wrapped_tags])
+                    table_data.append([f"  {scenario.name}", f"{scenario.steps}", wrapped_tags])
 
             # Define table headers
             headers = [bcolors.UNDERLINE + bcolors.BOLD + "Feature/Scenario" + bcolors.ENDC,
@@ -261,7 +261,7 @@ class TestManager:
             self.add_test_runner_data(scenario=scenario, ip="127.0.0.1", port=0)
 
             registry_queue = multiprocess.Queue()
-            registry_queue.put((config_registry, given_registry, when_registry, then_registry))
+            registry_queue.put((given_registry, when_registry, then_registry))
 
             test_runner = TestRunner(GameInstanceService(ComGameInstanceSocket(host="127.0.0.1")),
                                      self._timesteps, self._iterations, self._mode, scenario.feature.name,
@@ -272,7 +272,8 @@ class TestManager:
 
             self._scenario_datas[scenario].test_runner = test_runner
 
-            methods = test_runner.config()
+            test_runner.given()
+            methods = test_runner.engine_driver()
 
             scenarios_methods.append({
                 "name": scenario.name,

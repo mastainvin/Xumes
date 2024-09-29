@@ -1,9 +1,11 @@
 from abc import abstractmethod
 
+from xumes.test_automation.given_script import HasContext
 from xumes.test_automation.test_runner import TestRunner
 
 
-class Behavior:
+
+class Behavior(HasContext):
 
     def __init__(self):
         self._test_runner: TestRunner = None

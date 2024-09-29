@@ -35,6 +35,7 @@ Welcome to Xumes! 🤖 ✔️
    agent
    script
    imitable
+   test_step
 
 .. toctree::
    :maxdepth: 1

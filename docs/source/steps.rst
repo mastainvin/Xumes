@@ -11,14 +11,10 @@ Example of a steps file:
 
 .. code:: python
 
-    @config
-    def config(context):
-        context.driver.set_scene("res://Tests/PipeSizeTest/PipeSizeTest.tscn")
-
-
     @given("first pipe at {i:f} and second pipe at {j:f}")
     def step_impl(context, i, j):
-        context.driver.set_pipes_position(i, j)
+        context.engine_driver.set_scene("res://Tests/PipeSizeTest/PipeSizeTest.tscn")
+        context.instance_driver.set_pipes_position(i, j)
 
 
     @when("bird flies")
@@ -35,15 +31,6 @@ Example of a steps file:
 Each step file while require to implement the following methods using
 python decorators:
 
-
-.. method:: @config
-
-   :type: Method
-   :description: This method will be executed before the tests. It will set up the game instance.
-
-.. important::
-
-    In `Godot` you have to call the method `set_scene` and pass the path to the scene you want to test.
 
 .. method:: @given(step_description)
 
@@ -80,20 +67,30 @@ For instance, if you want to get the player health, you can do it like this:
    player_health = test_context.player.health
 
 
+Set-Up the test with the `engine_driver` (in @given)
+----------------------------------------------------
 
-Call game methods (in `@config` and `@given`)
----------------------------------------------
-
-You can call game methods in the `@config` and `@given` methods. For instance, if you want to set the player health to 100, you can do it like this:
+Engines could need to be setup before starting the test. This is the role of the `engine_driver`. For instance, in Godot. You need to chose the scene that will be instanced.
 
 .. code:: python
 
-   test_context.set_player_health(100)
+    test_context.engine_driver.set_scene("res://tests/integration/pipe_height.tscn")
+
+
+Call game methods with the `instance_driver` (in `@given`)
+----------------------------------------------------------
+
+You can call game methods in the `@given` method. For instance, if you want to set the player health to 100, you can do it like this:
+
+.. code:: python
+
+   test_context.instance_driver.set_player_health(100)
 
 
 .. note::
 
     In `Godot` those methods need to be exposed in the script of the `FeatureNode` root.
+
 
 
 

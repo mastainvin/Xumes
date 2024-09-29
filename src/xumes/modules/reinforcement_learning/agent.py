@@ -6,6 +6,7 @@ from xumes.core.model_helper import model_path
 from xumes.core.modes import TEST_MODE, TRAIN_MODE
 from xumes.test_automation.behavior import Behavior
 from xumes.modules.reinforcement_learning.stable_baselines_trainer import StableBaselinesTrainer
+from xumes.test_automation.given_script import TestStep
 from xumes.test_automation.input import Input
 
 OBST = TypeVar("OBST")
@@ -21,6 +22,16 @@ class Agent(Behavior, ABC):
         - `_logs_path` (Optional[str]): The path to save training logs.
         - `_logs_name` (Optional[str]): The name of the log files.
         - `_previous_model_path` (Optional[str]): The path to a pre-trained model, if available.
+
+    Stables Baselines Attributes:
+        - `observation_space` (gymnasium.spaces.Space): The observation space.
+        - `action_space` (gymnasium.spaces.Space): The action space.
+        - `max_episode_length` (int): The maximum length of an episode.
+        - `total_timesteps` (int): The total number of timesteps.
+        - `algorithm_type` str: The algorithm type.
+        - `algorithm` stable_baselines3.base.BaseAlgorithm: The algorithm instance.
+        - `save_path` (str): The path to save the trained
+        - `eval_freq` (int): The evaluation frequency during training.
     """
 
     def __init__(self, save_path: str = None, eval_freq: int = 1000, logs_path: Optional[str] = None,
@@ -140,7 +151,7 @@ class Agent(Behavior, ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def actions(self, raws_actions) -> List[Input]:
+    def actions(self, raws_actions) -> List[Input] | TestStep:
         """
         Abstract method to obtain the list of possible actions for the agent.
 

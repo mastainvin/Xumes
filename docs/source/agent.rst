@@ -3,6 +3,9 @@ Agent Class
 
 The ``Agent`` class extends the ``Behavior`` class and represents a machine learning agent that interacts with the game. It implements a reinforcement learning approach for predicting actions.
 
+.. autoclass:: xumes.Agent
+    :members: observation,reward,terminated,actions
+
 Exemple
 -------
 
@@ -62,76 +65,5 @@ Here is an example from the ``FlappyBird`` game, where the agent is a bird that 
 .. note:: As you can see I defined a attribute `points` to store the current score of the agent. In the ``terminated`` method, I reset the points to 0 when the episode is terminated.
 
 
-Attributes
-----------
 
-- `_save_path` (str): The path to save the trained model.
-- `_eval_freq` (int): The evaluation frequency during training.
-- `_logs_path` (Optional[str]): The path to save training logs.
-- `_logs_name` (Optional[str]): The name of the log files.
-- `_previous_model_path` (Optional[str]): The path to a pre-trained model, if available.
 
-and `stable_baselines3` attributes:
-
-- `observation_space` (gymnasium.spaces.Space): The observation space.
-- `action_space` (gymnasium.spaces.Space): The action space.
-- `max_episode_length` (int): The maximum length of an episode.
-- `total_timesteps` (int): The total number of timesteps.
-- `algorithm_type` str: The algorithm type.
-- `algorithm` stable_baselines3.base.BaseAlgorithm: The algorithm instance.
-- `save_path` (str): The path to save the trained
-- `eval_freq` (int): The evaluation frequency during training.
-
-Abstract Methods
-----------------
-
-These methods must be implemented by any class that inherits from `Agent`.
-
-.. automethod:: Agent.observation
-    :noindex:
-
-.. automethod:: Agent.reward
-    :noindex:
-
-.. automethod:: Agent.terminated
-    :noindex:
-
-.. automethod:: Agent.actions
-    :noindex:
-
-Abstract Methods Details
-------------------------
-
-.. _Agent.observation:
-
-observation(self) -> OBST
-    Abstract method to obtain observations from the environment.
-
-    :return: The observations from the environment.
-    :rtype: OBST
-
-.. _Agent.reward:
-
-reward(self) -> float
-    Abstract method to obtain the agent's current reward.
-
-    :return: The current reward.
-    :rtype: float
-
-.. _Agent.terminated:
-
-terminated(self) -> bool
-    Abstract method to check if the episode is terminated.
-
-    :return: True if the episode is terminated, otherwise False.
-    :rtype: bool
-
-.. _Agent.actions:
-
-actions(self, raws_actions) -> List
-    Abstract method to obtain the list of possible actions for the agent.
-
-    :param raws_actions: The raw actions to process.
-    :type raws_actions: any
-    :return: The list of possible actions.
-    :rtype: List

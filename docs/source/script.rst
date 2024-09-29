@@ -8,12 +8,8 @@ The `Script` class allows the user to create his own script has behavior. The sc
     The script can contains `Agent` objects and use all kind of algorithms to make decisions (ML, Metaheuristics).
 
 
-The `Script` class extends the `Behavior`.
-
-Methods that need to be implemented:
-
-- `def step(self) -> List[Dict[str, Any]]:`
-- `def terminated(self): -> bool`
+.. autoclass:: xumes.Script
+    :members: step, terminated
 
 Example of a script that use an two ML models and make a random decision 10% of the time:
 

@@ -62,7 +62,7 @@ def split_names(names: str) -> List[str]:
 @click.option("--steps_path", default=None, type=click.Path(), help="Path of the ./steps folder.")
 @click.option("--alpha", "-a", default=0.001, help="Alpha of the training.")
 @click.option("--fps", default=-1, help="Limit of FPS.")
-@click.option("--headless", is_flag=False, help="Run the game in headless mode.")
+@click.option("--headless", is_flag=True, help="Run the game in headless mode.")
 @click.option("-h", default=-1, help="Headless and fix FPS.")
 def test(debug, features_path, steps_path, iterations, info, log, alpha,
          features,
@@ -70,6 +70,7 @@ def test(debug, features_path, steps_path, iterations, info, log, alpha,
          tags,
          not_vectorize,
          fps, headless, h):
+
     if iterations is not None:
         iterations = int(iterations)
     else:

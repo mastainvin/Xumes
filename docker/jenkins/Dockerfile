@@ -11,15 +11,19 @@ RUN python3 -m venv /home/jenkins/xumes_env
 
 RUN /home/jenkins/xumes_env/bin/pip install --upgrade pip setuptools
 
-RUN git clone https://github.com/mastainvin/godot.git /home/jenkins/godot-fork
+RUN git clone https://github.com/godotengine/godot.git /home/jenkins/godot-source && \
+    cd /home/jenkins/godot-source && \
+    git checkout 4.2
 
-RUN cd /home/jenkins/godot-fork && \
-    git checkout xumes && \
+RUN git clone https://github.com/mastainvin/xumes-godot-module.git /home/jenkins/godot-source/modules/xumes
+
+RUN cd /home/jenkins/godot-source && \
     scons platform=linuxbsd use_llvm=yes -j2
 
 RUN mkdir -p /home/jenkins/xumes
 
-COPY ../../ /home/jenkins/xumes/
+# Copier tout le projet dans le dossier cible
+COPY ./ /home/jenkins/xumes/
 
 RUN /home/jenkins/xumes_env/bin/pip install --no-cache-dir /home/jenkins/xumes
 
